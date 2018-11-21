@@ -21,3 +21,4 @@ var/
 
 # vscode directories
 .vscode
+__pycache__
