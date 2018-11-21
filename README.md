@@ -1,3 +1,19 @@
+# edu-serverless
+
+Write the code below to ~/.aws/credentials
+
+```
+[eduDev]
+aws_access_key_id=***
+aws_secret_access_key=***
+aws_region=***
+
+[eduProd]
+aws_access_key_id=***
+aws_secret_access_key=***
+aws_region=***
+```
+
 # math-engine
 
 ## Known problems with converting latex to sympy with latex2sympy
