@@ -14,6 +14,14 @@ aws_secret_access_key=***
 aws_region=***
 ```
 
+### To deploy dev endpoint
+
+run `sls deploy`
+
+### To deploy prod endpoint
+
+run `sls deploy --prod`
+
 # math-engine
 
 ## Known problems with converting latex to sympy with latex2sympy
