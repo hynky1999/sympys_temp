@@ -4,7 +4,7 @@ from checks import equiv_symbolic, string_match, is_expanded
 from checks import parse_checks, check_func
 
 def handle(event, context):
-    body = event["body"]
+    body = json.dumps(event["body"])
 
     if body["input"] is None or\
        body["expected"] is None or\
