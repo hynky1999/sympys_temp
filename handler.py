@@ -4,8 +4,7 @@ from checks import equiv_symbolic, string_match, is_expanded
 from checks import parse_checks, check_func
 
 def handle(event, context):
-    body = json.dumps(event["body"])
-
+    body = json.loads(event["body"])
     if body["input"] is None or\
        body["expected"] is None or\
        body["checks"] is None:
@@ -34,10 +33,6 @@ def handle(event, context):
     return response
 
 # res = handle({
-#     "body": {
-#         "input": "\\frac{1}{2}",
-#         "expected": "0.5",
-#         "checks": "equivLiteral"
-#     }
+#     "body": "{\"input\": \"\\\\frac{1}{2}\", \"expected\": \"0.5\", \"checks\": \"equivLiteral\"}"
 # }, {})
 # print(res)
