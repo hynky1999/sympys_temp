@@ -8,7 +8,7 @@ service: edu # NOTE: update this with your service name
 provider:
   name: aws
   role: eduLambdaRole
-  runtime: python3.6
+  runtime: python3.7
   timeout: 30
   stage: ${opt:stage, self:custom.defaultStage}
   profile: ${self:custom.profiles.${self:provider.stage}}
