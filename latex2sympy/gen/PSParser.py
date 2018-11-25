@@ -1,13 +1,11 @@
-# Generated from PS.g4 by ANTLR 4.7.1
+# Generated from PS.g4 by ANTLR 4.5.3
 # encoding: utf-8
 from antlr4 import *
 from io import StringIO
-from typing.io import TextIO
-import sys
 
 def serializedATN():
     with StringIO() as buf:
-        buf.write("\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3;")
+        buf.write("\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3;")
         buf.write("\u01a2\4\2\t\2\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7")
         buf.write("\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t\13\4\f\t\f\4\r\t\r\4\16")
         buf.write("\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22\4\23\t\23")
@@ -51,11 +49,11 @@ def serializedATN():
         buf.write("\3\"\5\"\u0196\n\"\3#\3#\3#\3#\3#\3$\3$\3$\3$\3$\3$\2")
         buf.write("\b\4\n\f\16 \"%\2\4\6\b\n\f\16\20\22\24\26\30\32\34\36")
         buf.write(" \"$&(*,.\60\62\64\668:<>@BDF\2\b\3\2\659\3\2\5\6\5\2")
-        buf.write("\7\b*,\61\61\4\2\63\63;;\3\2\25(\3\2\23\24\2\u01b9\2H")
-        buf.write("\3\2\2\2\4J\3\2\2\2\6U\3\2\2\2\bY\3\2\2\2\n[\3\2\2\2\f")
-        buf.write("f\3\2\2\2\16q\3\2\2\2\20\u0083\3\2\2\2\22\u008e\3\2\2")
-        buf.write("\2\24\u0090\3\2\2\2\26\u0097\3\2\2\2\30\u00a0\3\2\2\2")
-        buf.write("\32\u00a2\3\2\2\2\34\u00aa\3\2\2\2\36\u00b2\3\2\2\2 \u00ba")
+        buf.write("\7\b*,\61\61\4\2\63\63;;\3\2\25(\3\2\23\24\u01b9\2H\3")
+        buf.write("\2\2\2\4J\3\2\2\2\6U\3\2\2\2\bY\3\2\2\2\n[\3\2\2\2\ff")
+        buf.write("\3\2\2\2\16q\3\2\2\2\20\u0083\3\2\2\2\22\u008e\3\2\2\2")
+        buf.write("\24\u0090\3\2\2\2\26\u0097\3\2\2\2\30\u00a0\3\2\2\2\32")
+        buf.write("\u00a2\3\2\2\2\34\u00aa\3\2\2\2\36\u00b2\3\2\2\2 \u00ba")
         buf.write("\3\2\2\2\"\u00ce\3\2\2\2$\u00e7\3\2\2\2&\u00ed\3\2\2\2")
         buf.write("(\u00fb\3\2\2\2*\u00fd\3\2\2\2,\u0108\3\2\2\2.\u010a\3")
         buf.write("\2\2\2\60\u0112\3\2\2\2\62\u0115\3\2\2\2\64\u011d\3\2")
@@ -344,9 +342,9 @@ class PSParser ( Parser ):
     BANG=56
     SYMBOL=57
 
-    def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
-        super().__init__(input, output)
-        self.checkVersion("4.7.1")
+    def __init__(self, input:TokenStream):
+        super().__init__(input)
+        self.checkVersion("4.5.3")
         self._interp = ParserATNSimulator(self, self.atn, self.decisionsToDFA, self.sharedContextCache)
         self._predicates = None
 
@@ -469,7 +467,6 @@ class PSParser ( Parser ):
                     if not((((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << PSParser.EQUAL) | (1 << PSParser.LT) | (1 << PSParser.LTE) | (1 << PSParser.GT) | (1 << PSParser.GTE))) != 0)):
                         self._errHandler.recoverInline(self)
                     else:
-                        self._errHandler.reportMatch(self)
                         self.consume()
                     self.state = 77
                     self.relation(3) 
@@ -643,7 +640,6 @@ class PSParser ( Parser ):
                     if not(_la==PSParser.ADD or _la==PSParser.SUB):
                         self._errHandler.recoverInline(self)
                     else:
-                        self._errHandler.reportMatch(self)
                         self.consume()
                     self.state = 94
                     self.additive(3) 
@@ -739,7 +735,6 @@ class PSParser ( Parser ):
                     if not((((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << PSParser.MUL) | (1 << PSParser.DIV) | (1 << PSParser.CMD_TIMES) | (1 << PSParser.CMD_CDOT) | (1 << PSParser.CMD_DIV) | (1 << PSParser.COLON))) != 0)):
                         self._errHandler.recoverInline(self)
                     else:
-                        self._errHandler.reportMatch(self)
                         self.consume()
                     self.state = 105
                     self.mp(3) 
@@ -835,7 +830,6 @@ class PSParser ( Parser ):
                     if not((((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << PSParser.MUL) | (1 << PSParser.DIV) | (1 << PSParser.CMD_TIMES) | (1 << PSParser.CMD_CDOT) | (1 << PSParser.CMD_DIV) | (1 << PSParser.COLON))) != 0)):
                         self._errHandler.recoverInline(self)
                     else:
-                        self._errHandler.reportMatch(self)
                         self.consume()
                     self.state = 116
                     self.mp_nofunc(3) 
@@ -895,7 +889,6 @@ class PSParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.state = 129
-            self._errHandler.sync(self)
             token = self._input.LA(1)
             if token in [PSParser.ADD, PSParser.SUB]:
                 self.enterOuterAlt(localctx, 1)
@@ -904,11 +897,10 @@ class PSParser ( Parser ):
                 if not(_la==PSParser.ADD or _la==PSParser.SUB):
                     self._errHandler.recoverInline(self)
                 else:
-                    self._errHandler.reportMatch(self)
                     self.consume()
                 self.state = 123
                 self.unary()
-                pass
+
             elif token in [PSParser.L_PAREN, PSParser.L_BRACE, PSParser.L_BRACKET, PSParser.BAR, PSParser.FUNC_LIM, PSParser.FUNC_INT, PSParser.FUNC_SUM, PSParser.FUNC_PROD, PSParser.FUNC_LOG, PSParser.FUNC_LN, PSParser.FUNC_SIN, PSParser.FUNC_COS, PSParser.FUNC_TAN, PSParser.FUNC_CSC, PSParser.FUNC_SEC, PSParser.FUNC_COT, PSParser.FUNC_ARCSIN, PSParser.FUNC_ARCCOS, PSParser.FUNC_ARCTAN, PSParser.FUNC_ARCCSC, PSParser.FUNC_ARCSEC, PSParser.FUNC_ARCCOT, PSParser.FUNC_SINH, PSParser.FUNC_COSH, PSParser.FUNC_TANH, PSParser.FUNC_ARSINH, PSParser.FUNC_ARCOSH, PSParser.FUNC_ARTANH, PSParser.FUNC_SQRT, PSParser.CMD_FRAC, PSParser.CMD_MATHIT, PSParser.DIFFERENTIAL, PSParser.LETTER, PSParser.NUMBER, PSParser.SYMBOL]:
                 self.enterOuterAlt(localctx, 2)
                 self.state = 125 
@@ -925,7 +917,7 @@ class PSParser ( Parser ):
                     self._errHandler.sync(self)
                     _alt = self._interp.adaptivePredict(self._input,4,self._ctx)
 
-                pass
+
             else:
                 raise NoViableAltException(self)
 
@@ -985,7 +977,6 @@ class PSParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.state = 140
-            self._errHandler.sync(self)
             token = self._input.LA(1)
             if token in [PSParser.ADD, PSParser.SUB]:
                 self.enterOuterAlt(localctx, 1)
@@ -994,11 +985,10 @@ class PSParser ( Parser ):
                 if not(_la==PSParser.ADD or _la==PSParser.SUB):
                     self._errHandler.recoverInline(self)
                 else:
-                    self._errHandler.reportMatch(self)
                     self.consume()
                 self.state = 132
                 self.unary_nofunc()
-                pass
+
             elif token in [PSParser.L_PAREN, PSParser.L_BRACE, PSParser.L_BRACKET, PSParser.BAR, PSParser.FUNC_LIM, PSParser.FUNC_INT, PSParser.FUNC_SUM, PSParser.FUNC_PROD, PSParser.FUNC_LOG, PSParser.FUNC_LN, PSParser.FUNC_SIN, PSParser.FUNC_COS, PSParser.FUNC_TAN, PSParser.FUNC_CSC, PSParser.FUNC_SEC, PSParser.FUNC_COT, PSParser.FUNC_ARCSIN, PSParser.FUNC_ARCCOS, PSParser.FUNC_ARCTAN, PSParser.FUNC_ARCCSC, PSParser.FUNC_ARCSEC, PSParser.FUNC_ARCCOT, PSParser.FUNC_SINH, PSParser.FUNC_COSH, PSParser.FUNC_TANH, PSParser.FUNC_ARSINH, PSParser.FUNC_ARCOSH, PSParser.FUNC_ARTANH, PSParser.FUNC_SQRT, PSParser.CMD_FRAC, PSParser.CMD_MATHIT, PSParser.DIFFERENTIAL, PSParser.LETTER, PSParser.NUMBER, PSParser.SYMBOL]:
                 self.enterOuterAlt(localctx, 2)
                 self.state = 133
@@ -1014,7 +1004,7 @@ class PSParser ( Parser ):
                     self._errHandler.sync(self)
                     _alt = self._interp.adaptivePredict(self._input,6,self._ctx)
 
-                pass
+
             else:
                 raise NoViableAltException(self)
 
@@ -1175,18 +1165,17 @@ class PSParser ( Parser ):
         self.enterRule(localctx, 22, self.RULE_postfix_op)
         try:
             self.state = 158
-            self._errHandler.sync(self)
             token = self._input.LA(1)
             if token in [PSParser.BANG]:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 156
                 self.match(PSParser.BANG)
-                pass
+
             elif token in [PSParser.BAR]:
                 self.enterOuterAlt(localctx, 2)
                 self.state = 157
                 self.eval_at()
-                pass
+
             else:
                 raise NoViableAltException(self)
 
@@ -1238,7 +1227,7 @@ class PSParser ( Parser ):
             self.state = 160
             self.match(PSParser.BAR)
             self.state = 166
-            self._errHandler.sync(self)
+            self._errHandler.sync(self);
             la_ = self._interp.adaptivePredict(self._input,11,self._ctx)
             if la_ == 1:
                 self.state = 161
@@ -1314,7 +1303,7 @@ class PSParser ( Parser ):
             self.state = 169
             self.match(PSParser.L_BRACE)
             self.state = 172
-            self._errHandler.sync(self)
+            self._errHandler.sync(self);
             la_ = self._interp.adaptivePredict(self._input,12,self._ctx)
             if la_ == 1:
                 self.state = 170
@@ -1385,7 +1374,7 @@ class PSParser ( Parser ):
             self.state = 177
             self.match(PSParser.L_BRACE)
             self.state = 180
-            self._errHandler.sync(self)
+            self._errHandler.sync(self);
             la_ = self._interp.adaptivePredict(self._input,13,self._ctx)
             if la_ == 1:
                 self.state = 178
@@ -1485,12 +1474,11 @@ class PSParser ( Parser ):
                     self.state = 188
                     self.match(PSParser.CARET)
                     self.state = 194
-                    self._errHandler.sync(self)
                     token = self._input.LA(1)
                     if token in [PSParser.CMD_MATHIT, PSParser.DIFFERENTIAL, PSParser.LETTER, PSParser.NUMBER, PSParser.SYMBOL]:
                         self.state = 189
                         self.atom()
-                        pass
+
                     elif token in [PSParser.L_BRACE]:
                         self.state = 190
                         self.match(PSParser.L_BRACE)
@@ -1498,12 +1486,12 @@ class PSParser ( Parser ):
                         self.expr()
                         self.state = 192
                         self.match(PSParser.R_BRACE)
-                        pass
+
                     else:
                         raise NoViableAltException(self)
 
                     self.state = 197
-                    self._errHandler.sync(self)
+                    self._errHandler.sync(self);
                     la_ = self._interp.adaptivePredict(self._input,15,self._ctx)
                     if la_ == 1:
                         self.state = 196
@@ -1599,12 +1587,11 @@ class PSParser ( Parser ):
                     self.state = 208
                     self.match(PSParser.CARET)
                     self.state = 214
-                    self._errHandler.sync(self)
                     token = self._input.LA(1)
                     if token in [PSParser.CMD_MATHIT, PSParser.DIFFERENTIAL, PSParser.LETTER, PSParser.NUMBER, PSParser.SYMBOL]:
                         self.state = 209
                         self.atom()
-                        pass
+
                     elif token in [PSParser.L_BRACE]:
                         self.state = 210
                         self.match(PSParser.L_BRACE)
@@ -1612,12 +1599,12 @@ class PSParser ( Parser ):
                         self.expr()
                         self.state = 212
                         self.match(PSParser.R_BRACE)
-                        pass
+
                     else:
                         raise NoViableAltException(self)
 
                     self.state = 217
-                    self._errHandler.sync(self)
+                    self._errHandler.sync(self);
                     la_ = self._interp.adaptivePredict(self._input,18,self._ctx)
                     if la_ == 1:
                         self.state = 216
@@ -1682,7 +1669,7 @@ class PSParser ( Parser ):
         self.enterRule(localctx, 34, self.RULE_comp)
         try:
             self.state = 229
-            self._errHandler.sync(self)
+            self._errHandler.sync(self);
             la_ = self._interp.adaptivePredict(self._input,20,self._ctx)
             if la_ == 1:
                 self.enterOuterAlt(localctx, 1)
@@ -1765,28 +1752,27 @@ class PSParser ( Parser ):
         self.enterRule(localctx, 36, self.RULE_comp_nofunc)
         try:
             self.state = 235
-            self._errHandler.sync(self)
             token = self._input.LA(1)
             if token in [PSParser.L_PAREN, PSParser.L_BRACE, PSParser.L_BRACKET]:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 231
                 self.group()
-                pass
+
             elif token in [PSParser.BAR]:
                 self.enterOuterAlt(localctx, 2)
                 self.state = 232
                 self.abs_group()
-                pass
+
             elif token in [PSParser.CMD_MATHIT, PSParser.DIFFERENTIAL, PSParser.LETTER, PSParser.NUMBER, PSParser.SYMBOL]:
                 self.enterOuterAlt(localctx, 3)
                 self.state = 233
                 self.atom()
-                pass
+
             elif token in [PSParser.CMD_FRAC]:
                 self.enterOuterAlt(localctx, 4)
                 self.state = 234
                 self.frac()
-                pass
+
             else:
                 raise NoViableAltException(self)
 
@@ -1846,7 +1832,6 @@ class PSParser ( Parser ):
         self.enterRule(localctx, 38, self.RULE_group)
         try:
             self.state = 249
-            self._errHandler.sync(self)
             token = self._input.LA(1)
             if token in [PSParser.L_PAREN]:
                 self.enterOuterAlt(localctx, 1)
@@ -1856,7 +1841,7 @@ class PSParser ( Parser ):
                 self.expr()
                 self.state = 239
                 self.match(PSParser.R_PAREN)
-                pass
+
             elif token in [PSParser.L_BRACKET]:
                 self.enterOuterAlt(localctx, 2)
                 self.state = 241
@@ -1865,7 +1850,7 @@ class PSParser ( Parser ):
                 self.expr()
                 self.state = 243
                 self.match(PSParser.R_BRACKET)
-                pass
+
             elif token in [PSParser.L_BRACE]:
                 self.enterOuterAlt(localctx, 3)
                 self.state = 245
@@ -1874,7 +1859,7 @@ class PSParser ( Parser ):
                 self.expr()
                 self.state = 247
                 self.match(PSParser.R_BRACE)
-                pass
+
             else:
                 raise NoViableAltException(self)
 
@@ -1983,7 +1968,6 @@ class PSParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.state = 262
-            self._errHandler.sync(self)
             token = self._input.LA(1)
             if token in [PSParser.LETTER, PSParser.SYMBOL]:
                 self.enterOuterAlt(localctx, 1)
@@ -1992,32 +1976,31 @@ class PSParser ( Parser ):
                 if not(_la==PSParser.LETTER or _la==PSParser.SYMBOL):
                     self._errHandler.recoverInline(self)
                 else:
-                    self._errHandler.reportMatch(self)
                     self.consume()
                 self.state = 257
-                self._errHandler.sync(self)
+                self._errHandler.sync(self);
                 la_ = self._interp.adaptivePredict(self._input,23,self._ctx)
                 if la_ == 1:
                     self.state = 256
                     self.subexpr()
 
 
-                pass
+
             elif token in [PSParser.NUMBER]:
                 self.enterOuterAlt(localctx, 2)
                 self.state = 259
                 self.match(PSParser.NUMBER)
-                pass
+
             elif token in [PSParser.DIFFERENTIAL]:
                 self.enterOuterAlt(localctx, 3)
                 self.state = 260
                 self.match(PSParser.DIFFERENTIAL)
-                pass
+
             elif token in [PSParser.CMD_MATHIT]:
                 self.enterOuterAlt(localctx, 4)
                 self.state = 261
                 self.mathit()
-                pass
+
             else:
                 raise NoViableAltException(self)
 
@@ -2299,7 +2282,6 @@ class PSParser ( Parser ):
             if not((((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << PSParser.FUNC_LOG) | (1 << PSParser.FUNC_LN) | (1 << PSParser.FUNC_SIN) | (1 << PSParser.FUNC_COS) | (1 << PSParser.FUNC_TAN) | (1 << PSParser.FUNC_CSC) | (1 << PSParser.FUNC_SEC) | (1 << PSParser.FUNC_COT) | (1 << PSParser.FUNC_ARCSIN) | (1 << PSParser.FUNC_ARCCOS) | (1 << PSParser.FUNC_ARCTAN) | (1 << PSParser.FUNC_ARCCSC) | (1 << PSParser.FUNC_ARCSEC) | (1 << PSParser.FUNC_ARCCOT) | (1 << PSParser.FUNC_SINH) | (1 << PSParser.FUNC_COSH) | (1 << PSParser.FUNC_TANH) | (1 << PSParser.FUNC_ARSINH) | (1 << PSParser.FUNC_ARCOSH) | (1 << PSParser.FUNC_ARTANH))) != 0)):
                 self._errHandler.recoverInline(self)
             else:
-                self._errHandler.reportMatch(self)
                 self.consume()
         except RecognitionException as re:
             localctx.exception = re
@@ -2431,18 +2413,16 @@ class PSParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.state = 358
-            self._errHandler.sync(self)
             token = self._input.LA(1)
             if token in [PSParser.FUNC_LOG, PSParser.FUNC_LN, PSParser.FUNC_SIN, PSParser.FUNC_COS, PSParser.FUNC_TAN, PSParser.FUNC_CSC, PSParser.FUNC_SEC, PSParser.FUNC_COT, PSParser.FUNC_ARCSIN, PSParser.FUNC_ARCCOS, PSParser.FUNC_ARCTAN, PSParser.FUNC_ARCCSC, PSParser.FUNC_ARCSEC, PSParser.FUNC_ARCCOT, PSParser.FUNC_SINH, PSParser.FUNC_COSH, PSParser.FUNC_TANH, PSParser.FUNC_ARSINH, PSParser.FUNC_ARCOSH, PSParser.FUNC_ARTANH]:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 285
                 self.func_normal()
                 self.state = 298
-                self._errHandler.sync(self)
+                self._errHandler.sync(self);
                 la_ = self._interp.adaptivePredict(self._input,30,self._ctx)
                 if la_ == 1:
                     self.state = 287
-                    self._errHandler.sync(self)
                     _la = self._input.LA(1)
                     if _la==PSParser.UNDERSCORE:
                         self.state = 286
@@ -2450,7 +2430,6 @@ class PSParser ( Parser ):
 
 
                     self.state = 290
-                    self._errHandler.sync(self)
                     _la = self._input.LA(1)
                     if _la==PSParser.CARET:
                         self.state = 289
@@ -2461,7 +2440,6 @@ class PSParser ( Parser ):
 
                 elif la_ == 2:
                     self.state = 293
-                    self._errHandler.sync(self)
                     _la = self._input.LA(1)
                     if _la==PSParser.CARET:
                         self.state = 292
@@ -2469,7 +2447,6 @@ class PSParser ( Parser ):
 
 
                     self.state = 296
-                    self._errHandler.sync(self)
                     _la = self._input.LA(1)
                     if _la==PSParser.UNDERSCORE:
                         self.state = 295
@@ -2480,7 +2457,7 @@ class PSParser ( Parser ):
 
 
                 self.state = 305
-                self._errHandler.sync(self)
+                self._errHandler.sync(self);
                 la_ = self._interp.adaptivePredict(self._input,31,self._ctx)
                 if la_ == 1:
                     self.state = 300
@@ -2497,7 +2474,7 @@ class PSParser ( Parser ):
                     pass
 
 
-                pass
+
             elif token in [PSParser.LETTER, PSParser.SYMBOL]:
                 self.enterOuterAlt(localctx, 2)
                 self.state = 307
@@ -2505,10 +2482,8 @@ class PSParser ( Parser ):
                 if not(_la==PSParser.LETTER or _la==PSParser.SYMBOL):
                     self._errHandler.recoverInline(self)
                 else:
-                    self._errHandler.reportMatch(self)
                     self.consume()
                 self.state = 309
-                self._errHandler.sync(self)
                 _la = self._input.LA(1)
                 if _la==PSParser.UNDERSCORE:
                     self.state = 308
@@ -2521,13 +2496,12 @@ class PSParser ( Parser ):
                 self.args()
                 self.state = 313
                 self.match(PSParser.R_PAREN)
-                pass
+
             elif token in [PSParser.FUNC_INT]:
                 self.enterOuterAlt(localctx, 3)
                 self.state = 315
                 self.match(PSParser.FUNC_INT)
                 self.state = 322
-                self._errHandler.sync(self)
                 token = self._input.LA(1)
                 if token in [PSParser.UNDERSCORE]:
                     self.state = 316
@@ -2544,13 +2518,13 @@ class PSParser ( Parser ):
                 elif token in [PSParser.ADD, PSParser.SUB, PSParser.L_PAREN, PSParser.L_BRACE, PSParser.L_BRACKET, PSParser.BAR, PSParser.FUNC_LIM, PSParser.FUNC_INT, PSParser.FUNC_SUM, PSParser.FUNC_PROD, PSParser.FUNC_LOG, PSParser.FUNC_LN, PSParser.FUNC_SIN, PSParser.FUNC_COS, PSParser.FUNC_TAN, PSParser.FUNC_CSC, PSParser.FUNC_SEC, PSParser.FUNC_COT, PSParser.FUNC_ARCSIN, PSParser.FUNC_ARCCOS, PSParser.FUNC_ARCTAN, PSParser.FUNC_ARCCSC, PSParser.FUNC_ARCSEC, PSParser.FUNC_ARCCOT, PSParser.FUNC_SINH, PSParser.FUNC_COSH, PSParser.FUNC_TANH, PSParser.FUNC_ARSINH, PSParser.FUNC_ARCOSH, PSParser.FUNC_ARTANH, PSParser.FUNC_SQRT, PSParser.CMD_FRAC, PSParser.CMD_MATHIT, PSParser.DIFFERENTIAL, PSParser.LETTER, PSParser.NUMBER, PSParser.SYMBOL]:
                     pass
                 else:
-                    pass
+                    raise NoViableAltException(self)
                 self.state = 330
-                self._errHandler.sync(self)
+                self._errHandler.sync(self);
                 la_ = self._interp.adaptivePredict(self._input,35,self._ctx)
                 if la_ == 1:
                     self.state = 325
-                    self._errHandler.sync(self)
+                    self._errHandler.sync(self);
                     la_ = self._interp.adaptivePredict(self._input,34,self._ctx)
                     if la_ == 1:
                         self.state = 324
@@ -2572,13 +2546,12 @@ class PSParser ( Parser ):
                     pass
 
 
-                pass
+
             elif token in [PSParser.FUNC_SQRT]:
                 self.enterOuterAlt(localctx, 4)
                 self.state = 332
                 self.match(PSParser.FUNC_SQRT)
                 self.state = 337
-                self._errHandler.sync(self)
                 _la = self._input.LA(1)
                 if _la==PSParser.L_BRACKET:
                     self.state = 333
@@ -2595,7 +2568,7 @@ class PSParser ( Parser ):
                 localctx.base = self.expr()
                 self.state = 341
                 self.match(PSParser.R_BRACE)
-                pass
+
             elif token in [PSParser.FUNC_SUM, PSParser.FUNC_PROD]:
                 self.enterOuterAlt(localctx, 5)
                 self.state = 343
@@ -2603,29 +2576,27 @@ class PSParser ( Parser ):
                 if not(_la==PSParser.FUNC_SUM or _la==PSParser.FUNC_PROD):
                     self._errHandler.recoverInline(self)
                 else:
-                    self._errHandler.reportMatch(self)
                     self.consume()
                 self.state = 350
-                self._errHandler.sync(self)
                 token = self._input.LA(1)
                 if token in [PSParser.UNDERSCORE]:
                     self.state = 344
                     self.subeq()
                     self.state = 345
                     self.supexpr()
-                    pass
+
                 elif token in [PSParser.CARET]:
                     self.state = 347
                     self.supexpr()
                     self.state = 348
                     self.subeq()
-                    pass
+
                 else:
                     raise NoViableAltException(self)
 
                 self.state = 352
                 self.mp(0)
-                pass
+
             elif token in [PSParser.FUNC_LIM]:
                 self.enterOuterAlt(localctx, 6)
                 self.state = 354
@@ -2634,7 +2605,7 @@ class PSParser ( Parser ):
                 self.limit_sub()
                 self.state = 356
                 self.mp(0)
-                pass
+
             else:
                 raise NoViableAltException(self)
 
@@ -2680,7 +2651,7 @@ class PSParser ( Parser ):
         self.enterRule(localctx, 54, self.RULE_args)
         try:
             self.state = 365
-            self._errHandler.sync(self)
+            self._errHandler.sync(self);
             la_ = self._interp.adaptivePredict(self._input,39,self._ctx)
             if la_ == 1:
                 self.enterOuterAlt(localctx, 1)
@@ -2780,14 +2751,12 @@ class PSParser ( Parser ):
             if not(_la==PSParser.LETTER or _la==PSParser.SYMBOL):
                 self._errHandler.recoverInline(self)
             else:
-                self._errHandler.reportMatch(self)
                 self.consume()
             self.state = 370
             self.match(PSParser.LIM_APPROACH_SYM)
             self.state = 371
             self.expr()
             self.state = 376
-            self._errHandler.sync(self)
             _la = self._input.LA(1)
             if _la==PSParser.CARET:
                 self.state = 372
@@ -2799,7 +2768,6 @@ class PSParser ( Parser ):
                 if not(_la==PSParser.ADD or _la==PSParser.SUB):
                     self._errHandler.recoverInline(self)
                 else:
-                    self._errHandler.reportMatch(self)
                     self.consume()
                 self.state = 375
                 self.match(PSParser.R_BRACE)
@@ -2849,7 +2817,7 @@ class PSParser ( Parser ):
         self.enterRule(localctx, 58, self.RULE_func_arg)
         try:
             self.state = 385
-            self._errHandler.sync(self)
+            self._errHandler.sync(self);
             la_ = self._interp.adaptivePredict(self._input,41,self._ctx)
             if la_ == 1:
                 self.enterOuterAlt(localctx, 1)
@@ -2962,12 +2930,11 @@ class PSParser ( Parser ):
             self.state = 389
             self.match(PSParser.UNDERSCORE)
             self.state = 395
-            self._errHandler.sync(self)
             token = self._input.LA(1)
             if token in [PSParser.CMD_MATHIT, PSParser.DIFFERENTIAL, PSParser.LETTER, PSParser.NUMBER, PSParser.SYMBOL]:
                 self.state = 390
                 self.atom()
-                pass
+
             elif token in [PSParser.L_BRACE]:
                 self.state = 391
                 self.match(PSParser.L_BRACE)
@@ -2975,7 +2942,7 @@ class PSParser ( Parser ):
                 self.expr()
                 self.state = 393
                 self.match(PSParser.R_BRACE)
-                pass
+
             else:
                 raise NoViableAltException(self)
 
@@ -3033,12 +3000,11 @@ class PSParser ( Parser ):
             self.state = 397
             self.match(PSParser.CARET)
             self.state = 403
-            self._errHandler.sync(self)
             token = self._input.LA(1)
             if token in [PSParser.CMD_MATHIT, PSParser.DIFFERENTIAL, PSParser.LETTER, PSParser.NUMBER, PSParser.SYMBOL]:
                 self.state = 398
                 self.atom()
-                pass
+
             elif token in [PSParser.L_BRACE]:
                 self.state = 399
                 self.match(PSParser.L_BRACE)
@@ -3046,7 +3012,7 @@ class PSParser ( Parser ):
                 self.expr()
                 self.state = 401
                 self.match(PSParser.R_BRACE)
-                pass
+
             else:
                 raise NoViableAltException(self)
 

@@ -27,9 +27,10 @@ custom:
 package:
   include:
     - checks.py
-    - latex2sympy/**
     - sympy/**
     - mpmath/**
+    - antlr4/**
+    - latex2sympy/**
   exclude:
 
 functions:
