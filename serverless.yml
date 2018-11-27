@@ -12,7 +12,7 @@ provider:
   timeout: 30
   stage: ${opt:stage, self:custom.defaultStage}
   profile: ${self:custom.profiles.${self:provider.stage}}
-  region: us-west-2
+  region: us-east-1
   cfLogs: true # < sls v1.10
   versionFunctions: false
   environment:
