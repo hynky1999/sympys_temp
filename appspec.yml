@@ -13,7 +13,7 @@ permissions:
 hooks:
   BeforeInstall:
     - location: scripts/install.sh
-      runas: root
+      runas: ec2-user
       timeout: 300
   AfterInstall:
     - location: scripts/post-install.sh
@@ -21,5 +21,5 @@ hooks:
       runas: ec2-user
   ApplicationStart:
     - location: scripts/start.sh
-      runas: root
+      runas: ec2-user
       timeout: 60
