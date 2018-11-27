@@ -57,3 +57,5 @@ which causes problems with equivLiteral, for which they should be represented as
 in order to distinguish them from \frac{-a}{b}. Solved during LaTeX preprocessing by converting such fractions
 to \frac{a}{b} \* (-1), which convert as desired if a is not 1. Numerator of 1 is converted to placeholder \one,
 otherwise the fraction is still converted by latex2sympy as having -1 in numerator.
+
+
