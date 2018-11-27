@@ -59,3 +59,5 @@ to \frac{a}{b} \* (-1), which convert as desired if a is not 1. Numerator of 1 i
 otherwise the fraction is still converted by latex2sympy as having -1 in numerator.
 
 
+
+
