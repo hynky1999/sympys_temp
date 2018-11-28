@@ -42,6 +42,14 @@ functions:
       - http:
           path: /evaluate
           method: POST
+  test:
+    handler: handler.test
+    name: test-${self:provider.stage}
+    description: Test with test.csv
+    events:
+      - http:
+          path: /test
+          method: GET
 plugins:
 resources:
   Resources:
