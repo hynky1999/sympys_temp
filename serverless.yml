@@ -34,6 +34,15 @@ package:
   exclude:
 
 functions:
+  preflight: 
+    handler: handler.preflight
+    name: preflight-${self:provider.stage}
+    description: Preflight request
+    events:
+      - http:
+          path: /evaluate
+          method: OPTIONS
+          cors: true
   evaluate:
     handler: handler.handle
     name: evaluate-${self:provider.stage}

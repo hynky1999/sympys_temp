@@ -7,6 +7,16 @@ from checks import is_simplified, is_expanded, is_factorised
 from checks import is_true
 from checks import parse_checks, check_func
 
+def preflight(event, context):
+    response = {
+        "statusCode": 200,
+        "headers": {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Credentials": True,
+        }
+    }
+    return response
+
 def handle(event, context):
     body = json.loads(event["body"])
     if body["input"] is None or\
