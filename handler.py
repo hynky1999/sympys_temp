@@ -21,26 +21,38 @@ def handle(event, context):
                 "message": "Bad Request"
             }
         }
-    
-    checks = parse_checks(body["checks"])
-    result = "true"
-    for check in checks:
-        value = check_func[check](body["input"], body["expected"], checks[check])
-        if value != "true":
-            result = value
-            break
+    try:
+        checks = parse_checks(body["checks"])
+        result = "true"
+        for check in checks:
+            value = check_func[check](body["input"], body["expected"], checks[check])
+            if value != "true":
+                result = value
+                break
 
-    response = {
-        "statusCode": 200,
-        "headers": {
-            "Access-Control-Allow-Origin": "*"
-        },
-        "body": json.dumps({
-            "result": result
-        })
-    }
+        response = {
+            "statusCode": 200,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": json.dumps({
+                "result": result
+            })
+        }
 
-    return response
+        return response
+    except Exception as e:
+        response = {
+            "statusCode": 500,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": json.dumps({
+                "error": "Error occured",
+                "message": e
+            })
+        }
+        return response
 
 def test(event, context):
     test_file_name = 'tests.csv'
