@@ -8,7 +8,21 @@ from checks import is_true
 from checks import parse_checks, check_func
 
 def handle(event, context):
-    body = json.loads(event["body"])
+    try:
+        body = json.loads(event["body"])
+    except Exception as e:
+        response = {
+            "statusCode": 500,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": json.dumps({
+                "error": "Error occured",
+                "message": e
+            })
+        }
+        return response
+
     if body["input"] is None or\
        body["expected"] is None or\
        body["checks"] is None:
