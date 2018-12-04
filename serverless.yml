@@ -42,6 +42,7 @@ functions:
       - http:
           path: /evaluate
           method: POST
+          cors: true
   test:
     handler: handler.test
     name: test-${self:provider.stage}
@@ -50,6 +51,7 @@ functions:
       - http:
           path: /test
           method: GET
+          cors: true
 plugins:
 resources:
   Resources:
