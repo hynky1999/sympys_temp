@@ -637,20 +637,17 @@ def parse_checks(options_str):
                         sep = sorted(unit.strip().strip("'").lower() for unit in sep.split(','))
                         # sanity check for allowed units
                         if any(unit not in UNITS for unit in sep):
-                            print('{} is not a valid SI or US Customary unit'.format(unit))
-                            sys.exit(0)
+                            raise Exception('{} is not a valid SI or US Customary unit'.format(unit))
                     elif add == 'tolerance':
                         try:
                             sep = float(sep)
                         except ValueError:
-                            print('{} is not a valid float value for tolerance'.format(sep))
-                            sys.exit(0)
+                            raise Exception('{} is not a valid float value for tolerance'.format(sep))
                     elif add == 'significantDecimalPlaces':
                         try:
                             sep = int(sep)
                         except ValueError:
-                            print('{} is not a valid int value for significantDecimalPlaces'.format(sep))
-                            sys.exit(0)
+                            raise Exception('{} is not a valid int value for significantDecimalPlaces'.format(sep))
                     add_dict[add] = sep
         else:
             main = check_string
@@ -658,20 +655,17 @@ def parse_checks(options_str):
             add_dict.pop('setDecimalSeparator')
 
         if main not in allowed_options:
-            print('Option "{}" not allowed'.format(main))
-            sys.exit(0)
+            raise Exception('Option "{}" not allowed'.format(main))
 
         for add in add_dict:
             if add not in allowed_options[main]:
-                print('Suboption "{}" '.format(add) +
-                      'not allowed for option "{}"'.format(main))
-                sys.exit(0)
+                raise Exception('Suboption "{}" '.format(add) + 'not allowed for option "{}"'.format(main))
 
         if 'setDecimalSeparator' in add_dict and\
            'setThousandsSeparator' in add_dict and\
            add_dict['setDecimalSeparator'] in add_dict['setThousandsSeparator']:
-                print('Same decimal and thousand separators for option "{}"'.format(main))
-                sys.exit(0)
+                raise Exception('Same decimal and thousand separators for option "{}"'.format(main))
+                
 
         check_dict[main] = add_dict
     return check_dict

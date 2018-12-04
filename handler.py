@@ -18,7 +18,7 @@ def handle(event, context):
             },
             "body": json.dumps({
                 "error": "Error occured",
-                "message": e
+                "message": str(e)
             })
         }
         return response
@@ -62,8 +62,8 @@ def handle(event, context):
                 "Access-Control-Allow-Origin": "*"
             },
             "body": json.dumps({
-                "error": "Error occured",
-                "message": e
+                "error": "Internal Server Error",
+                "message": str(e)
             })
         }
         return response
@@ -98,3 +98,8 @@ def test(event, context):
     }
 
     return response
+
+res = handle({
+    "body": "{\"input\": \"\\\\frac{1}{2}\", \"expected\": \"0.5\", \"checks\": \"equivLiteral:\"}"
+}, {})
+print(res)
