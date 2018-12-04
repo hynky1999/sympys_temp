@@ -1,2 +1,2 @@
 cd ~/edu-serverless
-sls deploy
+sudo sls deploy
