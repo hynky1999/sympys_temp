@@ -1,5 +1,10 @@
+#!/usr/bin/env python3
+
 import re
+import os
 import sys
+import decimal
+decimal.getcontext().rounding = decimal.ROUND_HALF_UP
 
 from sympy import sympify
 from sympy import simplify
@@ -7,13 +12,12 @@ from sympy import expand, factor
 from sympy import srepr
 from latex2sympy.process_latex import process_sympy
 
-# several functions and regexes for latex to sympy conversions
-percent_re = re.compile(r'([0-9.]+)\s*\\%')
-log_re = re.compile(r'\\log_([^{])')
-multiple_spaces_re = re.compile(' {2,}')
-variable_before_parentheses_re = re.compile(r'\b([abcdxyz])\(')
-trailing_zeros_re = re.compile(r'(\.[0-9]*?)(0+)\b')
-neg_fraction_re = re.compile(r'-\\frac\{(.*?)\}\{(.*?)\}')
+# default values and dictionaries ---------------------------------------------
+UNIT_FOLDER = 'units'
+SI_CSV = 'si.csv'
+US_CSV = 'us.csv'
+si_csv_path = os.path.join(UNIT_FOLDER, SI_CSV)
+us_csv_path = os.path.join(UNIT_FOLDER, US_CSV)
 
 DEFAULT_THOUSANDS_SEP = ','
 DEFAULT_DECIMAL_SEP = '.'
@@ -22,6 +26,64 @@ POSSIBLE_DECIMAL_SEP = ',.'
 THOUSANDS_SEP_PLACEHOLDER = '<THOUSANDSEP>'
 DECIMAL_SEP_PLACEHOLDER = '<DECIMALSEP>'
 SEP_ERROR_PLACEHOLDER = '<SEPERROR>'
+DEFAULT_PRECISION = 10
+
+ERROR = 'error'
+
+UNITS = {
+    # Unit, Description, ConvertTo, Coefficient
+    # SI
+    'g':  ('gram', 'g', 1),
+    'cg': ('centigram', 'g', 0.01),
+    'kg': ('kilogram', 'g', 1000),
+    'mg': ('milligram', 'g', 0.001),
+    'ng': ('nanogram', 'g', 0.000000001),
+    'm':  ('meter', 'm', 1),
+    'cm': ('centimeter', 'm', 0.01),
+    'km': ('kilometer', 'm', 1000),
+    'mm': ('millimeter', 'm', 0.001),
+    'nm': ('nanometer', 'm', 0.000000001),
+    's':  ('second', 's', 1),
+    'cs': ('centisecond', 's', 0.01),
+    'ks': ('kilosecond', 's', 1000),
+    'ms': ('millisecond', 's', 0.001),
+    'ns': ('nanosecond', 's', 0.000000001),
+    'L':  ('liter', 'L', 1),
+    'mL': ('milliliter', 'L', 0.01),
+    # US
+    'in':  ('inch', 'in', 1),
+    'ft':  ('foot', 'in', 12),
+    'mi':  ('mile', 'in', 63360),
+    'fl':  ('fluid ounce', 'fl', 1),
+    'cup': ('cup', 'fl', 8),
+    'pt':  ('pint', 'fl', 16),
+    'qt':  ('quart', 'fl', 32),
+    'gal': ('gallon', 'fl', 128),
+    'oz':  ('ounce', 'oz', 1),
+    'lb':  ('pound', 'oz', 16),
+}
+
+# end of default values and dictionaries block --------------------------------
+
+# several functions and regexes for LaTeX-to-sympy conversions ----------------
+# and LaTeX-to-LaTeX preprocessing 
+percent_re = re.compile(r'([0-9.]+)\s*\\%')
+log_re = re.compile(r'\\log_([^{])')
+multiple_spaces_re = re.compile(' {2,}')
+variable_before_parentheses_re = re.compile(r'\b([abcdxyz])\(')
+trailing_zeros_re = re.compile(r'(\.[0-9]*?)(0+)\b')
+neg_fraction_re = re.compile(r'-\\frac\{(.*?)\}\{(.*?)\}')
+closing_text_decorated_re = re.compile(r'\\text\{.*?\}$')
+closing_text_re = re.compile(r'[^0-9.}]*$')
+
+times = r'(\*|\\cdot ?|\\times ?)?'
+
+def load_units(units_csv_path):
+    ''' Load conversion tables for SI/US units
+    '''
+    conversion_table = {}
+    with open(units_csv_path, 'r', encoding='utf-8') as csv_file:
+        csv_file.readline()
 
 def convert_percent(matchobj):
     found_str = matchobj.group(1)
@@ -60,7 +122,6 @@ def replace_separators(input_latex,
     input_latex = not_decimal_sep_re.sub(SEP_ERROR_PLACEHOLDER, input_latex)
 
     # replace placeholders with actual separators
-    #input_latex = input_latex.replace(THOUSANDS_SEP_PLACEHOLDER, ',')
     input_latex = input_latex.replace(DECIMAL_SEP_PLACEHOLDER, '.')
     return input_latex
 
@@ -69,7 +130,8 @@ def preprocess_latex(input_latex,
                      keep_neg_fraction_form=False,
                      thousand_sep=None,
                      decimal_sep=DEFAULT_DECIMAL_SEP,
-                     preprocess_sep=True):
+                     preprocess_sep=True,
+                     ignore_text=False):
     ''' Convert anything that latex2sympy can't handle,
         e.g., percentages and logarithms
     '''
@@ -81,6 +143,10 @@ def preprocess_latex(input_latex,
                                          decimal=decimal_sep)
         if SEP_ERROR_PLACEHOLDER in input_latex:
             return None
+
+    if ignore_text:
+        input_latex = closing_text_re.sub('', input_latex)
+        input_latex = closing_text_decorated_re.sub('', input_latex)
 
     # percent sign (\%)
     input_latex = percent_re.sub(convert_percent, input_latex)
@@ -118,7 +184,8 @@ def convert(input_latex, evaluate=None,
             keep_neg_fraction_form=False,
             thousand_sep=None,
             decimal_sep=DEFAULT_DECIMAL_SEP,
-            preprocess_sep=True):
+            preprocess_sep=True,
+            ignore_text=False):
     ''' All preprocessing in one function
     '''
     input_latex = preprocess_latex(input_latex,
@@ -126,13 +193,15 @@ def convert(input_latex, evaluate=None,
                                    keep_neg_fraction_form=keep_neg_fraction_form,
                                    thousand_sep=thousand_sep,
                                    decimal_sep=decimal_sep,
-                                   preprocess_sep=preprocess_sep)
+                                   preprocess_sep=preprocess_sep,
+                                   ignore_text=ignore_text)
     if input_latex is None:
         return None
     input_symbolic = sympify_latex(input_latex, evaluate=evaluate)
     return input_symbolic
+# end of preprocessing block --------------------------------------------------
 
-# a couple of helper functions to wrap the return
+# a couple of helper functions to wrap the return -----------------------------
 # results in a more neat form
 def xor(a, b):
     ''' Logical xor one-liner
@@ -143,17 +212,18 @@ def result(bool_result):
     ''' Convert bool value to lowercase str
     ''' 
     return str(bool_result).lower()
+# end of helper functions -----------------------------------------------------
 
-
-# check functions corresponding to main option
+# check functions -------------------------------------------------------------
 def equiv_symbolic(input_latex, expected_latex, options):
     ''' check equivSymbolic
     '''
     input_latex = preprocess_latex(input_latex,
                                    thousand_sep=options.get('setThousandsSeparator', ','),
-                                   decimal_sep=options.get('setDecimalSeparator', '.'))
+                                   decimal_sep=options.get('setDecimalSeparator', '.'),
+                                   ignore_text=options.get('ignoreText', False))
     if input_latex is None:
-        return 'error'
+        return ERROR
     expected_latex = preprocess_latex(expected_latex,
                                       thousand_sep=options.get('setThousandsSeparator', ','),
                                       decimal_sep=options.get('setDecimalSeparator', '.'),
@@ -164,7 +234,7 @@ def equiv_symbolic(input_latex, expected_latex, options):
         input_symbolic = sympify_latex(input_latex)
         input_result_symbolic = sympify_latex(input_result_latex)
         if input_symbolic is None or input_result_symbolic is None:
-            return 'error'
+            return ERROR
 
         expected_latex, expected_result_latex = expected_latex.split('=')
         expected_symbolic = sympify_latex(expected_latex)
@@ -178,33 +248,145 @@ def equiv_symbolic(input_latex, expected_latex, options):
 
     input_symbolic = sympify_latex(input_latex)
     if input_symbolic is None:
-        return 'error'
+        return ERROR
     expected_symbolic = sympify_latex(expected_latex)
 
-    equiv = expand(simplify(input_symbolic)) -\
-            expand(simplify(expected_symbolic)) == 0
+    decimal_places = options.get('significantDecimalPlaces', None)
+    if decimal_places is not None:
+        equiv = round(decimal.Decimal(str(float(simplify(input_symbolic)))), decimal_places) ==\
+                round(decimal.Decimal(str(float(simplify(expected_symbolic)))), decimal_places)
+    else:
+        equiv = expand(simplify(input_symbolic)) -\
+                expand(simplify(expected_symbolic)) == 0
 
     return result(xor(equiv, 'inverseResult' in options))
+
+coefficient_of_one_re = re.compile(r'(?<![0-9].)1' + times + r'(?=[a-z(\\])', flags=re.IGNORECASE)
+constituent_parts_re = re.compile(r'[^\s()*+-]')
+leading_zero_re = re.compile(r'\b0(?=\.)')
+trailing_zeros_re = re.compile(r'(?<=\.)([1-9]*)0+\b')
 
 def equiv_literal(input_latex, expected_latex, options):
     ''' check equivLiteral
     '''
-    ignore_trailing_zeros = 'ignoreTrailingZeros' in options
-    input_symbolic = convert(input_latex, evaluate=False,
-                             ignore_trailing_zeros=ignore_trailing_zeros,
-                             keep_neg_fraction_form=True,
+    if 'allowInterval' in options:
+        input_latex = preprocess_latex(input_latex,
+                                       thousand_sep=options.get('setThousandsSeparator', ','),
+                                       decimal_sep=options.get('setDecimalSeparator', '.'))
+        if input_latex is None:
+            return ERROR
+        expected_latex = preprocess_latex(expected_latex,
+                                          thousand_sep=options.get('setThousandsSeparator', ','),
+                                          decimal_sep=options.get('setDecimalSeparator', '.'),
+                                          preprocess_sep=False)
+
+        equiv = str(input_latex) == str(expected_latex)
+    else:
+        ignore_trailing_zeros = 'ignoreTrailingZeros' in options
+        input_symbolic = convert(input_latex, evaluate=False,
+                                 ignore_trailing_zeros=ignore_trailing_zeros,
+                                 keep_neg_fraction_form=True,
+                                 thousand_sep=options.get('setThousandsSeparator', ','),
+                                 decimal_sep=options.get('setDecimalSeparator', '.'))
+        if input_symbolic is None:
+            return ERROR
+        expected_symbolic = convert(expected_latex, evaluate=False,
+                                    ignore_trailing_zeros=ignore_trailing_zeros,
+                                    keep_neg_fraction_form=True,
+                                    thousand_sep=options.get('setThousandsSeparator', ','),
+                                    decimal_sep=options.get('setDecimalSeparator', '.'),
+                                    preprocess_sep=False)
+
+        preprocessed_input_latex = preprocess_latex(input_latex,
+                                                    thousand_sep=options.get('setThousandsSeparator', ','),
+                                                    decimal_sep=options.get('setDecimalSeparator', '.'))
+
+        preprocessed_expected_latex = preprocess_latex(expected_latex,
+                                                       thousand_sep=options.get('setThousandsSeparator', ','),
+                                                       decimal_sep=options.get('setDecimalSeparator', '.'),
+                                                       preprocess_sep=False)
+
+        preprocessed_input_latex = leading_zero_re.sub('', preprocessed_input_latex)
+        preprocessed_expected_latex = leading_zero_re.sub('', preprocessed_expected_latex)
+
+        if 'ignoreTrailingZeros' in options:
+            preprocessed_input_latex = trailing_zeros_re.sub(r'\1', preprocessed_input_latex)
+            preprocessed_expected_latex = trailing_zeros_re.sub(r'\1', preprocessed_expected_latex)
+
+        if 'ignoreCoefficientOfOne' in options:
+            preprocessed_input_latex = coefficient_of_one_re.sub('', preprocessed_input_latex)
+            preprocessed_expected_latex = coefficient_of_one_re.sub('', preprocessed_expected_latex)
+
+        input_parts = constituent_parts_re.findall(preprocessed_input_latex)
+        expected_parts = constituent_parts_re.findall(preprocessed_expected_latex)
+
+        if 'ignoreOrder' in options:
+            input_parts.sort()
+            expected_parts.sort()
+
+        equiv = (str(input_symbolic) == str(expected_symbolic)) and\
+                input_parts == expected_parts
+
+    return result(xor(equiv, 'inverseResult' in options))
+
+def equiv_value(input_latex, expected_latex, options):
+    ''' check equivValue
+    '''
+    unit_re = re.compile(r'^(.*?) *\\text\{(' +\
+                         '|'.join(sorted(UNITS, key=len, reverse=True)) +\
+                         ')\}$')
+    input_latex = preprocess_latex(input_latex,
+                                   thousand_sep=options.get('setThousandsSeparator', ','),
+                                   decimal_sep=options.get('setDecimalSeparator', '.'))
+    if input_latex is None:
+        return ERROR
+    expected_latex = preprocess_latex(expected_latex,
+                                      thousand_sep=options.get('setThousandsSeparator', ','),
+                                      decimal_sep=options.get('setDecimalSeparator', '.'),
+                                      preprocess_sep=False)
+
+    expected_unit_match = unit_re.match(expected_latex)
+    if expected_unit_match is not None:
+        input_unit_match = unit_re.match(input_latex)
+        if input_unit_match is not None:
+            try:
+                input_converted_value = float(simplify(sympify_latex(input_unit_match.group(1)))) *\
+                                        UNITS[input_unit_match.group(2)][2]
+                input_converted_unit = UNITS[input_unit_match.group(2)][1]
+                expected_converted_value = float(simplify(sympify_latex(expected_unit_match.group(1)))) *\
+                                           UNITS[expected_unit_match.group(2)][2]
+                expected_converted_unit = UNITS[expected_unit_match.group(2)][1]
+            except ValueError:
+                return ERROR
+
+            equiv = input_converted_value == expected_converted_value and\
+                    input_converted_unit == expected_converted_unit
+
+            return result(xor(equiv, 'inverseResult' in options))
+        else:
+            return 'false'
+    
+    input_symbolic = convert(input_latex,
                              thousand_sep=options.get('setThousandsSeparator', ','),
-                             decimal_sep=options.get('setDecimalSeparator', '.'))
+                             decimal_sep=options.get('setDecimalSeparator', '.'),
+                             ignore_text=options.get('ignoreText', False))
     if input_symbolic is None:
-        return 'error'
-    expected_symbolic = convert(expected_latex, evaluate=False,
-                                ignore_trailing_zeros=ignore_trailing_zeros,
-                                keep_neg_fraction_form=True,
+        return ERROR
+
+    expected_symbolic = convert(expected_latex,
                                 thousand_sep=options.get('setThousandsSeparator', ','),
                                 decimal_sep=options.get('setDecimalSeparator', '.'),
                                 preprocess_sep=False)
 
-    equiv = str(input_symbolic) == str(expected_symbolic)
+    decimal_places = options.get('significantDecimalPlaces', None)
+    if decimal_places is not None:
+        input_numeric = round(decimal.Decimal(str(float(simplify(input_symbolic)))), decimal_places)
+        expected_numeric = round(decimal.Decimal(str(float(simplify(expected_symbolic)))), decimal_places)
+    else:
+        input_numeric = simplify(input_symbolic)
+        expected_numeric = simplify(expected_symbolic)
+
+    equiv = abs(input_numeric - expected_numeric) <= options.get('tolerance', 0.0)
     return result(xor(equiv, 'inverseResult' in options))
 
 def string_match(input_latex, expected_latex, options):
@@ -224,7 +406,7 @@ def is_simplified(input_latex, expected_latex=None, options={}):
                              thousand_sep=options.get('setThousandsSeparator', ','),
                              decimal_sep=options.get('setDecimalSeparator', '.'))
     if input_symbolic is None:
-        return 'error'
+        return ERROR
     simplified = str(input_symbolic) ==\
                  str(simplify(convert(input_latex,
                               thousand_sep=options.get('setThousandsSeparator', ','),
@@ -238,7 +420,7 @@ def is_expanded(input_latex, expected_latex=None, options={}):
                              thousand_sep=options.get('setThousandsSeparator', ','),
                              decimal_sep=options.get('setDecimalSeparator', '.'))
     if input_symbolic is None:
-        return 'error'
+        return ERROR
     expanded = input_symbolic - expand(simplify(input_symbolic)) == 0
     return result(xor(expanded, 'inverseResult' in options))
 
@@ -249,7 +431,7 @@ def is_factorised(input_latex, expected_latex=None, options={}):
                              thousand_sep=options.get('setThousandsSeparator', ','),
                              decimal_sep=options.get('setDecimalSeparator', '.'))
     if input_symbolic is None:
-        return 'error'
+        return ERROR
     factorised = input_symbolic == factor(input_symbolic)
     return result(xor(factorised, 'inverseResult' in options))
 
@@ -260,20 +442,91 @@ def is_true(input_latex, expected_latex=None, options={}):
                              thousand_sep=options.get('setThousandsSeparator', ','),
                              decimal_sep=options.get('setDecimalSeparator', '.'))
     if input_symbolic is None:
-        return 'error'
+        return ERROR
     true = bool(simplify(input_symbolic))
     return result(xor(true, 'inverseResult' in options))
 
-# a dictionary for mapping an option name
-# to the function that performs that check
+def is_unit(input_latex, expected_latex=None, options={}):
+    ''' check isUnit
+    '''
+    input_latex = preprocess_latex(input_latex,
+                                   thousand_sep=options.get('setThousandsSeparator', ','),
+                                   decimal_sep=options.get('setDecimalSeparator', '.'))
+    if input_latex is None or input_latex.count('.') > 1:
+        return ERROR
+    is_unit_re = re.compile(r'^(.*?) *\\text\{(' +
+                            '|'.join(options['allowedUnits']) + ')\}$')
+    unit = is_unit_re.match(input_latex) is not None
+    return result(xor(unit, 'inverseResult' in options))
+
+# regular expressions for pattern checks for equivSyntax
+coeff = r'([A-Wa-w]|\d+(\.\d+)?|-?\d+/-?\d+|\\frac\{-?\d+\}\{-?\d+\}|\d+ *(\d+/\d+|\\frac\{\d+\}\{\d+\})|)'
+decimal_re_pattern = r'^\d+\.\d{{{}}}$'
+simple_frac_re = re.compile(r'^(-?\d+/-?\d+|-?\\frac\{-?\d+\}\{-?\d+\})$')
+mixed_frac_re = re.compile(r'^-?\d+ *(\d+/\d+|\\frac\{\d+\}\{\d+\})$')
+exp_re = re.compile(r'^(([A-Wa-w]+|\d+(\.\d+)?)\^(\{.*[x-z].*\}|[x-z])|exp\(.*[x-z].*\))$')
+standard_form_linear_re = re.compile(r'^-?{} *{} *x *[+-] *{} *{} *y *= *-?{}$'.format(coeff, times, coeff, times, coeff))
+standard_form_quadratic_re = re.compile(r'^-?{} *{} *x\^(2|[{{]2[}}]) *[+-] *{} *{} *x *[+-] *{} *= *0$'.format(coeff, times, coeff, times, coeff))
+slope_intercept_form_re = re.compile(r'^y *= *-?{} *{} *x *[+-] *{}$'.format(coeff, times, coeff))
+point_slope_form_re = re.compile(r'^(\(y *[+-] *{}\)|y *([+-] *{})?) *= *(-?{} *{} *\(x *[+-] *{}\)|x *([+-] *{})?)$'.format(coeff, coeff, coeff, times, coeff, coeff))
+
+pattern_dict = {
+    'isSimpleFraction': simple_frac_re,
+    'isMixedFraction': mixed_frac_re,
+    'isExponent': exp_re,
+    'isSlopeInterceptForm': slope_intercept_form_re,
+    'isPointSlopeForm': point_slope_form_re
+}
+
+standard_form_dict = {
+    'linear': standard_form_linear_re,
+    'quadratic': standard_form_quadratic_re
+}
+
+def equiv_syntax(input_latex, expected_latex=None, options={}):
+    ''' check equivSyntax depending on the pattern specified
+
+        Checks implemented:
+         - isDecimal
+         - isSimpleFraction
+         - isMixedFraction
+         - isExponent
+         - isStandardForm - linear equation or quadratic equation
+         - isSlopeInterceptForm - linear equation
+         - isPointSlopeForm - linear equation
+    '''
+    precision = options.get('isDecimal', None)
+    if precision is not None:
+        # compile regex here to account for precision
+        pattern_re = re.compile(decimal_re_pattern.format(precision))
+    else:
+        form = options.get('isStandardForm', None)
+        if form is not None:
+            pattern_re = standard_form_dict[form]
+        else:
+            for option in pattern_dict:
+                if options.get(option, False):
+                    pattern_re = pattern_dict[option]
+
+    equiv = pattern_re.match(input_latex.strip()) is not None
+    return result(xor(equiv, 'inverseResult' in options))
+
+# end of check functions block ------------------------------------------------
+
+# helper functions, dictionaries, and regexes for parsing options -------------
+
+# a dictionary mapping option names to functions performing the checks
 check_func = {
     'equivSymbolic': equiv_symbolic,
     'equivLiteral': equiv_literal,
+    'equivValue': equiv_value,
     'stringMatch': string_match,
     'isSimplified': is_simplified,
     'isExpanded': is_expanded,
     'isFactorised': is_factorised,
     'isTrue': is_true,
+    'isUnit': is_unit,
+    'equivSyntax': equiv_syntax,
 }
 
 # a dictionary of possible main options and their respective
@@ -286,16 +539,24 @@ allowed_options = {
         'inverseResult',
         'ignoreText',
         'compareSides',
-        'significantDecimalPlaces'},
+        'significantDecimalPlaces',
+        'useEulerNumber'},
     'equivLiteral': {
         'setThousandsSeparator',
         'setDecimalSeparator',
         'inverseResult',
-        'ignoreTrailingZeros'},
+        'ignoreTrailingZeros',
+        'ignoreOrder',
+        'ignoreCoefficientOfOne',
+        'allowInterval'},
     'equivValue': {
+        'tolerance',
         'setThousandsSeparator',
         'setDecimalSeparator',
-        'inverseResult'},
+        'ignoreText',
+        'compareSides'
+        'inverseResult',
+        'significantDecimalPlaces'},
     'isSimplified': {
         'setThousandsSeparator',
         'setDecimalSeparator',
@@ -313,6 +574,7 @@ allowed_options = {
         'setDecimalSeparator',
         'inverseResult'},
     'isUnit': {
+        'allowedUnits',
         'setThousandsSeparator',
         'setDecimalSeparator',
         'inverseResult'},
@@ -320,23 +582,38 @@ allowed_options = {
         'ignoreLeadingAndTrailingSpaces',
         'treatMultipleSpacesAsOne',
         'inverseResult'},
-    'equivSyntax': {},
+    'equivSyntax': {
+        'isDecimal',
+        'isSimpleFraction',
+        'isMixedFraction',
+        'isExponent',
+        'isStandardForm',
+        'isSlopeInterceptForm',
+        'isPointSlopeForm'},
 }
 
 no_set_decimal_separator = {main for main in allowed_options 
                             if 'setDecimalSeparator' not in allowed_options[main]}
 
-set_thousand_separator_re = re.compile(r"(?<=setThousandsSeparator): ?\[([ ,.']+)\]")
+set_thousand_separator_re = re.compile(r"(?<=setThousandsSeparator=)?\[([ ,.']+)\]")
 thousand_separator_re = re.compile(r"'([ .,])'")
-set_decimal_separator_re = re.compile(r"(?<=setDecimalSeparator): ?'([,.])'")
+set_decimal_separator_re = re.compile(r"(?<=setDecimalSeparator=)?'([,.])'")
+
+tolerance_re = re.compile(r"(?<=tolerance=)?'([,.])'")
+allowed_units_re = re.compile(r"(?<=allowedUnits=)?\[(.+?)\]")
+unit_re = re.compile(r"'(.+?)'")
+non_boolean_suboption_re = re.compile(r'^(setThousandsSeparator|setDecimalSeparator|tolerance|allowedUnits)=')
+equiv_syntax_option_re_list = [re.compile(r'(isDecimal)=(\d+)')]
 
 def sub_thousand_separator(matchobj):
-    return '_' + ''.join(thousand_separator_re.findall(matchobj.group(1))).replace(',', '<COMMA>')
+    return ''.join(thousand_separator_re.findall(matchobj.group(1))).replace(',', '<COMMA>')
 
-def sub_decimal_separator(matchobj):
-    return '_' + matchobj.group(1).replace(',', '<COMMA>')
+def sub_comma(matchobj):
+    return matchobj.group(1).replace(',', '<COMMA>')
 
 def parse_checks(options_str):
+    ''' Parse option string
+    '''
     # first, split groups of options
     check_list = options_str.split(';')
     # second, split each 
@@ -345,16 +622,36 @@ def parse_checks(options_str):
         add_dict = {'setDecimalSeparator': '.'}
         if ':' in check_string:
             check_string = set_thousand_separator_re.sub(sub_thousand_separator, check_string)
-            check_string = set_decimal_separator_re.sub(sub_decimal_separator, check_string)
-            main, add_string = check_string.split(':')
+            check_string = set_decimal_separator_re.sub(sub_comma, check_string)
+            check_string = allowed_units_re.sub(sub_comma, check_string)
+
+            main, add_string = check_string.split(':', maxsplit=1)
             add_list = add_string.split(',')
             for add in add_list:
-                if not (add.startswith('setThousandsSeparator') or
-                   add.startswith('setDecimalSeparator')):
+                if '=' not in add:
                     add_dict[add] = True
                 else:
-                    add, sep = add.split('_')
-                    add_dict[add] = sep.replace('<COMMA>', ',')
+                    add, sep = add.split('=')
+                    sep = sep.replace('<COMMA>', ',')
+                    if add == 'allowedUnits':
+                        sep = sorted(unit.strip().strip("'").lower() for unit in sep.split(','))
+                        # sanity check for allowed units
+                        if any(unit not in UNITS for unit in sep):
+                            print('{} is not a valid SI or US Customary unit'.format(unit))
+                            sys.exit(0)
+                    elif add == 'tolerance':
+                        try:
+                            sep = float(sep)
+                        except ValueError:
+                            print('{} is not a valid float value for tolerance'.format(sep))
+                            sys.exit(0)
+                    elif add == 'significantDecimalPlaces':
+                        try:
+                            sep = int(sep)
+                        except ValueError:
+                            print('{} is not a valid int value for significantDecimalPlaces'.format(sep))
+                            sys.exit(0)
+                    add_dict[add] = sep
         else:
             main = check_string
         if main in no_set_decimal_separator:
@@ -363,11 +660,13 @@ def parse_checks(options_str):
         if main not in allowed_options:
             print('Option "{}" not allowed'.format(main))
             sys.exit(0)
+
         for add in add_dict:
             if add not in allowed_options[main]:
                 print('Suboption "{}" '.format(add) +
                       'not allowed for option "{}"'.format(main))
                 sys.exit(0)
+
         if 'setDecimalSeparator' in add_dict and\
            'setThousandsSeparator' in add_dict and\
            add_dict['setDecimalSeparator'] in add_dict['setThousandsSeparator']:
