@@ -7,16 +7,6 @@ from checks import is_simplified, is_expanded, is_factorised
 from checks import is_true
 from checks import parse_checks, check_func
 
-def preflight(event, context):
-    response = {
-        "statusCode": 200,
-        "headers": {
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Credentials": True,
-        }
-    }
-    return response
-
 def handle(event, context):
     body = json.loads(event["body"])
     if body["input"] is None or\
@@ -24,6 +14,9 @@ def handle(event, context):
        body["checks"] is None:
         return {
             "statusCode": 400,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
             "body": {
                 "message": "Bad Request"
             }
@@ -39,6 +32,9 @@ def handle(event, context):
 
     response = {
         "statusCode": 200,
+        "headers": {
+            "Access-Control-Allow-Origin": "*"
+        },
         "body": json.dumps({
             "result": result
         })
@@ -69,6 +65,9 @@ def test(event, context):
 
     response = {
         "statusCode": 200,
+        "headers": {
+            "Access-Control-Allow-Origin": "*"
+        },
         "body": report_str
     }
 
