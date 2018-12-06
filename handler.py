@@ -99,7 +99,10 @@ def test(event, context):
 
     return response
 
-res = handle({
-    "body": "{\"input\": \"\\\\frac{1}{2}\", \"expected\": \"0.5\", \"checks\": \"equivLiteral:\"}"
-}, {})
-print(res)
+# res = handle({
+#     "body": "{\"input\": \"\\\\frac{1}{2}\", \"expected\": \"0.5\", \"checks\": \"equivLiteral:\"}"
+# }, {})
+# print(res)
+
+# res = test({}, {})
+# print(res)
