@@ -163,3 +163,22 @@
 163,stringMatch:treatMultipleSpacesAsOne,\dot,\cdot,stringMatch:treatMultipleSpacesAsOne,false
 164,stringMatch:treatMultipleSpacesAsOne,\times,\cdot,stringMatch:treatMultipleSpacesAsOne,false
 165,stringMatch:treatMultipleSpacesAsOne,*,*,stringMatch:treatMultipleSpacesAsOne,true
+166,equivLiteral: fraction with minus,-\frac{2}{4},-\frac{1}{2},equivLiteral,false
+167,equivLiteral: sum instead of number,2+0,2,equivLiteral,false
+168,equivLiteral:ignoreTrailingZeros,-\frac{1}{2},0.5,equivLiteral:ignoreTrailingZeros,false
+169,equivValue with tolerance,8.3,10,equivValue:tolerance=1.6,false
+170,equivSymbolic;equivLiteral:inverseResult,(x+2)^2,(x+2)^2,equivSymbolic;equivLiteral:inverseResult,false
+171,equivSymbolic;equivLiteral:inverseResult,(x+2)^2,(2+x)^2,equivSymbolic;equivLiteral:inverseResult,true
+172,equivSymbolic;equivLiteral:inverseResult,(x-2)^2,(2-x)^2,equivSymbolic;equivLiteral:inverseResult,true
+173,equivSymbolic;equivLiteral:inverseResult,(x-2),(2-x),equivSymbolic;equivLiteral:inverseResult,false
+174,equivSymbolic;equivLiteral:inverseResult,(x+2)^2,x^2 + 4x + 4,equivSymbolic;equivLiteral:inverseResult,true
+175,equivSymbolic;equivLiteral:inverseResult,(x+2)^2,x^2 + 4 + 4x,equivSymbolic;equivLiteral:inverseResult,true
+176,equivSymbolic;equivLiteral:inverseResult,(x+2)^2,x(x+4) + 4,equivSymbolic;equivLiteral:inverseResult,true
+177,equivSymbolic;equivLiteral:inverseResult;isExpanded,(x+2)^2,x^2 + 4x + 4,equivSymbolic;equivLiteral:inverseResult;isExpanded,true
+178,equivSymbolic;equivLiteral:inverseResult;isExpanded,(x+2)^2,x^2 + 4 + 4x,equivSymbolic;equivLiteral:inverseResult;isExpanded,true
+179,equivSymbolic;equivLiteral:inverseResult;isExpanded,(x+2)^2,x(x+4) + 4,equivSymbolic;equivLiteral:inverseResult;isExpanded,false
+180,"equivSymbolic;equivLiteral:inverseResult,ignoreOrder",(x+2)^2,(2+x)^2,"equivSymbolic;equivLiteral:inverseResult,ignoreOrder",false
+181,"equivSymbolic;equivLiteral:inverseResult,ignoreOrder",(x+2)^2,(2+1x)^2,"equivSymbolic;equivLiteral:inverseResult,ignoreOrder",true
+182,equivSymbolic;isSimplified,1400/800,7/4,equivSymbolic;isSimplified,true
+183,equivSymbolic;isSimplified,1400/800,1.75,equivSymbolic;isSimplified,true
+184,equivSymbolic;isSimplified,1400/800,1 (15/20),equivSymbolic;isSimplified,false
