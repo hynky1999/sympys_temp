@@ -3,10 +3,22 @@
 import csv
 import sys
 
-from checks import equiv_symbolic, equiv_literal, string_match
-from checks import is_simplified, is_expanded, is_factorised
-from checks import is_true
 from checks import parse_checks, check_func
+
+def test_case(input_latex, expected_latex, options):
+    checks = parse_checks(options)
+
+    # perform all checks
+    for check in checks:
+        result = check_func[check](input_latex.strip('$'),
+                                   expected_latex=expected_latex.strip('$'),
+                                   options=checks[check])
+        if result != 'true':
+            test_result = result
+            break
+        else:
+            test_result = 'true'
+    return test_result
 
 if __name__ == '__main__':
     if len(sys.argv) == 2:
@@ -18,10 +30,7 @@ if __name__ == '__main__':
     with open(test_file_name, 'r', encoding='utf-8') as test_file:
         for row in csv.reader(test_file):
             testno, desc, input_latex, expected_latex, options, expected_result = row
-            main, add = parse_checks(options).popitem()
-
-            #print(testno, expected_result, sep='\t')
-            test_result = check_func[main](input_latex, expected_latex=expected_latex, options=add)
+            test_result = test_case(input_latex, expected_latex, options)
             if test_result != expected_result:
                 fails.append(row + [test_result])
                 fail_count += 1

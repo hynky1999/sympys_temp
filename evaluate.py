@@ -28,7 +28,7 @@ def parse_args():
 
     check_list = parse_checks(args.checks)
         
-    return args.input, args.expected, check_list
+    return args.input.strip('$'), args.expected.strip('$'), check_dict
 
 if __name__ == '__main__':
     input_latex, expected_latex, checks = parse_args()

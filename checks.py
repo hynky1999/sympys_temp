@@ -3,6 +3,7 @@
 import re
 import os
 import sys
+from collections import OrderedDict
 import decimal
 decimal.getcontext().rounding = decimal.ROUND_HALF_UP
 
@@ -72,9 +73,12 @@ log_re = re.compile(r'\\log_([^{])')
 multiple_spaces_re = re.compile(' {2,}')
 variable_before_parentheses_re = re.compile(r'\b([abcdxyz])\(')
 trailing_zeros_re = re.compile(r'(\.[0-9]*?)(0+)\b')
+trailing_decimal_sep_re = re.compile(r'(\.)(?![0-9])')
 neg_fraction_re = re.compile(r'-\\frac\{(.*?)\}\{(.*?)\}')
 closing_text_decorated_re = re.compile(r'\\text\{.*?\}$')
 closing_text_re = re.compile(r'[^0-9.}]*$')
+
+mixed_fraction_error_re = re.compile(r'[0-9] *\( *[0-9]+ */ *[0-9]+ *\)')
 
 times = r'(\*|\\cdot ?|\\times ?)?'
 
@@ -135,6 +139,10 @@ def preprocess_latex(input_latex,
     ''' Convert anything that latex2sympy can't handle,
         e.g., percentages and logarithms
     '''
+    # check for incorrect mixed fractions such as 1 (3/4)
+    if mixed_fraction_error_re.search(input_latex) is not None:
+        return None
+
     # replace decimal separators from allowed to appropriate,
     # report errors if there are separators that are not allowed
     if preprocess_sep:
@@ -157,6 +165,8 @@ def preprocess_latex(input_latex,
     # trailing zeros
     if ignore_trailing_zeros:
         input_latex = trailing_zeros_re.sub(r'\1', input_latex)
+        input_latex = trailing_decimal_sep_re.sub('', input_latex)
+
     # fix fractions so that -\frac{1}{2} is not converted into -1/2
     if keep_neg_fraction_form:
         input_latex = neg_fraction_re.sub(convert_frac, input_latex)
@@ -218,13 +228,14 @@ def result(bool_result):
 def equiv_symbolic(input_latex, expected_latex, options):
     ''' check equivSymbolic
     '''
-    input_latex = preprocess_latex(input_latex,
+    input_latex = preprocess_latex(input_latex.strip(),
                                    thousand_sep=options.get('setThousandsSeparator', ','),
                                    decimal_sep=options.get('setDecimalSeparator', '.'),
                                    ignore_text=options.get('ignoreText', False))
     if input_latex is None:
         return ERROR
-    expected_latex = preprocess_latex(expected_latex,
+
+    expected_latex = preprocess_latex(expected_latex.strip(),
                                       thousand_sep=options.get('setThousandsSeparator', ','),
                                       decimal_sep=options.get('setDecimalSeparator', '.'),
                                       preprocess_sep=False)
@@ -249,6 +260,7 @@ def equiv_symbolic(input_latex, expected_latex, options):
     input_symbolic = sympify_latex(input_latex)
     if input_symbolic is None:
         return ERROR
+
     expected_symbolic = sympify_latex(expected_latex)
 
     decimal_places = options.get('significantDecimalPlaces', None)
@@ -256,8 +268,11 @@ def equiv_symbolic(input_latex, expected_latex, options):
         equiv = round(decimal.Decimal(str(float(simplify(input_symbolic)))), decimal_places) ==\
                 round(decimal.Decimal(str(float(simplify(expected_symbolic)))), decimal_places)
     else:
-        equiv = expand(simplify(input_symbolic)) -\
-                expand(simplify(expected_symbolic)) == 0
+        try:
+            equiv = expand(simplify(input_symbolic)) -\
+                    expand(simplify(expected_symbolic)) == 0
+        except TypeError:
+            return ERROR
 
     return result(xor(equiv, 'inverseResult' in options))
 
@@ -283,14 +298,16 @@ def equiv_literal(input_latex, expected_latex, options):
         equiv = str(input_latex) == str(expected_latex)
     else:
         ignore_trailing_zeros = 'ignoreTrailingZeros' in options
-        input_symbolic = convert(input_latex, evaluate=False,
+
+        input_symbolic = convert(input_latex.strip(), evaluate=False,
                                  ignore_trailing_zeros=ignore_trailing_zeros,
                                  keep_neg_fraction_form=True,
                                  thousand_sep=options.get('setThousandsSeparator', ','),
                                  decimal_sep=options.get('setDecimalSeparator', '.'))
         if input_symbolic is None:
             return ERROR
-        expected_symbolic = convert(expected_latex, evaluate=False,
+
+        expected_symbolic = convert(expected_latex.strip(), evaluate=False,
                                     ignore_trailing_zeros=ignore_trailing_zeros,
                                     keep_neg_fraction_form=True,
                                     thousand_sep=options.get('setThousandsSeparator', ','),
@@ -311,7 +328,9 @@ def equiv_literal(input_latex, expected_latex, options):
 
         if 'ignoreTrailingZeros' in options:
             preprocessed_input_latex = trailing_zeros_re.sub(r'\1', preprocessed_input_latex)
+            preprocessed_input_latex = trailing_decimal_sep_re.sub(r'\1', preprocessed_input_latex)
             preprocessed_expected_latex = trailing_zeros_re.sub(r'\1', preprocessed_expected_latex)
+            preprocessed_expected_latex = trailing_decimal_sep_re.sub(r'\1', preprocessed_expected_latex)
 
         if 'ignoreCoefficientOfOne' in options:
             preprocessed_input_latex = coefficient_of_one_re.sub('', preprocessed_input_latex)
@@ -408,9 +427,9 @@ def is_simplified(input_latex, expected_latex=None, options={}):
     if input_symbolic is None:
         return ERROR
     simplified = str(input_symbolic) ==\
-                 str(simplify(convert(input_latex,
-                              thousand_sep=options.get('setThousandsSeparator', ','),
-                              decimal_sep=options.get('setDecimalSeparator', '.'))))
+                 str(expand(simplify(convert(input_latex,
+                                     thousand_sep=options.get('setThousandsSeparator', ','),
+                                     decimal_sep=options.get('setDecimalSeparator', '.')))))
     return result(xor(simplified, 'inverseResult' in options))
 
 def is_expanded(input_latex, expected_latex=None, options={}):
@@ -617,7 +636,7 @@ def parse_checks(options_str):
     # first, split groups of options
     check_list = options_str.split(';')
     # second, split each 
-    check_dict = {}
+    check_dict = OrderedDict()
     for check_string in check_list:
         add_dict = {'setDecimalSeparator': '.'}
         if ':' in check_string:
