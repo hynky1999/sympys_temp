@@ -250,17 +250,17 @@
 250,equivLiteral ignoring coefficient of 1,1\sin(x)+2,\sin(x)+2,equivLiteral:ignoreCoefficientOfOne,true
 251,equivLiteral ignoring coefficient of 1,1\times x+2,x+2,equivLiteral:ignoreCoefficientOfOne,true
 252,equivLiteral ignoring coefficient of 1,1(x+2),x+2,equivLiteral:ignoreCoefficientOfOne,true
-254,equivLiteral ignoring trailing zeros,0.50,0.5,equivLiteral:ignoreTrailingZeros,true
-255,equivLiteral ignoring trailing zeros,0.5,0.5,equivLiteral:ignoreTrailingZeros,true
-256,equivLiteral ignoring trailing zeros,.5,0.5,equivLiteral:ignoreTrailingZeros,true
-257,equivLiteral ignoring trailing zeros,0.501,0.5,equivLiteral:ignoreTrailingZeros,false
-258,equivLiteral ignoring order,1+x,x+1,equivLiteral:ignoreOrder,true
-259,equivLiteral ignoring order,1+x+x+x^2,x^2+2x+1,equivLiteral:ignoreOrder,false
-260,equivLiteral ignoring order,2*x,x*2,equivLiteral:ignoreOrder,true
-261,equivLiteral ignoring order,1+1x,x+1,equivLiteral:ignoreOrder,false
-262,equivLiteral ignoring order,1+x,1+x,equivLiteral:ignoreOrder,true
-263,equivValue with units,"1\text{mi}","1\text{mi}",equivValue,true
-264,equivValue with units,"5280\text{ft}","1\text{mi}",equivValue,true
-265,equivValue with units,63360\text{in},1\text{mi},equivValue,true
-266,equivValue with units,\frac{10560}{2}\text{ft},1\text{mi},equivValue,true
-267,equivValue with units,1.2\text{m},1\text{mi},equivValue,false
+253,equivLiteral ignoring trailing zeros,0.50,0.5,equivLiteral:ignoreTrailingZeros,true
+254,equivLiteral ignoring trailing zeros,0.5,0.5,equivLiteral:ignoreTrailingZeros,true
+255,equivLiteral ignoring trailing zeros,.5,0.5,equivLiteral:ignoreTrailingZeros,true
+256,equivLiteral ignoring trailing zeros,0.501,0.5,equivLiteral:ignoreTrailingZeros,false
+257,equivLiteral ignoring order,1+x,x+1,equivLiteral:ignoreOrder,true
+258,equivLiteral ignoring order,1+x+x+x^2,x^2+2x+1,equivLiteral:ignoreOrder,false
+259,equivLiteral ignoring order,2*x,x*2,equivLiteral:ignoreOrder,true
+260,equivLiteral ignoring order,1+1x,x+1,equivLiteral:ignoreOrder,false
+261,equivLiteral ignoring order,1+x,1+x,equivLiteral:ignoreOrder,true
+262,equivValue with units,"1\text{mi}","1\text{mi}",equivValue,true
+263,equivValue with units,"5280\text{ft}","1\text{mi}",equivValue,true
+264,equivValue with units,63360\text{in},1\text{mi},equivValue,true
+265,equivValue with units,\frac{10560}{2}\text{ft},1\text{mi},equivValue,true
+266,equivValue with units,1.2\text{m},1\text{mi},equivValue,false
