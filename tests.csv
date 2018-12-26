@@ -264,7 +264,23 @@
 264,equivValue with units,63360\text{in},1\text{mi},equivValue,true
 265,equivValue with units,\frac{10560}{2}\text{ft},1\text{mi},equivValue,true
 266,equivValue with units,1.2\text{m},1\text{mi},equivValue,false
-267,equivSymbolic without compareSides but with equalities,3+4=7,4 + 3 = 7,equivSymbolic,true
-268,equivSymbolic without compareSides but with equalities: wrong answer,3+4=9,4 + 3 = 7,equivSymbolic,false
-269,equivSymbolic without compareSides but with equalities: wrong equality that evaluates to True,3+3=6,4 + 3 = 7,equivSymbolic,true
-270,equivSymbolic without compareSides but with equalities: wrong expression and answer,3+3=9,4 + 3 = 7,equivSymbolic,false
+267,Equivalent symbolic with coefficient,(2.0+1x)^2,(x+2)^2,"equivSymbolic;equivLiteral:inverseResult,ignoreOrder,ignoreCoefficientOfOne,ignoreTrailingZeros",true
+268,Equivalent symbolic with decimal,(2.0+x)^2,(x+2)^2,"equivSymbolic;equivLiteral:inverseResult,ignoreOrder,ignoreTrailingZeros",true
+269,Equivalent symbolic with coefficient,(2+1x)^2,(x+2)^2,"equivSymbolic;equivLiteral:inverseResult,ignoreOrder,ignoreCoefficientOfOne",true
+270,Equivalent symbolic with coefficient and decimal,(1x+2.0)^2,(x+2)^2,"equivSymbolic;equivLiteral:inverseResult,ignoreOrder,ignoreCoefficientOfOne",true
+271,Equivalent symbolic with coefficient and decimal,(2.0+1x)^2,(x+2)^2,"equivSymbolic;equivLiteral:inverseResult,ignoreOrder,ignoreCoefficientOfOne",true
+272,Equivalent symbolic with decimal,(2.0+x)^2,(x+2)^2,"equivSymbolic;equivLiteral:inverseResult,ignoreOrder",true
+273,Equivalent value with units,5000\text{m},5\text{km},"equivValue;isUnit:allowedUnits=[m,cm,km]",true
+274,Equivalent value with units,5\text{km},5\text{km},"equivValue;isUnit:allowedUnits=[m,cm,km]",true
+275,Equivalent value with units,500000\text{cm},5\text{km},"equivValue;isUnit:allowedUnits=[m,cm,km]",true
+276,Simplification with paranthesis,x(x+3/12),x^2 + x/4,equivSymbolic;isSimplified,false
+277,Simplification with paranthesis,x(x+1/4),x^2 + x/4,equivSymbolic;isSimplified,false
+278,Simplification with paranthesis,x(x+1/4),x(x+ 1/4),equivSymbolic;isSimplified,false
+279,Simplification with paranthesis,x^2 + x/4,x^2 + x/4,equivSymbolic;isSimplified,true
+280,Mixed fraction simplification,1 (3/4),1 3/4,equivSymbolic;isSimplified,error
+281,Mixed fraction simplification,7/4,1 3/4,equivSymbolic;isSimplified;equivSyntax:isMixedFraction,false
+282,Mixed fraction simplification,1 6/8,1 3/4,equivSymbolic;isSimplified;equivSyntax:isMixedFraction,false
+283,equivSymbolic without compareSides but with equalities,3+4=7,4 + 3 = 7,equivSymbolic,true
+284,equivSymbolic without compareSides but with equalities: wrong answer,3+4=9,4 + 3 = 7,equivSymbolic,false
+285,equivSymbolic without compareSides but with equalities: wrong equality that evaluates to True,3+3=6,4 + 3 = 7,equivSymbolic,true
+286,equivSymbolic without compareSides but with equalities: wrong expression and answer,3+3=9,4 + 3 = 7,equivSymbolic,false
