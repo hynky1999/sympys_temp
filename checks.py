@@ -240,14 +240,16 @@ def equiv_symbolic(input_latex, expected_latex, options):
                                       decimal_sep=options.get('setDecimalSeparator', '.'),
                                       preprocess_sep=False)
 
+    # if suboption 'compareSides' is used,
+    # we expect the expressions to be equalities
     if 'compareSides' in options:
-        input_latex, input_result_latex = input_latex.split('=')
+        input_latex, input_result_latex = input_latex.split('=', maxsplit=1)
         input_symbolic = sympify_latex(input_latex)
         input_result_symbolic = sympify_latex(input_result_latex)
         if input_symbolic is None or input_result_symbolic is None:
             return ERROR
 
-        expected_latex, expected_result_latex = expected_latex.split('=')
+        expected_latex, expected_result_latex = expected_latex.split('=', maxsplit=1)
         expected_symbolic = sympify_latex(expected_latex)
         expected_result_symbolic = sympify_latex(expected_result_latex)
 
@@ -262,6 +264,13 @@ def equiv_symbolic(input_latex, expected_latex, options):
         return ERROR
 
     expected_symbolic = sympify_latex(expected_latex)
+
+    # if expected answer evaluates to boolean
+    # (most prominent case is when it's an equality),
+    # evaluate if input evaluates to the same value
+    if type(expected_symbolic) == bool:
+        equiv = expected_symbolic == input_symbolic
+        return result(xor(equiv, 'inverseResult' in options))
 
     decimal_places = options.get('significantDecimalPlaces', None)
     if decimal_places is not None:

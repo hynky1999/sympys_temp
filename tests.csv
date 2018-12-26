@@ -264,3 +264,7 @@
 264,equivValue with units,63360\text{in},1\text{mi},equivValue,true
 265,equivValue with units,\frac{10560}{2}\text{ft},1\text{mi},equivValue,true
 266,equivValue with units,1.2\text{m},1\text{mi},equivValue,false
+267,equivSymbolic without compareSides but with equalities,3+4=7,4 + 3 = 7,equivSymbolic,true
+268,equivSymbolic without compareSides but with equalities: wrong answer,3+4=9,4 + 3 = 7,equivSymbolic,false
+269,equivSymbolic without compareSides but with equalities: wrong equality that evaluates to True,3+3=6,4 + 3 = 7,equivSymbolic,true
+270,equivSymbolic without compareSides but with equalities: wrong expression and answer,3+3=9,4 + 3 = 7,equivSymbolic,false
