@@ -422,7 +422,48 @@ def equiv_value(input_latex, expected_latex, options):
             return result(xor(equiv, 'inverseResult' in options))
         else:
             return 'false'
-    
+
+    if 'compareSides' in options:
+        input_latex, input_result_latex = input_latex.split('=', maxsplit=1)
+        input_symbolic = convert(input_latex,
+                             thousand_sep=getThousandsSeparator(options),
+                             decimal_sep=getDecimalSeparator(options),
+                             preprocess_sep=False,
+                             ignore_text=options.get('ignoreText', False))
+        input_result_symblic = convert(input_result_latex,
+                             thousand_sep=getThousandsSeparator(options),
+                             decimal_sep=getDecimalSeparator(options),
+                             preprocess_sep=False,
+                             ignore_text=options.get('ignoreText', False))
+        if input_symbolic is None or input_result_symblic is None:
+            return ERROR
+
+        expected_latex, expected_result_latex = expected_latex.split('=', maxsplit=1)
+        expected_symbolic = convert(expected_latex,
+                                    thousand_sep=getThousandsSeparator(options),
+                                    decimal_sep=getDecimalSeparator(options),
+                                    preprocess_sep=False)
+        expected_result_symbolic = convert(expected_result_latex,
+                                    thousand_sep=getThousandsSeparator(options),
+                                    decimal_sep=getDecimalSeparator(options),
+                                    preprocess_sep=False)      
+
+        decimal_places = options.get('significantDecimalPlaces', None)
+        if decimal_places is not None:
+            input_numeric = expand(simplify(input_symbolic))
+            input_result_numeric = round(decimal.Decimal(str(float(simplify(input_result_symblic)))), decimal_places)
+            expected_numeric = expand(simplify(expected_symbolic))
+            expected_result_numeric = round(decimal.Decimal(str(float(simplify(expected_result_symbolic)))), decimal_places)
+        else:
+            input_numeric = expand(simplify(input_symbolic))
+            input_result_numeric = simplify(input_symbolic)
+            expected_numeric = expand(simplify(expected_symbolic))
+            expected_result_numeric = simplify(expected_symbolic)
+
+        equiv = input_numeric == expected_numeric and\
+                abs(input_result_numeric - expected_result_numeric) <= options.get('tolerance', 0.0)
+        return result(xor(equiv, 'inverseResult' in options))
+
     input_symbolic = convert(input_latex,
                              thousand_sep=getThousandsSeparator(options),
                              decimal_sep=getDecimalSeparator(options),
@@ -612,7 +653,7 @@ allowed_options = {
         'setThousandsSeparator',
         'setDecimalSeparator',
         'ignoreText',
-        'compareSides'
+        'compareSides',
         'inverseResult',
         'significantDecimalPlaces'},
     'isSimplified': {
