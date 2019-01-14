@@ -257,8 +257,7 @@ def equiv_symbolic(input_latex, expected_latex, options):
 
     expected_latex = preprocess_latex(expected_latex.strip(),
                                       thousand_sep=getThousandsSeparator(options),
-                                      decimal_sep=getDecimalSeparator(options),
-                                      preprocess_sep=False)
+                                      decimal_sep=getDecimalSeparator(options))
 
     # if suboption 'compareSides' is used,
     # we expect the expressions to be equalities
