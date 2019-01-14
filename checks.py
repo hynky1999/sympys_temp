@@ -329,8 +329,7 @@ def equiv_literal(input_latex, expected_latex, options):
             return ERROR
         expected_latex = preprocess_latex(expected_latex,
                                         thousand_sep=getThousandsSeparator(options),
-                                        decimal_sep=getDecimalSeparator(options),
-                                        preprocess_sep=False)
+                                        decimal_sep=getDecimalSeparator(options))
 
         equiv = str(input_latex) == str(expected_latex)
     else:
@@ -348,8 +347,7 @@ def equiv_literal(input_latex, expected_latex, options):
                                     ignore_trailing_zeros=ignore_trailing_zeros,
                                     keep_neg_fraction_form=True,
                                     thousand_sep=getThousandsSeparator(options),
-                                    decimal_sep=getDecimalSeparator(options),
-                                    preprocess_sep=False)
+                                    decimal_sep=getDecimalSeparator(options))
 
         preprocessed_input_latex = preprocess_latex(input_latex,
                                                     thousand_sep=getThousandsSeparator(options),
@@ -399,8 +397,7 @@ def equiv_value(input_latex, expected_latex, options):
         return ERROR
     expected_latex = preprocess_latex(expected_latex,
                                       thousand_sep=getThousandsSeparator(options),
-                                      decimal_sep=getDecimalSeparator(options),
-                                      preprocess_sep=False)
+                                      decimal_sep=getDecimalSeparator(options))
 
     expected_unit_match = unit_re.match(expected_latex)
     if expected_unit_match is not None:
