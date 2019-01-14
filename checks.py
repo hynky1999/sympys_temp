@@ -253,10 +253,18 @@ def equiv_symbolic(input_latex, expected_latex, options):
         expected_symbolic = sympify_latex(expected_latex)
         expected_result_symbolic = sympify_latex(expected_result_latex)
 
-        equiv = expand(simplify(input_symbolic)) ==\
-                expand(simplify(expected_symbolic)) and\
-                simplify(input_result_symbolic) ==\
-                simplify(expected_result_symbolic)
+        decimal_places = options.get('significantDecimalPlaces', None)
+        if decimal_places is not None:
+            equiv = expand(simplify(input_symbolic)) ==\
+                    expand(simplify(expected_symbolic)) and\
+                    round(decimal.Decimal(str(float(simplify(input_result_symbolic))))) ==\
+                    round(decimal.Decimal(str(float(simplify(expected_result_symbolic)))))
+        else:
+            equiv = expand(simplify(input_symbolic)) ==\
+                    expand(simplify(expected_symbolic)) and\
+                    simplify(input_result_symbolic) ==\
+                    simplify(expected_result_symbolic)
+
         return result(xor(equiv, 'inverseResult' in options))
 
     input_symbolic = sympify_latex(input_latex)
