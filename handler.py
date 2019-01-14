@@ -117,5 +117,5 @@ def test(event, context):
 # }, {})
 # print(res)
 
-res = test({}, {})
-print(res)
+# res = test({}, {})
+# print(res)
