@@ -606,7 +606,7 @@ def equiv_syntax(input_latex, expected_latex=None, options={}):
             for option in pattern_dict:
                 if options.get(option, False):
                     pattern_re = pattern_dict[option]
-
+    input_latex = input_latex.replace('\\left', '').replace('\\right', '')
     equiv = pattern_re.match(input_latex.strip()) is not None
     return result(xor(equiv, 'inverseResult' in options))
 
