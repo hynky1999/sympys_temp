@@ -222,6 +222,26 @@ def result(bool_result):
     ''' Convert bool value to lowercase str
     ''' 
     return str(bool_result).lower()
+
+def getThousandsSeparator(options):
+    thousand_sep = options.get('setThousandsSeparator', None)
+    decimal_sep = options.get('setDecimalSeparator', None)
+
+    if thousand_sep is None and decimal_sep is None:
+        thousand_sep = ','
+    elif thousand_sep is None and decimal_sep is not None:
+        thousand_sep = '.' if decimal_sep == ',' else ','
+    return thousand_sep
+
+def getDecimalSeparator(options):
+    thousand_sep = options.get('setThousandsSeparator', None)
+    decimal_sep = options.get('setDecimalSeparator', None)
+
+    if thousand_sep is None and decimal_sep is None:
+        decimal_sep = '.'
+    elif thousand_sep is not None and decimal_sep is None:
+        decimal_sep = ',' if thousand_sep == '.' else '.'
+    return decimal_sep
 # end of helper functions -----------------------------------------------------
 
 # check functions -------------------------------------------------------------
@@ -229,15 +249,15 @@ def equiv_symbolic(input_latex, expected_latex, options):
     ''' check equivSymbolic
     '''
     input_latex = preprocess_latex(input_latex.strip(),
-                                   thousand_sep=options.get('setThousandsSeparator', ','),
-                                   decimal_sep=options.get('setDecimalSeparator', '.'),
+                                   thousand_sep=getThousandsSeparator(options),
+                                   decimal_sep=getDecimalSeparator(options),
                                    ignore_text=options.get('ignoreText', False))
     if input_latex is None:
         return ERROR
 
     expected_latex = preprocess_latex(expected_latex.strip(),
-                                      thousand_sep=options.get('setThousandsSeparator', ','),
-                                      decimal_sep=options.get('setDecimalSeparator', '.'),
+                                      thousand_sep=getThousandsSeparator(options),
+                                      decimal_sep=getDecimalSeparator(options),
                                       preprocess_sep=False)
 
     # if suboption 'compareSides' is used,
@@ -303,14 +323,14 @@ def equiv_literal(input_latex, expected_latex, options):
     '''
     if 'allowInterval' in options:
         input_latex = preprocess_latex(input_latex,
-                                       thousand_sep=options.get('setThousandsSeparator', ','),
-                                       decimal_sep=options.get('setDecimalSeparator', '.'))
+                                       thousand_sep=getThousandsSeparator(options),
+                                       decimal_sep=getDecimalSeparator(options))
         if input_latex is None:
             return ERROR
         expected_latex = preprocess_latex(expected_latex,
-                                          thousand_sep=options.get('setThousandsSeparator', ','),
-                                          decimal_sep=options.get('setDecimalSeparator', '.'),
-                                          preprocess_sep=False)
+                                        thousand_sep=getThousandsSeparator(options),
+                                        decimal_sep=getDecimalSeparator(options),
+                                        preprocess_sep=False)
 
         equiv = str(input_latex) == str(expected_latex)
     else:
@@ -319,25 +339,25 @@ def equiv_literal(input_latex, expected_latex, options):
         input_symbolic = convert(input_latex.strip(), evaluate=False,
                                  ignore_trailing_zeros=ignore_trailing_zeros,
                                  keep_neg_fraction_form=True,
-                                 thousand_sep=options.get('setThousandsSeparator', ','),
-                                 decimal_sep=options.get('setDecimalSeparator', '.'))
+                                 thousand_sep=getThousandsSeparator(options),
+                                 decimal_sep=getDecimalSeparator(options))
         if input_symbolic is None:
             return ERROR
 
         expected_symbolic = convert(expected_latex.strip(), evaluate=False,
                                     ignore_trailing_zeros=ignore_trailing_zeros,
                                     keep_neg_fraction_form=True,
-                                    thousand_sep=options.get('setThousandsSeparator', ','),
-                                    decimal_sep=options.get('setDecimalSeparator', '.'),
+                                    thousand_sep=getThousandsSeparator(options),
+                                    decimal_sep=getDecimalSeparator(options),
                                     preprocess_sep=False)
 
         preprocessed_input_latex = preprocess_latex(input_latex,
-                                                    thousand_sep=options.get('setThousandsSeparator', ','),
-                                                    decimal_sep=options.get('setDecimalSeparator', '.'))
+                                                    thousand_sep=getThousandsSeparator(options),
+                                                    decimal_sep=getDecimalSeparator(options))
 
         preprocessed_expected_latex = preprocess_latex(expected_latex,
-                                                       thousand_sep=options.get('setThousandsSeparator', ','),
-                                                       decimal_sep=options.get('setDecimalSeparator', '.'),
+                                                       thousand_sep=getThousandsSeparator(options),
+                                                       decimal_sep=getDecimalSeparator(options),
                                                        preprocess_sep=False)
 
         preprocessed_input_latex = leading_zero_re.sub('', preprocessed_input_latex)
@@ -371,14 +391,15 @@ def equiv_value(input_latex, expected_latex, options):
     unit_re = re.compile(r'^(.*?) *\\text\{(' +\
                          '|'.join(sorted(UNITS, key=len, reverse=True)) +\
                          ')\}$')
+
     input_latex = preprocess_latex(input_latex,
-                                   thousand_sep=options.get('setThousandsSeparator', ','),
-                                   decimal_sep=options.get('setDecimalSeparator', '.'))
+                                   thousand_sep=getThousandsSeparator(options),
+                                   decimal_sep=getDecimalSeparator(options))
     if input_latex is None:
         return ERROR
     expected_latex = preprocess_latex(expected_latex,
-                                      thousand_sep=options.get('setThousandsSeparator', ','),
-                                      decimal_sep=options.get('setDecimalSeparator', '.'),
+                                      thousand_sep=getThousandsSeparator(options),
+                                      decimal_sep=getDecimalSeparator(options),
                                       preprocess_sep=False)
 
     expected_unit_match = unit_re.match(expected_latex)
@@ -403,15 +424,16 @@ def equiv_value(input_latex, expected_latex, options):
             return 'false'
     
     input_symbolic = convert(input_latex,
-                             thousand_sep=options.get('setThousandsSeparator', ','),
-                             decimal_sep=options.get('setDecimalSeparator', '.'),
+                             thousand_sep=getThousandsSeparator(options),
+                             decimal_sep=getDecimalSeparator(options),
+                             preprocess_sep=False,
                              ignore_text=options.get('ignoreText', False))
     if input_symbolic is None:
         return ERROR
 
     expected_symbolic = convert(expected_latex,
-                                thousand_sep=options.get('setThousandsSeparator', ','),
-                                decimal_sep=options.get('setDecimalSeparator', '.'),
+                                thousand_sep=getThousandsSeparator(options),
+                                decimal_sep=getDecimalSeparator(options),
                                 preprocess_sep=False)
 
     decimal_places = options.get('significantDecimalPlaces', None)
@@ -439,22 +461,22 @@ def is_simplified(input_latex, expected_latex=None, options={}):
     ''' check isSimplified
     '''
     input_symbolic = convert(input_latex, evaluate=False,
-                             thousand_sep=options.get('setThousandsSeparator', ','),
-                             decimal_sep=options.get('setDecimalSeparator', '.'))
+                             thousand_sep=getThousandsSeparator(options),
+                             decimal_sep=getDecimalSeparator(options))
     if input_symbolic is None:
         return ERROR
     simplified = str(input_symbolic) ==\
                  str(expand(simplify(convert(input_latex,
-                                     thousand_sep=options.get('setThousandsSeparator', ','),
-                                     decimal_sep=options.get('setDecimalSeparator', '.')))))
+                                     thousand_sep=getThousandsSeparator(options),
+                                     decimal_sep=getDecimalSeparator(options)))))
     return result(xor(simplified, 'inverseResult' in options))
 
 def is_expanded(input_latex, expected_latex=None, options={}):
     ''' check isExpanded
     '''
     input_symbolic = convert(input_latex,
-                             thousand_sep=options.get('setThousandsSeparator', ','),
-                             decimal_sep=options.get('setDecimalSeparator', '.'))
+                             thousand_sep=getThousandsSeparator(options),
+                             decimal_sep=getDecimalSeparator(options))
     if input_symbolic is None:
         return ERROR
     expanded = input_symbolic - expand(simplify(input_symbolic)) == 0
@@ -464,8 +486,8 @@ def is_factorised(input_latex, expected_latex=None, options={}):
     ''' check isFactorised
     '''
     input_symbolic = convert(input_latex,
-                             thousand_sep=options.get('setThousandsSeparator', ','),
-                             decimal_sep=options.get('setDecimalSeparator', '.'))
+                             thousand_sep=getThousandsSeparator(options),
+                             decimal_sep=getDecimalSeparator(options))
     if input_symbolic is None:
         return ERROR
     factorised = input_symbolic == factor(input_symbolic)
@@ -475,8 +497,8 @@ def is_true(input_latex, expected_latex=None, options={}):
     ''' check isTrue
     '''
     input_symbolic = convert(input_latex,
-                             thousand_sep=options.get('setThousandsSeparator', ','),
-                             decimal_sep=options.get('setDecimalSeparator', '.'))
+                             thousand_sep=getThousandsSeparator(options),
+                             decimal_sep=getDecimalSeparator(options))
     if input_symbolic is None:
         return ERROR
     true = bool(simplify(input_symbolic))
@@ -486,8 +508,8 @@ def is_unit(input_latex, expected_latex=None, options={}):
     ''' check isUnit
     '''
     input_latex = preprocess_latex(input_latex,
-                                   thousand_sep=options.get('setThousandsSeparator', ','),
-                                   decimal_sep=options.get('setDecimalSeparator', '.'))
+                                   thousand_sep=getThousandsSeparator(options),
+                                   decimal_sep=getDecimalSeparator(options))
     if input_latex is None or input_latex.count('.') > 1:
         return ERROR
     is_unit_re = re.compile(r'^(.*?) *\\text\{(' +
