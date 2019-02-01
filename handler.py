@@ -2,12 +2,11 @@ import csv
 import sys
 import json
 
-from checks import equiv_symbolic, equiv_literal, string_match
-from checks import is_simplified, is_expanded, is_factorised
-from checks import is_true
 from checks import parse_checks, check_func
 
 def handle(event, context):
+    print("Request Body: ")
+    print(event["body"])
     try:
         body = json.loads(event["body"])
     except Exception as e:
