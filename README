@@ -1,0 +1,83 @@
+Run:
+
+python3.7 testchecks.py 
+
+tests.csv  new test cases
+tests_V1.0_dump.csv  test cases from dump file
+
+We need to have local copies of libraries: sympy, antlr4, latex2sympy  because there is some stability issue
+
+
+
+** DATA DUMP ***
+Usage: python export_latex.py user_activity.csv outputcsv
+Needed packages: lxml
+You can install it using pip
+
+Rules
+Start:
+We read info(factorised,simplified...) and if any info is set we will call respective function on string alongside with other function defined under.
+IsRationalized is not defined at checks.py so the program always returns Undefined
+
+Currently program doesn’t support multiple separators(not needed there are all the same in excel file) but it is possible to defined them and they will be added to every function called on the string.
+
+1.  At start the program tries to find any unit(km,l,cm…..) in the string. If it succeeds it will process the string as a unit - > More at UNIT_PROCESSING. If it doesn’t process string well it  will return Undefined
+
+2. Then the program tries find inequality signs(<,>.....) If it succeeds it will process the string as a inequation - > More at INEQUATION_PROCESSING. If it doesn’t process string well it  will return Undefined
+
+3.Then the program tries to find equality sign(=) If it succeeds it will process the string as a equation - > More at EQUATION_PROCESSING
+
+4.Then the program treats the string as a equivLiteral. It is better because equivLiteral is more specific and is harder to achieve than equivSymbolic. The program process the string according to EQUIV_LITERAL_PROCESSING
+
+5. If we cannot treat the string as equivLiteral we have to use equivSymbolic-> we process the string according to EQUIV_SYMBOLIC_PROCESSING
+
+6. If we haven’t succeeded yet then we treat the string as string_mat -> more at STRING_MATCH_PROCESSING
+
+7. If the program gets to this point it return Undefined
+
+
+UNIT_PROCESSING:
+	
+default rule = isUnit
+append option allowedUnits with units in expected latex
+append rule = equivValue if possible or we need to get answer to false
+append inverse result to all functions if expected answer is false and we have answer true
+Else Undefined
+
+
+INEQUATION_PROCESSING:
+default rule = isTrue
+append inverse result to all functions if expected answer is false and we have answer true
+Else Undefined
+
+EQUATION_PROCESSING
+default rule = equivSymbolic
+default option = compareSides
+append option inverse result to all functions if expected answer is false and we have answer true
+append option ignoreText if expected answer is true and we have answer false
+Else Undefined
+
+EQUIV_LITERAL_PROCESSING
+default rule = equivLiteral
+append option allowInterval if string contains interval
+append option ignoreCoefficientOfOne if string contains coefOfOne
+append option inverse result to all functions if expected answer is false and we have answer true
+append option ignoreOrder if expected answer is true and we have answer false
+append option ignoreTrailingZeros  if expected answer is true and we have answer false
+Else Undefined
+EQUIV_SYMBOLIC_PROCESSING
+default rule = equivSymbolic
+append option ignoreText if expected answer is true and we have answer false
+append option significantDecimalPlaces with numbers from 1-10 until we get true if expected answer is true and we have answer false
+append option inverse result to all functions if expected answer is false and we have answer true
+Else Undefined
+STRING_MATCH_PROCESSING
+default rule = stringMatch
+append option inverse result to all functions if expected answer is false and we have answer true
+append option treatMultipleSpacesAsOne if expected answer is true and we have answer false
+append option ignoreLeadingAndTrailingSpaces if expected answer is true and we have answer false
+Else Undefined
+
+
+
+

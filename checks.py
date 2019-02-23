@@ -11,6 +11,7 @@ from sympy import sympify
 from sympy import simplify
 from sympy import expand, factor
 from sympy import srepr
+from sympy import nsimplify
 from latex2sympy.process_latex import process_sympy
 
 # default values and dictionaries ---------------------------------------------
@@ -286,7 +287,53 @@ def equiv_symbolic(input_latex, expected_latex, options):
 
         return result(xor(equiv, 'inverseResult' in options))
 
+    ################################
+    ### NEW CONDITION ADDED HERE ###
+    ################################
+
+    # if suboption 'isTrue' is used,
+    # we expect the expressions to be equivalents
+    if 'isTrue' in options:
+
+        if '<=' in input_latex and '<=' in expected_latex: separ = '<='
+        elif '>=' in input_latex and '>=' in expected_latex: separ = '>='
+        elif '<' in input_latex and '<' in expected_latex: separ = '<'
+        elif '>' in input_latex and '>' in expected_latex: separ = '>'
+        elif '=' in input_latex and '=' in expected_latex: separ = '='
+        else: return result(False)
+
+        input_latex, input_result_latex = input_latex.split(separ, maxsplit=1)
+        input_symbolic = sympify_latex(input_latex)
+        input_result_symbolic = sympify_latex(input_result_latex)
+        if input_symbolic is None or input_result_symbolic is None:
+            return ERROR
+
+        expected_latex, expected_result_latex = expected_latex.split(separ, maxsplit=1)
+        expected_symbolic = sympify_latex(expected_latex)
+        expected_result_symbolic = sympify_latex(expected_result_latex)
+
+        decimal_places = options.get('significantDecimalPlaces', None)
+        if decimal_places is not None:
+            equiv = expand(simplify(input_symbolic)) ==\
+                    expand(simplify(expected_symbolic)) and\
+                    round(decimal.Decimal(str(float(simplify(input_result_symbolic))))) ==\
+                    round(decimal.Decimal(str(float(simplify(expected_result_symbolic)))))
+        else:
+            equiv = expand(simplify(input_symbolic)) -\
+                    expand(simplify(input_result_symbolic)) ==\
+                    simplify(expected_symbolic) -\
+                    simplify(expected_result_symbolic)
+
+        return result(xor(equiv, 'inverseResult' in options))
+
+    #print(input_latex, type(input_latex))
+    pattern = re.compile(r'[0-9]\\frac{[0-9]}{[0-9]}')
+
+    if bool(pattern.match(input_latex)):
+        input_latex = input_latex[0]+'+'+input_latex[1:]
+
     input_symbolic = sympify_latex(input_latex)
+
     if input_symbolic is None:
         return ERROR
 
@@ -527,8 +574,28 @@ def is_factorised(input_latex, expected_latex=None, options={}):
                              decimal_sep=getDecimalSeparator(options))
     if input_symbolic is None:
         return ERROR
-    factorised = input_symbolic == factor(input_symbolic)
+    
+    if re.search('^\(.*[\)\)].*\)$', str(input_symbolic)):
+        factorised = bool( re.search('^\(.*[\)\)].*\)$', str(input_symbolic)) )
+    else:
+        factorised = str(input_symbolic) == str(factor(input_symbolic, gaussian=True))
+
     return result(xor(factorised, 'inverseResult' in options))
+
+def set_evaluation(input_latex, expected_latex=None, options={}):
+    ''' check setEvaluation
+    '''
+    input_symbolic = list(map(int, input_latex.split(',')))
+    expected_latex = list(map(int, expected_latex.split(',')))
+
+    if input_symbolic is None:
+        return ERROR
+
+    input_symbolic.sort()
+    expected_latex.sort()
+
+    evaluation = input_symbolic == expected_latex
+    return result(xor(evaluation, 'inverseResult' in options))
 
 def is_true(input_latex, expected_latex=None, options={}):
     ''' check isTrue
@@ -622,6 +689,7 @@ check_func = {
     'isTrue': is_true,
     'isUnit': is_unit,
     'equivSyntax': equiv_syntax,
+    'setEvaluation': set_evaluation,
 }
 
 # a dictionary of possible main options and their respective
@@ -629,6 +697,7 @@ check_func = {
 # of option combinations passed to the script
 allowed_options = {
     'equivSymbolic': {
+        'isTrue',
         'setThousandsSeparator',
         'setDecimalSeparator',
         'inverseResult',
@@ -659,7 +728,10 @@ allowed_options = {
     'isFactorised': {
         'setThousandsSeparator',
         'setDecimalSeparator',
-        'inverseResult'},
+        'inverseResult',
+        'realType',
+        'complexType',
+        'integerType'},
     'isExpanded': {
         'setThousandsSeparator',
         'setDecimalSeparator',
@@ -685,6 +757,8 @@ allowed_options = {
         'isStandardForm',
         'isSlopeInterceptForm',
         'isPointSlopeForm'},
+    'setEvaluation': {
+        'inverseResult'},
 }
 
 no_set_decimal_separator = {main for main in allowed_options 
