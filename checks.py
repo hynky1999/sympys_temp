@@ -624,7 +624,7 @@ def is_unit(input_latex, expected_latex=None, options={}):
 # regular expressions for pattern checks for equivSyntax
 coeff = r'([A-Wa-w]|\d+(\.\d+)?|-?\d+/-?\d+|\\frac\{-?\d+\}\{-?\d+\}|\d+ *(\d+/\d+|\\frac\{\d+\}\{\d+\})|)'
 decimal_re_pattern = r'^\d+\.\d{{{}}}$'
-simple_frac_re = re.compile(r'^(-?\d+/-?\d+|-?\\frac\{-?\d+\}\{-?\d+\})$')
+simple_frac_re = re.compile(r'^(-?\d+/-?\d+|-?\d+\\div-?\d+|-?\\frac\{-?\d+\}\{-?\d+\})$')
 mixed_frac_re = re.compile(r'^-?\d+ *(\d+/\d+|\\frac\{\d+\}\{\d+\})$')
 exp_re = re.compile(r'^(([A-Wa-w]+|\d+(\.\d+)?)\^(\{.*[x-z].*\}|[x-z])|exp\(.*[x-z].*\))$')
 standard_form_linear_re = re.compile(r'^-?{} *{} *x *[+-] *{} *{} *y *= *-?{}$'.format(coeff, times, coeff, times, coeff))
