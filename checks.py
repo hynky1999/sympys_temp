@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.7
+print("Hellow from checks.py")
 
 import re
 import os
