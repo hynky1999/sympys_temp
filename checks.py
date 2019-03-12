@@ -1,5 +1,4 @@
-#!/usr/bin/env python3.7
-print("Hellow from checks.py")
+#!/usr/bin/env python3
 
 import re
 import os
@@ -189,7 +188,6 @@ def sympify_latex(input_latex, evaluate=None):
                                  evaluate=evaluate)
     except:
         return None
-
     return input_symbolic
 
 def convert(input_latex, evaluate=None,
@@ -211,7 +209,6 @@ def convert(input_latex, evaluate=None,
     if input_latex is None:
         return None
     input_symbolic = sympify_latex(input_latex, evaluate=evaluate)
-
     return input_symbolic
 # end of preprocessing block --------------------------------------------------
 
@@ -258,12 +255,10 @@ def equiv_symbolic(input_latex, expected_latex, options):
                                    ignore_text=options.get('ignoreText', False))
     if input_latex is None:
         return ERROR
-    print('inputtt: ', input_latex)
 
     expected_latex = preprocess_latex(expected_latex.strip(),
                                       thousand_sep=getThousandsSeparator(options),
                                       decimal_sep=getDecimalSeparator(options))
-    print('expecteddd: ', expected_latex)
 
     # if suboption 'compareSides' is used,
     # we expect the expressions to be equalities
@@ -552,24 +547,12 @@ def is_simplified(input_latex, expected_latex=None, options={}):
     input_symbolic = convert(input_latex, evaluate=False,
                              thousand_sep=getThousandsSeparator(options),
                              decimal_sep=getDecimalSeparator(options))
-
-    print("OPS:", options)
-    print("TS:", getThousandsSeparator(options))
-    print("DS:", getDecimalSeparator(options))
-    print('\nHERE CHECK IF IT IS SIMPLIFIED:\n')
-    print('input_symbolic: ', input_symbolic)
     if input_symbolic is None:
         return ERROR
-    print("IS:", input_symbolic)
-    print("input_latex:", input_latex)
-    print("RHS:", (expand(simplify(convert(input_latex, thousand_sep=getThousandsSeparator(options), decimal_sep=getDecimalSeparator(options))))) )
     simplified = str(input_symbolic) ==\
                  str(expand(simplify(convert(input_latex,
                                      thousand_sep=getThousandsSeparator(options),
                                      decimal_sep=getDecimalSeparator(options)))))
-    print('simplified (boolean): ', simplified)
-    print('inverseResult:', 'inverseResult' in options)
-    print('inverseResult2:', xor(simplified, 'inverseResult' in options))
     return result(xor(simplified, 'inverseResult' in options))
 
 def is_expanded(input_latex, expected_latex=None, options={}):
@@ -641,7 +624,7 @@ def is_unit(input_latex, expected_latex=None, options={}):
 # regular expressions for pattern checks for equivSyntax
 coeff = r'([A-Wa-w]|\d+(\.\d+)?|-?\d+/-?\d+|\\frac\{-?\d+\}\{-?\d+\}|\d+ *(\d+/\d+|\\frac\{\d+\}\{\d+\})|)'
 decimal_re_pattern = r'^\d+\.\d{{{}}}$'
-simple_frac_re = re.compile(r'^(-?\d+/-?\d+|-?\\frac\{-?\d+\}\{-?\d+\})$')
+simple_frac_re = re.compile(r'^(-?\d+/-?\d+|-?\d+\\div-?\d+|-?\\frac\{-?\d+\}\{-?\d+\})$')
 mixed_frac_re = re.compile(r'^-?\d+ *(\d+/\d+|\\frac\{\d+\}\{\d+\})$')
 exp_re = re.compile(r'^(([A-Wa-w]+|\d+(\.\d+)?)\^(\{.*[x-z].*\}|[x-z])|exp\(.*[x-z].*\))$')
 standard_form_linear_re = re.compile(r'^-?{} *{} *x *[+-] *{} *{} *y *= *-?{}$'.format(coeff, times, coeff, times, coeff))
@@ -688,7 +671,6 @@ def equiv_syntax(input_latex, expected_latex=None, options={}):
                     pattern_re = pattern_dict[option]
     input_latex = input_latex.replace('\\left', '').replace('\\right', '')
     equiv = pattern_re.match(input_latex.strip()) is not None
-
     return result(xor(equiv, 'inverseResult' in options))
 
 # end of check functions block ------------------------------------------------

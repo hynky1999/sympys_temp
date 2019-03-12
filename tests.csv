@@ -1,1 +1,311 @@
+1,equivLiteral: simple fraction vs. decimal,\frac{1}{2},0.5,equivLiteral,false
+2,equivLiteral: simple fractions,\frac{1}{2},\frac{1}{2},equivLiteral,true
+3,equivLiteral: decimal fraction vs. simple fraction,0.5,\frac{1}{2},equivLiteral,false
+4,equivLiteral: fraction with minus,-\frac{1}{2},-\frac{1}{2},equivLiteral,true
+5,equivLiteral: fraction with minus,-\frac{1}{2},\frac{-1}{2},equivLiteral,false
+6,equivLiteral: fraction with minus,\frac{1}{-2},-\frac{1}{2},equivLiteral,false
+7,equivLiteral: fraction with minus,\frac{-x}{2},-\frac{x}{2},equivLiteral,false
+8,equivLiteral: fraction with minus,-\frac{x-1}{2},\frac{-(x-1)}{2},equivLiteral,false
+9,equivLiteral: fraction with minus,-\frac{2}{3},\frac{-2}{3},equivLiteral,false
+10,equivLiteral: coefficient of 1,1x+2,x+2,equivLiteral,false
+11,equivLiteral: different order,x+1,1+x,equivLiteral,false
+12,equivLiteral: decimal fractions,0.50,0.5,equivLiteral,false
+13,equivLiteral: decimal fractions,.5,0.5,equivLiteral,true
+14,equivLiteral: decimal fractions,"0,5",0.5,equivLiteral,error
+15,equivLiteral: fraction instead of number,4/2,2,equivLiteral,false
+16,equivLiteral: simple case,2,2,equivLiteral,true
+17,equivLiteral: simple case with brackets,(2),2,equivLiteral,true
+18,equivLiteral: sum instead of number,1+1,2,equivLiteral,false
+19,equivLiteral:inverseResult: decimal fractions,0.5,0.5,equivLiteral:inverseResult,false
+20,equivLiteral:inverseResult: simple fraction vs. decimal,\frac{1}{2},0.5,equivLiteral:inverseResult,true
+21,equivLiteral:inverseResult: decimal fraction vs. simple fraction,0.5,\frac{1}{2},equivLiteral:inverseResult,true
+22,equivLiteral:inverseResult: coefficient of 1,1x+2,x+2,equivLiteral:inverseResult,true
+23,equivLiteral:inverseResult: fraction instead of number,4/2,2,equivLiteral:inverseResult,true
+24,equivLiteral:ignoreTrailingZeros,0.5,0.5,equivLiteral:ignoreTrailingZeros,true
+25,equivLiteral:ignoreTrailingZeros,0.5,0.5,equivLiteral:ignoreTrailingZeros,true
+26,equivLiteral:ignoreTrailingZeros,0.5,0.5,equivLiteral:ignoreTrailingZeros,true
+27,equivLiteral:ignoreTrailingZeros,0.500001,0.5,equivLiteral:ignoreTrailingZeros,false
+28,equivLiteral:ignoreTrailingZeros,0.50+0.5,0.5+0.5,equivLiteral:ignoreTrailingZeros,true
+29,"equivLiteral:setDecimalSeparator=','","1,1",1.1,"equivLiteral:setDecimalSeparator=','",true
+30,"equivLiteral:setDecimalSeparator=','","1,1+1",1.1+1,"equivLiteral:setDecimalSeparator=','",true
+31,"equivLiteral:setDecimalSeparator=','","2,1",1.1+1,"equivLiteral:setDecimalSeparator=','",false
+32,"equivLiteral:setDecimalSeparator=','","1,1+x",1.1+x,"equivLiteral:setDecimalSeparator=','",true
+33,"equivLiteral:setDecimalSeparator=','","1+1,1",1+1.1,"equivLiteral:setDecimalSeparator=','",true
+34,"equivLiteral:setThousandsSeparator=[',', ' ']","1,000,000",1000000,"equivLiteral:setThousandsSeparator=[',', ' ']",true
+35,"equivLiteral:setThousandsSeparator=[',']","1,000,000",1000000,"equivLiteral:setThousandsSeparator=[',']",true
+36,"equivLiteral:setThousandsSeparator=[' ']",1 000 000,1000000,"equivLiteral:setThousandsSeparator=[' ']",true
+37,"equivLiteral:setThousandsSeparator=[',']",1 000 + x,1000 + x,"equivLiteral:setThousandsSeparator=[',']",error
+38,"equivLiteral:setThousandsSeparator=[',', ' ']","1,0",1,"equivLiteral:setThousandsSeparator=[',', ' ']",error
+39,equivSymbolic: \log_2 x,\log_2 x,\log_{2} x,equivSymbolic,true
+40,equivSymbolic: addition and multiplication non-associativity,x+y*z,(x+y) \times z,equivSymbolic,false
+41,equivSymbolic: addition associativity,x+(y+z),(x+y)+z,equivSymbolic,true
+42,equivSymbolic: addition commutativity,x+y,y+x,equivSymbolic,true
+43,equivSymbolic: division without divisor,a / b /,a / b / c,equivSymbolic,error
+44,equivSymbolic: fraction with missing closing '}',\frac{1}{10,0.1,equivSymbolic,error
+45,equivSymbolic: percent conversion,10\%,0.1,equivSymbolic,true
+46,equivSymbolic: simple fraction vs. decimal,\frac{1}{10},0.1,equivSymbolic,true
+47,equivSymbolic: sin without backslash,sin x,\sin x,equivSymbolic,false
+48,equivSymbolic: sin/cos equivalency to tangent,\frac{\sin x}{\cos x},\tan x,equivSymbolic,true
+49,equivSymbolic: sin/cos with missing x,\frac{\sin}{\cos},\tan x,equivSymbolic,error
+50,equivSymbolic: squares expansion,(x+y)^2,x^2 + 2xy + y^2,equivSymbolic,true
+51,"equivSymbolic:setDecimalSeparator=',': percent conversion","10,1\%","0,101","equivSymbolic:setDecimalSeparator=','",true
+52,"equivSymbolic:setDecimalSeparator=',': simple fraction vs. decimal","\frac{1,0}{10}",0.1,"equivSymbolic:setDecimalSeparator=','",true
+53,"equivSymbolic:setDecimalSeparator=',': floats","1,01",1.01,"equivSymbolic:setDecimalSeparator=','",true
+54,"equivSymbolic:setDecimalSeparator=',': enumeration","1, 2, 3","1, 2, 3","equivSymbolic:setDecimalSeparator=','",error
+55,"equivSymbolic:setDecimalSeparator=',': polynomial","x+1,2",x+1.2,"equivSymbolic:setDecimalSeparator=','",true
+56,"equivSymbolic:setThousandsSeparator=[' ']: percent conversion","1 000\%",1000,"equivSymbolic:setThousandsSeparator=[' ']",false
+57,"equivSymbolic:setThousandsSeparator=[' ']': simple fraction vs. decimal","\frac{1}{1 000}",0.001,"equivSymbolic:setThousandsSeparator=[' ']",true
+58,"equivSymbolic:setThousandsSeparator=[',']: percent conversion","1,000\%",10,"equivSymbolic:setThousandsSeparator=[',']",true
+59,"equivSymbolic:setThousandsSeparator=[',']': simple fraction vs. decimal","\frac{1}{1,000}",0.001,"equivSymbolic:setThousandsSeparator=[',']",true
+60,"equivSymbolic:setThousandsSeparator=[',', ' ']': polynomial","x+1,2",x+1.2,"equivSymbolic:setThousandsSeparator=[',', ' ']",error
+61,equivSymbolic:compareSides: addition commutativity,3+4=7,4 + 3 = 7,equivSymbolic:compareSides,true
+62,equivSymbolic:compareSides: percent conversion,30\%+4.2=4.5,0.3 + 4.2 = 4.5,equivSymbolic:compareSides,true
+63,equivSymbolic:compareSides: wrong answer,3+4=9,4 + 3 = 7,equivSymbolic:compareSides,false
+64,equivSymbolic:compareSides: wrong expression,3+3=7,4 + 3 = 7,equivSymbolic:compareSides,false
+65,equivSymbolic:compareSides: wrong expression and answer,3+3=9,4 + 3 = 7,equivSymbolic:compareSides,false
+66,isExpanded: simple polynomial,2x,,isExpanded,true
+67,isExpanded: simple polynomial,x^2+3x,,isExpanded,true
+68,isExpanded: simple polynomial with two variables,x^2+xy+3x+3y,,isExpanded,true
+69,isExpanded: simple polynomial with two variables,3y+3x+xy+x^2,,isExpanded,true
+70,isExpanded: product of two sums,(x+3)(x+y),,isExpanded,false
+71,isExpanded: simple polynomial,"2,0x",,"isExpanded:setDecimalSeparator=','",true
+72,isExpanded: simple polynomial,"x^2+3,0x",,"isExpanded:setDecimalSeparator=','",true
+73,isExpanded: simple polynomial with two variables,"x^2+xy+3,0x+3,0y",,"isExpanded:setDecimalSeparator=','",true
+74,isExpanded: simple polynomial with two variables,"3,0y+3,0x+xy+x^2",,"isExpanded:setDecimalSeparator=','",true
+75,isExpanded: product of two sums,"(x+3,0)(x+y)",,"isExpanded:setDecimalSeparator=','",false
+76,isExpanded: simple polynomial,2x,,"isExpanded:setThousandsSeparator=[',']",true
+77,isExpanded: simple polynomial,"x^2+3,000x",,"isExpanded:setThousandsSeparator=[',']",true
+78,isExpanded: simple polynomial with two variables,x^2+xy+3 000x+3 000y,,isExpanded:setThousandsSeparator=[' '],true
+79,isExpanded: simple polynomial with two variables,3 000y+3 000x+xy+x^2,,isExpanded:setThousandsSeparator=[' '],true
+80,isExpanded: product of two sums,(x+3 000)(x+y),,"isExpanded:setThousandsSeparator=[',', ' ']",false
+81,isExpanded:inverseResult: simple polynomial,2x,,isExpanded:inverseResult,false
+82,isExpanded:inverseResult: simple polynomial,x^2+3x,,isExpanded:inverseResult,false
+83,isExpanded:inverseResult: simple polynomial with two variables,x^2+xy+3x+3y,,isExpanded:inverseResult,false
+84,isExpanded:inverseResult: simple polynomial with two variables,3y+3x+xy+x^2,,isExpanded:inverseResult,false
+85,isExpanded:inverseResult: product of two sums,(x+3)(x+y),,isExpanded:inverseResult,true
+86,isFactorised: 2x,2x,,isFactorised,true
+87,isFactorised:simple polynomial,x^2+3x,,isFactorised,false
+88,isFactorised: factorised + constant,x(x-3)+2,,isFactorised,false
+89,isFactorised: factorised,(x+y)(x+3),,isFactorised,true
+90,isFactorised: factorised,(x+3)(x+y),,isFactorised,true
+91,"isFactorised:setDecimalSeparator=',': 2,2x","2,2x",,"isFactorised:setDecimalSeparator=','",true
+92,"isFactorised:setDecimalSeparator=',':simple polynomial","x^2+3,3x",,"isFactorised:setDecimalSeparator=','",false
+93,"isFactorised:setDecimalSeparator=',': factorised + constant","x(x-3)+2,2",,"isFactorised:setDecimalSeparator=','",false
+94,"isFactorised:setDecimalSeparator=',': factorised","(x+y)(x+3)",,"isFactorised:setDecimalSeparator=','",true
+95,"isFactorised:setDecimalSeparator=',': factorised","(x+3)(x+y)",,"isFactorised:setDecimalSeparator=','",true
+96,isFactorised: 2x,2x,,"isFactorised:setThousandsSeparator=[',']",true
+97,isFactorised:simple polynomial,x^2+3x,,"isFactorised:setThousandsSeparator=[',']",false
+98,isFactorised: factorised + constant,"x(x-3)+2,000",,isFactorised:setThousandsSeparator=[' '],error
+99,isFactorised: factorised,(x+y)(x+3 000),,isFactorised:setThousandsSeparator=[' '],true
+100,isFactorised: factorised,(x+3 000)(x+y),,"isFactorised:setThousandsSeparator=[',', ' ']",true
+101,isFactorised:inverseResult: 2x,2x,,isFactorised:inverseResult,false
+102,isFactorised:inverseResult:simple polynomial,x^2+3x,,isFactorised:inverseResult,true
+103,isFactorised:inverseResult: factorised + constant,x(x-3)+2,,isFactorised:inverseResult,true
+104,isFactorised:inverseResult: factorised,(x+y)(x+3),,isFactorised:inverseResult,false
+105,isFactorised:inverseResult: factorised,(x+3)(x+y),,isFactorised:inverseResult,false
+106,isSimplified: 4x+1,4x+1,,isSimplified,true
+107,isSimplified: 4x+2+1,4x+2+1,,isSimplified,false
+108,isSimplified: x(x),x(x),,isSimplified,false
+109,isSimplified: 3/7,3/7,,isSimplified,true
+110,isSimplified: 9/21,9/21,,isSimplified,false
+111,"isSimplified:setDecimalSeparator=',': 4x+1,1","4x+1,1",,"isSimplified:setDecimalSeparator=','",true
+112,"isSimplified:setDecimalSeparator=',': 4x+2,1+1,1","4x+2,1+1,1",,"isSimplified:setDecimalSeparator=','",false
+113,"isSimplified:setDecimalSeparator=',': x(x)",x(x),,"isSimplified:setDecimalSeparator=','",false
+114,"isSimplified:setDecimalSeparator=',': 3/7",3/7,,"isSimplified:setDecimalSeparator=','",true
+115,"isSimplified:setDecimalSeparator=',': 9/21",9/21,,"isSimplified:setDecimalSeparator=','",false
+116,"isSimplified:setThousandsSeparator=[',']: 4x+1",4x+1,,"isSimplified:setThousandsSeparator=[',']",true
+117,"isSimplified:setThousandsSeparator=[',']: 4x+2+1,000","4x+2+1,000",,"isSimplified:setThousandsSeparator=[',']",false
+118,isSimplified:setThousandsSeparator=[' ']: x(x),x(x),,isSimplified:setThousandsSeparator=[' '],false
+119,isSimplified:setThousandsSeparator=[' ']: 3 000/7 000,3 000/7 000,,isSimplified:setThousandsSeparator=[' '],false
+120,"isSimplified:setThousandsSeparator=[',', ' ']: 9 000/21 000",9 000/21 000,,"isSimplified:setThousandsSeparator=[',', ' ']",false
+121,isSimplified:inverseResult: 4x+1,4x+1,,isSimplified:inverseResult,false
+122,isSimplified:inverseResult: 4x+2+1,4x+2+1,,isSimplified:inverseResult,true
+123,isSimplified:inverseResult: x(x),x(x),,isSimplified:inverseResult,true
+124,isSimplified:inverseResult: 3/7,3/7,,isSimplified:inverseResult,false
+125,isSimplified:inverseResult: 9/21,9/21,,isSimplified:inverseResult,true
+126,isTrue: 1,1,,isTrue,true
+127,isTrue: 5>1,5>1,,isTrue,true
+128,isTrue: x,x,,isTrue,true
+129,isTrue: 1=2,1=2,,isTrue,false
+130,isTrue: 5<1,5<1,,isTrue,false
+131,isTrue: 1,"1,0",,"isTrue:setDecimalSeparator=','",true
+132,isTrue: 5>1,"5,0>1,0",,"isTrue:setDecimalSeparator=','",true
+133,isTrue: x,x,,"isTrue:setDecimalSeparator=','",true
+134,isTrue: 1=2,"1=2,0",,"isTrue:setDecimalSeparator=','",false
+135,isTrue: 5<1,"5<1,0",,"isTrue:setDecimalSeparator=','",false
+136,isTrue: setThousandsSeparator=[' ']: 1,1,,isTrue:setThousandsSeparator=[' '],true
+137,isTrue: setThousandsSeparator=[' ']: 5 000 > 1 000,5 000 > 1 000,,isTrue:setThousandsSeparator=[' '],true
+138,"isTrue: setThousandsSeparator=[',']: x",x,,"isTrue:setThousandsSeparator=[',']",true
+139,"isTrue: setThousandsSeparator=[',']: 1,0=2,0","1,0=2,0",,"isTrue:setThousandsSeparator=[',']",error
+140,"isTrue: setThousandsSeparator=[' ', ',']: 5 000 < 1 000",5 000 < 1 000,,"isTrue:setThousandsSeparator=[' ', ',']",false
+141,isTrue:inverseResult: 1,1,,isTrue:inverseResult,false
+142,isTrue:inverseResult: 5>1,5>1,,isTrue:inverseResult,false
+143,isTrue:inverseResult: x,x,,isTrue:inverseResult,false
+144,isTrue:inverseResult: 1=2,1=2,,isTrue:inverseResult,true
+145,isTrue:inverseResult: 5<1,5<1,,isTrue:inverseResult,true
+146,"stringMatch:ignoreLeadingAndTrailingSpaces: numbers","1, 2, 3 ","1, 2, 3",stringMatch:ignoreLeadingAndTrailingSpaces,true
+147,"stringMatch:ignoreLeadingAndTrailingSpaces: a variable", a ,a,stringMatch:ignoreLeadingAndTrailingSpaces,true
+148,"stringMatch:ignoreLeadingAndTrailingSpaces: \dot vs. \cdot",\dot,\cdot,stringMatch:ignoreLeadingAndTrailingSpaces,false
+149,"stringMatch:ignoreLeadingAndTrailingSpaces: \times vs. \cdot",\times,\cdot,stringMatch:ignoreLeadingAndTrailingSpaces,false
+150,"stringMatch:ignoreLeadingAndTrailingSpaces: asterisk",*,*,stringMatch:ignoreLeadingAndTrailingSpaces,true
+151,"stringMatch: numbers","1, 2, 3","1, 2, 3",stringMatch,true
+152,"stringMatch: a variable", a ,a,stringMatch,false
+153,"stringMatch: \dot vs. \cdot",\dot,\cdot,stringMatch,false
+154,"stringMatch: \times vs. \cdot",\times,\cdot,stringMatch,false
+155,"stringMatch: asterisk",*,*,stringMatch,true
+156,"stringMatch:inverseResult: numbers","1, 2, 3","1, 2, 3",stringMatch:inverseResult,false
+157,"stringMatch:inverseResult: a variable", a ,a,stringMatch:inverseResult,true
+158,"stringMatch:inverseResult: \dot vs. \cdot",\dot,\cdot,stringMatch:inverseResult,true
+159,"stringMatch:inverseResult: \times vs. \cdot",\times,\cdot,stringMatch:inverseResult,true
+160,"stringMatch:inverseResult: asterisk",*,*,stringMatch:inverseResult,false
+161,"stringMatch:treatMultipleSpacesAsOne","1, 2,  3","1, 2, 3",stringMatch:treatMultipleSpacesAsOne,true
+162,"stringMatch:treatMultipleSpacesAsOne", a ,a,stringMatch:treatMultipleSpacesAsOne,false
+163,"stringMatch:treatMultipleSpacesAsOne",\dot,\cdot,stringMatch:treatMultipleSpacesAsOne,false
+164,"stringMatch:treatMultipleSpacesAsOne",\times,\cdot,stringMatch:treatMultipleSpacesAsOne,false
+165,"stringMatch:treatMultipleSpacesAsOne",*,*,stringMatch:treatMultipleSpacesAsOne,true
+166,equivSymbolic:ignoreText,"3 dogs",3,equivSymbolic:ignoreText,true
+167,equivSymbolic:ignoreText,"4 dogs",3,equivSymbolic:ignoreText,false
+168,equivSymbolic:ignoreText,"3 \text{cm}",3,equivSymbolic:ignoreText,true
+169,equivSymbolic:ignoreText,"3 \text{cm} long",3,equivSymbolic:ignoreText,true
+170,equivSymbolic:ignoreText,"4 \text{cm} long",3,equivSymbolic:ignoreText,false
+171,isUnit,"7 \text{ft}",,"isUnit:allowedUnits=[ft]",true
+172,isUnit,"7\text{ft}",,"isUnit:allowedUnits=[ft,mi]",true
+173,isUnit,"10\text{in}",,"isUnit:allowedUnits=['ft', 'mi']",false
+174,isUnit,"1.01\text{in}",,"isUnit:allowedUnits=[in]",true
+175,isUnit,"1.0.1\text{in}",,"isUnit:allowedUnits=[in]",error
+176,isUnit,"7 \text{ft}",,"isUnit:allowedUnits=[ft],inverseResult",false
+177,isUnit,"\frac{1}{2}\text{ft}",,"isUnit:allowedUnits=[ft, mi],inverseResult",false
+178,isUnit,"10\text{in}",,"isUnit:allowedUnits=[ft, mi],inverseResult",true
+179,isUnit,"1.01\text{in}",,"isUnit:allowedUnits=[in],inverseResult",false
+180,isUnit,"1.0.1\text{in}",,"isUnit:allowedUnits=[in],inverseResult",error
+181,isUnit,"7,000 \text{ft}",,"isUnit:allowedUnits=[ft],setThousandsSeparator=[',']",true
+182,isUnit,"7 000\text{ft}",,"isUnit:allowedUnits=[ft, mi],setThousandsSeparator=[' ']",true
+183,isUnit,"10 000 \text{in}",,"isUnit:allowedUnits=['ft', 'mi'],setThousandsSeparator=[' ']",false
+184,isUnit,"1.01\text{in}",,"isUnit:allowedUnits=[in],setThousandsSeparator=[' ']",true
+185,isUnit,"1.0.1\text{in}",,"isUnit:allowedUnits=[in],setThousandsSeparator=[' ']",error
+186,equivValue with tolerance,10,10,"equivValue:tolerance=1.6",true
+187,equivValue with tolerance,11.6,10,"equivValue:tolerance=1.6",true
+188,equivValue with tolerance,8.4,10,"equivValue:tolerance=1.6",true
+189,equivValue with tolerance,11,10,"equivValue:tolerance=1.6",true
+190,equivValue with tolerance,11.7,10,"equivValue:tolerance=1.6",false
+309,equivValue with tolerance,11.7,10,"equivValue:tolerance=1.6,inverseResult",true
+310,equivValue with tolerance,8.4,10,"equivValue:tolerance=1.6,inverseResult",false
+191,equivSyntax:isDecimal with argument 3 and 3 decimal digits,2.165,,"equivSyntax:isDecimal=3",true
+192,equivSyntax:isDecimal with argument 3 but 2 decimal digits,3.14,,"equivSyntax:isDecimal=3",false
+193,equivSyntax:isDecimal with argument 3 but integer input,1,,"equivSyntax:isDecimal=3",false
+194,equivSyntax:isDecimal with simple fraction in \frac{a}{b} form,\frac{1}{2},,"equivSyntax:isDecimal=3",false
+195,equivSyntax:isDecimal with simple fraction in a/b form,1/2,,"equivSyntax:isDecimal=3",false
+196,equivSyntax:isSimpleFraction with -1/2,-1/2,,equivSyntax:isSimpleFraction,true
+197,equivSyntax:isSimpleFraction with \frac,\frac{1}{2},,equivSyntax:isSimpleFraction,true
+198,equivSyntax:isSimpleFraction with -\frac,-\frac{1}{2},,equivSyntax:isSimpleFraction,true
+199,equivSyntax:isSimpleFraction with \frac and decimal,\frac{1.0}{2.0},,equivSyntax:isSimpleFraction,false
+200,equivSyntax:isSimpleFraction with mixed fraction,1\frac{1}{2},,equivSyntax:isSimpleFraction,false
+201,equivSyntax:isMixedFraction with 1 1/2,1 1/2,,equivSyntax:isMixedFraction,true
+202,equivSyntax:isMixedFraction with \frac and space,1 \frac{1}{2},,equivSyntax:isMixedFraction,true
+203,equivSyntax:isMixedFraction with \frac and no space,1\frac{1}{2},,equivSyntax:isMixedFraction,true
+204,equivSyntax:isMixedFraction with minus in enumerator,1\frac{-1}{2},,equivSyntax:isMixedFraction,false
+205,equivSyntax:isMixedFraction with decimal,1.0\frac{1}{2},,equivSyntax:isMixedFraction,false
+206,equivSyntax:isExponent,e^x,,equivSyntax:isExponent,true
+207,equivSyntax:isExponent,exp(x),,equivSyntax:isExponent,true
+208,equivSyntax:isExponent,3.5^x,,equivSyntax:isExponent,true
+209,equivSyntax:isExponent,x^5,,equivSyntax:isExponent,false
+210,equivSyntax:isExponent,x^x,,equivSyntax:isExponent,false
+211,equivSyntax:isStandardForm=linear,Ax+By=C,,equivSyntax:isStandardForm=linear,true
+212,equivSyntax:isStandardForm=linear,5x + 3y = 4,,equivSyntax:isStandardForm=linear,true
+213,equivSyntax:isStandardForm=linear,-x + y = 1,,equivSyntax:isStandardForm=linear,true
+214,equivSyntax:isStandardForm=linear,1\frac{1}{2}x+\frac{3}{5}y=1,,equivSyntax:isStandardForm=linear,true
+215,equivSyntax:isStandardForm=linear,1.1x+3.3y=4,,equivSyntax:isStandardForm=linear,true
+216,equivSyntax:isStandardForm=quadratic,Ax^2+Bx+C=0,,equivSyntax:isStandardForm=quadratic,true
+217,equivSyntax:isStandardForm=quadratic,5x^2 + 3x + 4 = 0,,equivSyntax:isStandardForm=quadratic,true
+218,equivSyntax:isStandardForm=quadratic,5x^2 + 3x = 4,,equivSyntax:isStandardForm=quadratic,false
+219,equivSyntax:isStandardForm=quadratic,1\frac{1}{2}x^{2}+\frac{3}{5}x-1=0,,equivSyntax:isStandardForm=quadratic,true
+220,equivSyntax:isStandardForm=quadratic,1.1x^2 + 3.3x + 4 = 0,,equivSyntax:isStandardForm=quadratic,true
+221,equivSyntax:isSlopeInterceptForm,y=ax+b,,equivSyntax:isSlopeInterceptForm,true
+222,equivSyntax:isSlopeInterceptForm,y = -x + 1,,equivSyntax:isSlopeInterceptForm,true
+223,equivSyntax:isSlopeInterceptForm,y = 3.3x + 4,,equivSyntax:isSlopeInterceptForm,true
+224,equivSyntax:isSlopeInterceptForm,x+y=0,,equivSyntax:isSlopeInterceptForm,false
+225,equivSyntax:isSlopeInterceptForm,x=y,,equivSyntax:isSlopeInterceptForm,false
+226,equivSyntax:isPointSlopeForm,(y-1)=2(x+3),,equivSyntax:isPointSlopeForm,true
+227,equivSyntax:isPointSlopeForm,y = -x + 1,,equivSyntax:isPointSlopeForm,false
+228,equivSyntax:isPointSlopeForm,y = x,,equivSyntax:isPointSlopeForm,true
+229,equivSyntax:isPointSlopeForm,x+y=0,,equivSyntax:isPointSlopeForm,false
+230,equivSyntax:isPointSlopeForm,3y-1=x,,equivSyntax:isPointSlopeForm,false
+231,equivLiteral:allowInterval,"[1, 2)","[1, 2)",equivLiteral:allowInterval,true
+232,equivLiteral:allowInterval,"[1, 2)","(1, 2)",equivLiteral:allowInterval,false
+233,equivLiteral:allowInterval,"[1.1, 2.2)","[1.1, 2.2)",equivLiteral:allowInterval,true
+234,equivLiteral:allowInterval,x,"[1, 2)",equivLiteral:allowInterval,false
+235,equivLiteral:allowInterval,"[1.0, 2.0)","[1, 2)",equivLiteral:allowInterval,false
+236,equivSymbolic:significantDecimalPlaces,0.33,1/3,equivSymbolic:significantDecimalPlaces=2,true
+237,equivSymbolic:significantDecimalPlaces,0.33333333,1/3,equivSymbolic:significantDecimalPlaces=2,true
+238,equivSymbolic:significantDecimalPlaces,2/6,1/3,equivSymbolic:significantDecimalPlaces=2,true
+239,equivSymbolic:significantDecimalPlaces,33\%,1/3,equivSymbolic:significantDecimalPlaces=2,true
+240,equivSymbolic:significantDecimalPlaces,0.3,1/3,equivSymbolic:significantDecimalPlaces=2,false
+241,equivValue with significantDecimalPlaces,10,10,"equivValue:significantDecimalPlaces=3",true
+242,equivValue with significantDecimalPlaces,10.000,10,"equivValue:significantDecimalPlaces=3",true
+243,equivValue with significantDecimalPlaces,10.0001,10,"equivValue:significantDecimalPlaces=3",true
+244,equivValue with significantDecimalPlaces,9.9995,10,"equivValue:significantDecimalPlaces=3",true
+245,equivValue with significantDecimalPlaces,10.0005,10,"equivValue:significantDecimalPlaces=3",false
+246,equivValue with significantDecimalPlaces,10.001,10,"equivValue:significantDecimalPlaces=3",false
+247,equivValue with significantDecimalPlaces,9.9994,10,"equivValue:significantDecimalPlaces=3",false
+248,equivLiteral ignoring coefficient of 1,1x+2,x+2,equivLiteral:ignoreCoefficientOfOne,true
+249,equivLiteral ignoring coefficient of 1,x+12,x+2,equivLiteral:ignoreCoefficientOfOne,false
+250,equivLiteral ignoring coefficient of 1,1\sin(x)+2,\sin(x)+2,equivLiteral:ignoreCoefficientOfOne,true
+251,equivLiteral ignoring coefficient of 1,1\times x+2,x+2,equivLiteral:ignoreCoefficientOfOne,true
+252,equivLiteral ignoring coefficient of 1,1(x+2),x+2,equivLiteral:ignoreCoefficientOfOne,true
+253,equivLiteral ignoring trailing zeros,0.50,0.5,equivLiteral:ignoreTrailingZeros,true
+254,equivLiteral ignoring trailing zeros,0.5,0.5,equivLiteral:ignoreTrailingZeros,true
+255,equivLiteral ignoring trailing zeros,.5,0.5,equivLiteral:ignoreTrailingZeros,true
+256,equivLiteral ignoring trailing zeros,0.501,0.5,equivLiteral:ignoreTrailingZeros,false
+257,equivLiteral ignoring order,1+x,x+1,equivLiteral:ignoreOrder,true
+258,equivLiteral ignoring order,1+x+x+x^2,x^2+2x+1,equivLiteral:ignoreOrder,false
+259,equivLiteral ignoring order,2*x,x*2,equivLiteral:ignoreOrder,true
+260,equivLiteral ignoring order,1+1x,x+1,equivLiteral:ignoreOrder,false
+261,equivLiteral ignoring order,1+x,1+x,equivLiteral:ignoreOrder,true
+262,equivValue with units,"1\text{mi}","1\text{mi}",equivValue,true
+263,equivValue with units,"5280\text{ft}","1\text{mi}",equivValue,true
+264,equivValue with units,63360\text{in},1\text{mi},equivValue,true
+265,equivValue with units,\frac{10560}{2}\text{ft},1\text{mi},equivValue,true
+266,equivValue with units,1.2\text{m},1\text{mi},equivValue,false
+267,Equivalent symbolic with coefficient,(2.0+1x)^2,(x+2)^2,"equivSymbolic;equivLiteral:inverseResult,ignoreOrder,ignoreCoefficientOfOne,ignoreTrailingZeros",true
+268,Equivalent symbolic with decimal,(2.0+x)^2,(x+2)^2,"equivSymbolic;equivLiteral:inverseResult,ignoreOrder,ignoreTrailingZeros",true
+269,Equivalent symbolic with coefficient,(2+1x)^2,(x+2)^2,"equivSymbolic;equivLiteral:inverseResult,ignoreOrder,ignoreCoefficientOfOne",true
+270,Equivalent symbolic with coefficient and decimal,(1x+2.0)^2,(x+2)^2,"equivSymbolic;equivLiteral:inverseResult,ignoreOrder,ignoreCoefficientOfOne",true
+271,Equivalent symbolic with coefficient and decimal,(2.0+1x)^2,(x+2)^2,"equivSymbolic;equivLiteral:inverseResult,ignoreOrder,ignoreCoefficientOfOne",true
+272,Equivalent symbolic with decimal,(2.0+x)^2,(x+2)^2,"equivSymbolic;equivLiteral:inverseResult,ignoreOrder",true
+273,Equivalent value with units,5000\text{m},5\text{km},"equivValue;isUnit:allowedUnits=[m,cm,km]",true
+274,Equivalent value with units,5\text{km},5\text{km},"equivValue;isUnit:allowedUnits=[m,cm,km]",true
+275,Equivalent value with units,500000\text{cm},5\text{km},"equivValue;isUnit:allowedUnits=[m,cm,km]",true
+276,Simplification with paranthesis,x(x+3/12),x^2 + x/4,equivSymbolic;isSimplified,false
+277,Simplification with paranthesis,x(x+1/4),x^2 + x/4,equivSymbolic;isSimplified,false
+278,Simplification with paranthesis,x(x+1/4),x(x+ 1/4),equivSymbolic;isSimplified,false
+279,Simplification with paranthesis,x^2 + x/4,x^2 + x/4,equivSymbolic;isSimplified,true
+280,Mixed fraction simplification,1 (3/4),1 3/4,equivSymbolic;isSimplified,error
+281,Mixed fraction simplification,7/4,1 3/4,equivSymbolic;isSimplified;equivSyntax:isMixedFraction,false
 282,Mixed fraction simplification,1 6/8,1 3/4,equivSymbolic;isSimplified;equivSyntax:isMixedFraction,false
+283,equivSymbolic without compareSides but with equalities,3+4=7,4 + 3 = 7,equivSymbolic,true
+284,equivSymbolic without compareSides but with equalities: wrong answer,3+4=9,4 + 3 = 7,equivSymbolic,false
+285,equivSymbolic without compareSides but with equalities: wrong equality that evaluates to True,3+3=6,4 + 3 = 7,equivSymbolic,true
+286,equivSymbolic without compareSides but with equalities: wrong expression and answer,3+3=9,4 + 3 = 7,equivSymbolic,false
+287,equivSymbolic without compareSides but with equalities: wrong expression and answer,10+1/2,10.5,equivSymbolic,true
+288,equivSymbolic:EV-479,1+\frac{3}{4},\frac{7}{4},equivSymbolic,true
+289,equivSymbolic:EV-479,1\frac{3}{4},\frac{7}{4},equivSymbolic,true
+290,equivSymbolic:EV-479,1+3/4,7/4,equivSymbolic,true
+291,equivSymbolic: algebraic expression:EV-634,y=3x+20,y-20=3x,equivSymbolic:isTrue,true
+292,equivSymbolic: algebraic expression:EV-634,y=3x+20.1,y-20.1=3x,equivSymbolic:isTrue,true
+293,equivSymbolic: algebraic expression:EV-634,y=3x+20-5z,y-20+5z=3x,equivSymbolic:isTrue,true
+294,equivSymbolic: algebraic expression,y<3x+20-5z,y-20+5z<3x,equivSymbolic:isTrue,true
+295,equivSymbolic: algebraic expression,y>=3x+20-5z,y-20+5z>=3x,equivSymbolic:isTrue,true
+296,equivSymbolic: algebraic expression,y>3x+20-5z,y-20+5z<3x,equivSymbolic:isTrue,false
+297,equivSymbolic: algebraic expression,y-5>3x+20-5z,y-25+5z<3x,equivSymbolic:isTrue,false
+298,equivSymbolic: algebraic expression,y>3x^2+20-5z,y-20+5z<3x^2,equivSymbolic:isTrue,false
+299,equivSymbolic: algebraic expression,y>10w+3x+20-5z,y-20+5z<10w+3x,equivSymbolic:isTrue,false
+300,setEvaluation: any order,"-3,3","3,-3",setEvaluation,true
+301,setEvaluation: any order,"-6,-3,3","3,-3",setEvaluation,false
+302,setEvaluation: any order,"-6,-3,3","3,6,-3",setEvaluation,false
+303,isFactorised: complex factorised,(x+I)(x-I),,isFactorised:complexType,true
+304,isFactorised: real factorised,(x+1.5)(x-1.5),,isFactorised:realType,true
+305,isFactorised: integer factorised,(x+1)(x-1),,isFactorised:integerType,true
+306,isFactorised: integer factorised,x^2-4x+4,,isFactorised:integerType,false
+307,isFactorised: complex factorised,x^2+9,,isFactorised:complexType,false
+308,isFactorised: real factorised,x^2+1.5x+4.4,,isFactorised:realType,false
+309,isUnit,"\frac{1}{2}\text{Km}",,"isUnit:allowedUnits=[km]",false
