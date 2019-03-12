@@ -78,6 +78,7 @@ append option treatMultipleSpacesAsOne if expected answer is true and we have an
 append option ignoreLeadingAndTrailingSpaces if expected answer is true and we have answer false
 Else Undefined
 
+Test commit
 
 
 
