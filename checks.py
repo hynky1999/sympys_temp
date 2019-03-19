@@ -210,6 +210,42 @@ def convert(input_latex, evaluate=None,
         return None
     input_symbolic = sympify_latex(input_latex, evaluate=evaluate)
     return input_symbolic
+
+# Replace variables in the input_latex
+# # input_latex: normal latex string
+# # variables: [
+# #     { id: 'x', type: 'value', value: 3 },
+# #     { id: 'y', type: 'value', value: 5 },
+# #     { id: 'z', type: 'formula', value: 'x+y' }
+# # ]
+def replace_variables(input_latex,
+                      variables):
+    input_latex = preprocess_latex(input_latex)
+
+    # Replace formula variables first deeply until fixed times
+    for i in range(0, 10):
+        prev_latex = input_latex
+        for variable in variables:
+            if variable['type'] == 'formula':
+                variable_re = re.compile(r'\b' + re.escape(variable['id']) + r'\b')
+                input_latex = re.sub(variable_re, '(' + variable['value'] + ')', input_latex)
+        if prev_latex == input_latex:
+            break
+
+    # Replace value variables for the calculations
+    for variable in variables:
+        if variable['type'] == 'value':
+            variable_re = re.compile(r'\b' + re.escape(variable['id']) + r'\b')
+            input_latex = re.sub(variable_re, str(variable['value']), input_latex)
+
+    return input_latex
+
+# Calculate the formula
+def calculate_expression(input_latex):
+    input_latex = preprocess_latex(input_latex.strip(), ',', '.')
+    input_symbolic = sympify_latex(input_latex)
+    return simplify(input_symbolic)
+
 # end of preprocessing block --------------------------------------------------
 
 # a couple of helper functions to wrap the return -----------------------------

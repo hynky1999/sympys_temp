@@ -2,7 +2,7 @@ import csv
 import sys
 import json
 
-from checks import parse_checks, check_func
+from checks import parse_checks, check_func, replace_variables, calculate_expression
 
 def handle(event, context):
     print("Request Body: ")
@@ -67,6 +67,65 @@ def handle(event, context):
         }
         return response
 
+def calculate(event, context):
+    try:
+        body = json.loads(event["body"])
+    except Exception as e:
+        response = {
+            "statusCode": 500,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": json.dumps({
+                "error": "Error occured",
+                "message": str(e)
+            })
+        }
+        return response
+
+    if body["latex"] is None or\
+       body["variables"] is None:
+        return {
+            "statusCode": 400,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": {
+                "message": "Bad Request"
+            }
+        }
+    try:
+        input_latex = body["latex"]
+        variables = body["variables"]
+
+        input_latex = replace_variables(input_latex, variables)
+        result = calculate_expression(input_latex)
+
+        response = {
+            "statusCode": 200,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": json.dumps({
+                "result": result
+            })
+        }
+
+        return response
+    except Exception as e:
+        print(e)
+        response = {
+            "statusCode": 500,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": json.dumps({
+                "error": "Internal Server Error",
+                "message": str(e)
+            })
+        }
+        return response
+
 def test(event, context):
     test_file_name = 'tests.csv'
 
@@ -117,4 +176,16 @@ def test(event, context):
 # print(res)
 
 # res = test({}, {})
+# print(res)
+
+# res = calculate({
+#     "body": "{ \
+#         \"latex\": \"x+y+z+w\", \
+#         \"variables\": [ \
+#             { \"id\": \"x\", \"type\": \"value\", \"value\": 3 }, \
+#             { \"id\": \"y\", \"type\": \"value\", \"value\": 5 }, \
+#             { \"id\": \"z\", \"type\": \"formula\", \"value\": \"x+y\" } \
+#         ] \
+#     }"
+# }, {})
 # print(res)

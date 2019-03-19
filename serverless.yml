@@ -43,6 +43,15 @@ functions:
           path: /evaluate
           method: POST
           cors: true
+  calculate:
+    handler: handler.calculate
+    name: evaluate-${self:provider.stage}
+    description: Calculate LaTex
+    events:
+      - http:
+          path: /calculate
+          method: POST
+          cors: true
   test:
     handler: handler.test
     name: test-${self:provider.stage}
