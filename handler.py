@@ -182,9 +182,9 @@ def test(event, context):
 #     "body": "{ \
 #         \"latex\": \"x+y+z+w\", \
 #         \"variables\": [ \
-#             { \"id\": \"x\", \"type\": \"value\", \"value\": 3 }, \
-#             { \"id\": \"y\", \"type\": \"value\", \"value\": 5 }, \
-#             { \"id\": \"z\", \"type\": \"formula\", \"value\": \"x+y\" } \
+#             { \"id\": \"x\", \"value\": 3 }, \
+#             { \"id\": \"y\", \"value\": 5 }, \
+#             { \"id\": \"z\", \"value\": \"x+y\" } \
 #         ] \
 #     }"
 # }, {})

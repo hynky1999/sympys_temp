@@ -309,3 +309,7 @@
 307,isFactorised: complex factorised,x^2+9,,isFactorised:complexType,false
 308,isFactorised: real factorised,x^2+1.5x+4.4,,isFactorised:realType,false
 309,isUnit,"\frac{1}{2}\text{Km}",,"isUnit:allowedUnits=[km]",false
+310,"calculate method","input:x=3,y=5,formula:x+y",8,calculate,true
+311,"calculate method","input:x=3,y=5,formula:x+y",9,calculate,false
+312,"calculate method","input:x=3,formula:x+y",3+y,calculate,true
+313,"calculate method","input:x=3,formula:x+y",3+x,calculate,false
