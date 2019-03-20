@@ -45,7 +45,7 @@ functions:
           cors: true
   calculate:
     handler: handler.calculate
-    name: evaluate-${self:provider.stage}
+    name: calculate-${self:provider.stage}
     description: Calculate LaTex
     events:
       - http:
