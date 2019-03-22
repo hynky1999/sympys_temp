@@ -96,18 +96,26 @@ def calculate(event, context):
             }
         }
     try:
-        latexes = body["latexes"]
-        variables = body["variables"]
+        objs = body
+        if isinstance(body, dict):
+            objs = [body]
 
-        result = []
-        for latex in latexes:
-            input_latex = latex["formula"]
+        resp_objs = []
+        for obj in objs:
+            latexes = obj["latexes"]
+            variables = obj["variables"]
+
+            result = {}
+            for latex in latexes:
+                input_latex = latex["formula"]
+                
+                input_latex = replace_variables(input_latex, variables)
+                value = calculate_expression(input_latex)
+                result[latex["id"]] = str(value)
             
-            input_latex = replace_variables(input_latex, variables)
-            value = calculate_expression(input_latex)
-            result.append({
-                "id": latex["id"],
-                "value": str(value)
+            resp_objs.append({
+                "id": obj["id"],
+                "values": result
             })
 
         response = {
@@ -115,9 +123,7 @@ def calculate(event, context):
             "headers": {
                 "Access-Control-Allow-Origin": "*"
             },
-            "body": json.dumps({
-                "result": result
-            })
+            "body": json.dumps(resp_objs)
         }
 
         return response
@@ -190,9 +196,10 @@ def test(event, context):
 
 # res = calculate({
 #     "body": "{ \
+#         \"id\": \"example\", \
 #         \"latexes\": [ \
-#             { \"id\": \"1\", \"formula\": \"x+y+z\" }, \
-#             { \"id\": \"2\", \"formula\": \"y+z\" } \
+#             { \"id\": \"w\", \"formula\": \"x+y+z\" }, \
+#             { \"id\": \"k\", \"formula\": \"y+z\" } \
 #         ], \
 #         \"variables\": [ \
 #             { \"id\": \"x\", \"value\": 3 }, \
