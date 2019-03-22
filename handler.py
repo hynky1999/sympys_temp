@@ -84,17 +84,6 @@ def calculate(event, context):
         }
         return response
 
-    if body["latexes"] is None or\
-       body["variables"] is None:
-        return {
-            "statusCode": 400,
-            "headers": {
-                "Access-Control-Allow-Origin": "*"
-            },
-            "body": {
-                "message": "Bad Request"
-            }
-        }
     try:
         objs = body
         if isinstance(body, dict):
@@ -102,6 +91,18 @@ def calculate(event, context):
 
         resp_objs = []
         for obj in objs:
+            if obj["latexes"] is None or\
+               obj["variables"] is None:
+                return {
+                    "statusCode": 400,
+                    "headers": {
+                        "Access-Control-Allow-Origin": "*"
+                    },
+                    "body": {
+                        "message": "Bad Request"
+                    }
+                }
+
             latexes = obj["latexes"]
             variables = obj["variables"]
 
@@ -195,7 +196,7 @@ def test(event, context):
 #print(res)
 
 # res = calculate({
-#     "body": "{ \
+#     "body": "[{ \
 #         \"id\": \"example\", \
 #         \"latexes\": [ \
 #             { \"id\": \"w\", \"formula\": \"x+y+z\" }, \
@@ -206,7 +207,7 @@ def test(event, context):
 #             { \"id\": \"y\", \"value\": 5 }, \
 #             { \"id\": \"z\", \"value\": \"x+y\" } \
 #         ] \
-#     }"
+#     }]"
 # }, {})
 # print(res)
 
