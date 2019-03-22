@@ -227,7 +227,7 @@ def replace_variables(input_latex,
     for i in range(0, 10):
         prev_latex = input_latex
         for variable in variables:
-            variable_re = re.compile(r'\b' + re.escape(variable['id']) + r'\b')
+            variable_re = re.compile(re.escape(variable['id']) + r'\b')
             input_latex = re.sub(variable_re, '(' + variable['value'] + ')', input_latex)
         if prev_latex == input_latex:
             break
