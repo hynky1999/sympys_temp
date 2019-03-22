@@ -222,16 +222,15 @@ def convert(input_latex, evaluate=None,
 def replace_variables(input_latex,
                       variables):
     input_latex = preprocess_latex(input_latex)
-
+    
     # Replace variables first deeply until fixed times
     for i in range(0, 10):
         prev_latex = input_latex
         for variable in variables:
-            variable_re = re.compile(re.escape(variable['id']) + r'\b')
-            input_latex = re.sub(variable_re, '(' + variable['value'] + ')', input_latex)
+            variable_re = re.compile(re.escape(variable['id']) + r'\b')    
+            input_latex = re.sub(variable_re, '(' + str(variable['value']) + ')', input_latex)
         if prev_latex == input_latex:
             break
-
     return input_latex
 
 # Calculate the formula
