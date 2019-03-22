@@ -84,7 +84,7 @@ def calculate(event, context):
         }
         return response
 
-    if body["latex"] is None or\
+    if body["latexes"] is None or\
        body["variables"] is None:
         return {
             "statusCode": 400,
@@ -96,18 +96,27 @@ def calculate(event, context):
             }
         }
     try:
-        input_latex = body["latex"]
+        latexes = body["latexes"]
         variables = body["variables"]
 
-        input_latex = replace_variables(input_latex, variables)
-        result = calculate_expression(input_latex)
+        result = []
+        for latex in latexes:
+            input_latex = latex["formula"]
+            
+            input_latex = replace_variables(input_latex, variables)
+            value = calculate_expression(input_latex)
+            result.append({
+                "id": latex["id"],
+                "value": str(value)
+            })
+
         response = {
             "statusCode": 200,
             "headers": {
                 "Access-Control-Allow-Origin": "*"
             },
             "body": json.dumps({
-                "result": str(result)
+                "result": result
             })
         }
 
@@ -181,7 +190,10 @@ def test(event, context):
 
 # res = calculate({
 #     "body": "{ \
-#         \"latex\": \"x+y+z+w\", \
+#         \"latexes\": [ \
+#             { \"id\": \"1\", \"formula\": \"x+y+z\" }, \
+#             { \"id\": \"2\", \"formula\": \"y+z\" } \
+#         ], \
 #         \"variables\": [ \
 #             { \"id\": \"x\", \"value\": 3 }, \
 #             { \"id\": \"y\", \"value\": 5 }, \
