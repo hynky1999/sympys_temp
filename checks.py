@@ -304,10 +304,16 @@ def equiv_symbolic(input_latex, expected_latex, options):
 
         decimal_places = options.get('significantDecimalPlaces', None)
         if decimal_places is not None:
-            equiv = expand(simplify(input_symbolic)) ==\
+            try:
+                equiv = expand(simplify(input_symbolic)) ==\
+                        expand(simplify(expected_symbolic)) and\
+                        round(decimal.Decimal(str(float(simplify(input_result_symbolic)))), decimal_places) ==\
+                        round(decimal.Decimal(str(float(simplify(expected_result_symbolic)))), decimal_places)
+            except:
+                equiv = expand(simplify(input_symbolic)) ==\
                     expand(simplify(expected_symbolic)) and\
-                    round(decimal.Decimal(str(float(simplify(input_result_symbolic))))) ==\
-                    round(decimal.Decimal(str(float(simplify(expected_result_symbolic)))))
+                    simplify(input_result_symbolic) ==\
+                    simplify(expected_result_symbolic)
         else:
             equiv = expand(simplify(input_symbolic)) ==\
                     expand(simplify(expected_symbolic)) and\
@@ -343,10 +349,16 @@ def equiv_symbolic(input_latex, expected_latex, options):
 
         decimal_places = options.get('significantDecimalPlaces', None)
         if decimal_places is not None:
-            equiv = expand(simplify(input_symbolic)) ==\
-                    expand(simplify(expected_symbolic)) and\
-                    round(decimal.Decimal(str(float(simplify(input_result_symbolic))))) ==\
-                    round(decimal.Decimal(str(float(simplify(expected_result_symbolic)))))
+            try:
+                equiv = expand(simplify(input_symbolic)) -\
+                        round(decimal.Decimal(str(float(simplify(input_result_symbolic)))), decimal_places) ==\
+                        expand(simplify(expected_symbolic)) -\
+                        round(decimal.Decimal(str(float(simplify(expected_result_symbolic)))), decimal_places)
+            except:
+                equiv = expand(simplify(input_symbolic)) -\
+                    expand(simplify(input_result_symbolic)) ==\
+                    simplify(expected_symbolic) -\
+                    simplify(expected_result_symbolic)
         else:
             equiv = expand(simplify(input_symbolic)) -\
                     expand(simplify(input_result_symbolic)) ==\
@@ -377,8 +389,12 @@ def equiv_symbolic(input_latex, expected_latex, options):
 
     decimal_places = options.get('significantDecimalPlaces', None)
     if decimal_places is not None:
-        equiv = round(decimal.Decimal(str(float(simplify(input_symbolic)))), decimal_places) ==\
-                round(decimal.Decimal(str(float(simplify(expected_symbolic)))), decimal_places)
+        try:
+            equiv = round(decimal.Decimal(str(float(simplify(input_symbolic)))), decimal_places) ==\
+                    round(decimal.Decimal(str(float(simplify(expected_symbolic)))), decimal_places)
+        except:
+            equiv = expand(simplify(input_symbolic)) -\
+                    expand(simplify(expected_symbolic)) == 0
     else:
         try:
             equiv = expand(simplify(input_symbolic)) -\
@@ -523,14 +539,20 @@ def equiv_value(input_latex, expected_latex, options):
         decimal_places = options.get('significantDecimalPlaces', None)
         if decimal_places is not None:
             input_numeric = expand(simplify(input_symbolic))
-            input_result_numeric = round(decimal.Decimal(str(float(simplify(input_result_symblic)))), decimal_places)
+            try:
+                input_result_numeric = round(decimal.Decimal(str(float(simplify(input_result_symblic)))), decimal_places)
+            except:
+                input_result_numeric = simplify(input_result_symblic)
             expected_numeric = expand(simplify(expected_symbolic))
-            expected_result_numeric = round(decimal.Decimal(str(float(simplify(expected_result_symbolic)))), decimal_places)
+            try:
+                expected_result_numeric = round(decimal.Decimal(str(float(simplify(expected_result_symbolic)))), decimal_places)
+            except:
+                expected_result_numeric = simplify(expected_result_symbolic)
         else:
             input_numeric = expand(simplify(input_symbolic))
-            input_result_numeric = simplify(input_symbolic)
+            input_result_numeric = simplify(input_result_symblic)
             expected_numeric = expand(simplify(expected_symbolic))
-            expected_result_numeric = simplify(expected_symbolic)
+            expected_result_numeric = simplify(expected_result_symbolic)
 
         equiv = input_numeric == expected_numeric and\
                 abs(input_result_numeric - expected_result_numeric) <= options.get('tolerance', 0.0)
@@ -551,8 +573,12 @@ def equiv_value(input_latex, expected_latex, options):
 
     decimal_places = options.get('significantDecimalPlaces', None)
     if decimal_places is not None:
-        input_numeric = round(decimal.Decimal(str(float(simplify(input_symbolic)))), decimal_places)
-        expected_numeric = round(decimal.Decimal(str(float(simplify(expected_symbolic)))), decimal_places)
+        try:
+            input_numeric = round(decimal.Decimal(str(float(simplify(input_symbolic)))), decimal_places)
+            expected_numeric = round(decimal.Decimal(str(float(simplify(expected_symbolic)))), decimal_places)
+        except:
+            input_numeric = simplify(input_symbolic)
+            expected_numeric = simplify(expected_symbolic)
     else:
         input_numeric = simplify(input_symbolic)
         expected_numeric = simplify(expected_symbolic)
