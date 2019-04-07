@@ -367,11 +367,9 @@ def equiv_symbolic(input_latex, expected_latex, options):
 
         return result(xor(equiv, 'inverseResult' in options))
 
-    #print(input_latex, type(input_latex))
-    pattern = re.compile(r'[0-9]\\frac{[0-9]}{[0-9]}')
-
-    if bool(pattern.match(input_latex)):
-        input_latex = input_latex[0]+'+'+input_latex[1:]
+    fraction_plus_re = r'(-?)\s*([0-9]+)(\s*(?=\\frac{.+}{.+})|\s+(?=[(\[-]{0,2}\d+[\])]?/[\[(-]{0,2}\d+[\])]?))'
+    input_latex = re.sub(fraction_plus_re,lambda x: '{}{}{}'.format(x.group(1),x.group(2),x.group(1) if x.group(1) else '+'),input_latex)
+    expected_latex = re.sub(fraction_plus_re,lambda x: '{}{}{}'.format(x.group(1),x.group(2),x.group(1) if x.group(1) else '+'),expected_latex)
 
     input_symbolic = sympify_latex(input_latex)
 

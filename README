@@ -1,21 +1,42 @@
-Run:
-
+To Run test cases from the backend:
 python3.7 testchecks.py 
 
-tests.csv  new test cases
-tests_V1.0_dump.csv  test cases from dump file
 
-We need to have local copies of libraries: sympy, antlr4, latex2sympy  because there is some stability issue
+To Run test cases as seen in the API:
+1)  Clone the repository "edu-serverless" to locally 
+2) Install the serverless offline module in the source code directory.
+      $ npm install serverless-offline --save-dev
+3) Add the serverless offline plugin in the serverless.yml
+
+plugins:
+  - serverless-offline
+
+4) Enable the Debug mode for sls
+$ export SLS_DEBUG=*
+5) Start the application locally
+$ sls offline --printOutput
+6) Hit the http://localhost:3000/test in the browser, details logs will be displayed in the terminal.
+
+
+
+FILES:
+tests.csv ==> official test file
+user_activity.csv  ==> Dump of all user questions in the database as per the first version of this feature. It has junk, errors, and duplicates.
+
 
 
 
 ** DATA DUMP ***
-Usage: python export_latex.py user_activity.csv outputcsv
+# usage (example of the first 1000 lines of user_activity.csv):
+python3.7 convert_db_dump.py user_activity1000.csv new_tests.csv
+
 Needed packages: lxml
 You can install it using pip
+We need to have local copies of libraries: sympy, antlr4, latex2sympy  because there is some stability issus
 
-Rules
-Start:
+======================================================================
+Rules generation for data dump:
+
 We read info(factorised,simplified...) and if any info is set we will call respective function on string alongside with other function defined under.
 IsRationalized is not defined at checks.py so the program always returns Undefined
 

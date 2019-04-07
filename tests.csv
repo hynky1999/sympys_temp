@@ -313,3 +313,19 @@
 311,"calculate method","input:x=3,y=5,formula:x+y",9,calculate,false
 312,"calculate method","input:x=3,formula:x+y",3+y,calculate,true
 313,"calculate method","input:x=3,formula:x+y",3+x,calculate,false
+314,"mixed fraction, EV-1322","1\frac{3}{4}","","isSimplified",true
+315,"mixed fraction, EV-1322","1\frac{6}{8}","","isSimplified",false
+316,"mixed fraction, EV-1322","1 6/8","1\frac{3}{4}","equivSymbolic",true
+317,"mixed fraction, EV-1322","1\frac{3}{4}","1.75","equivSymbolic",true
+318,"mixed fraction, EV-1322","1\frac{6}{8}","1\frac{3}{4}","equivSymbolic",true
+319,"mixed fraction, EV-1322","1 3/4","1.75","equivSymbolic",true
+320,"mixed fraction, EV-1322","-1 \frac{3}{4}","-1.75","equivSymbolic",true
+321,"mixed fraction, EV-1322","-   1 3/4","-1.75","equivSymbolic",true
+322,Mixed fraction simplification,1/1,1,equivSymbolic;isSimplified,false
+323,Mixed fraction simplification,4,8/2,equivSymbolic;isSimplified,true
+324,Mixed fraction simplification different notations,2\frac{1}{2},5/2,equivSymbolic,true
+325,Mixed fraction simplification different notations,-2\frac{1}{2},-5/2,equivSymbolic,true
+328,equivSymbolic,\frac{5}{2},2\frac{1}{2},equivSymbolic;equivSyntax:isMixedFraction,true
+329,simplification ,32,16\times2,equivSymbolic;isSimplified,true
+330,"parenthesis",x^2-15x+56,\left(x-7\right)\left(x-8\right),equivSymbolic,true
+331,"basic equivSymbolic",y=45x+40,y-45x=40,equivSymbolic,true
