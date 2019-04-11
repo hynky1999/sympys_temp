@@ -267,7 +267,7 @@
 265,equivValue with units,\frac{10560}{2}\text{ft},1\text{mi},equivValue,true
 266,equivValue with units,1.2\text{m},1\text{mi},equivValue,false
 267,Equivalent symbolic with coefficient,(2.0+1x)^2,(x+2)^2,"equivSymbolic;equivLiteral:inverseResult,ignoreOrder,ignoreCoefficientOfOne,ignoreTrailingZeros",true
-268,Equivalent symbolic with decimal,(2.0+x)^2,(x+2)^2,"equivSymbolic;equivLiteral:inverseResult,ignoreOrder,ignoreTrailingZeros",true
+268,Equivalent symbolic with decimal,(2.0+x)^2,(x+2)^2,"equivSymbolic;equivLiteral:inverseResult,ignoreOrder,ignoreTrailingZeros",false
 269,Equivalent symbolic with coefficient,(2+1x)^2,(x+2)^2,"equivSymbolic;equivLiteral:inverseResult,ignoreOrder,ignoreCoefficientOfOne",true
 270,Equivalent symbolic with coefficient and decimal,(1x+2.0)^2,(x+2)^2,"equivSymbolic;equivLiteral:inverseResult,ignoreOrder,ignoreCoefficientOfOne",true
 271,Equivalent symbolic with coefficient and decimal,(2.0+1x)^2,(x+2)^2,"equivSymbolic;equivLiteral:inverseResult,ignoreOrder,ignoreCoefficientOfOne",true
@@ -325,8 +325,25 @@
 323,Mixed fraction simplification,4,8/2,equivSymbolic;isSimplified,true
 324,Mixed fraction simplification different notations,2\frac{1}{2},5/2,equivSymbolic,true
 325,Mixed fraction simplification different notations,-2\frac{1}{2},-5/2,equivSymbolic,true
-326,equivSymbolic,\frac{5}{2},2\frac{1}{2},equivSymbolic;equivSyntax:isMixedFraction,true
-327,equivSymbolic,\frac{5}{2},2\frac{1}{2},equivSymbolic;isMixedFraction,true
+326,equivSymbolic,2\frac{1}{2},\frac{5}{2},equivSymbolic;equivSyntax:isMixedFraction,true
+327,equivSymbolic,2\frac{1}{2},\frac{5}{2},equivSymbolic:isMixedFraction,true
 328,simplification ,32,16\times2,equivSymbolic;isSimplified,true
 330,"parenthesis",x^2-15x+56,\left(x-7\right)\left(x-8\right),equivSymbolic,true
 331,"basic equivSymbolic",y=45x+40,y-45x=40,equivSymbolic,true
+332,"EV-1097, handling trailing zeroe",1000.000,1000,equivLiteral:ignoreTrailingZeros,true
+333,"equivSymbolic;isSimplified",\frac{1}{2},\frac{3}{6},equivSymbolic;isSimplified,true
+334,"equivSymbolic;isSimplified",\frac{3}{7},\frac{1}{2},equivSymbolic;isSimplified,false
+335,"equivSymbolic;isSimplified",x+x+y,2x+y,equivSymbolic;isSimplified,false
+336,"equivSymbolic;isSimplified",x+x+y,3x+y,equivSymbolic;isSimplified,false
+336,"equivSymbolic;isSimplified",3x+y,x+x+x+y,equivSymbolic;isSimplified,true
+337,"equivSymbolic;equivSyntax:isMixedFraction",2\frac{1}{2},\frac{5}{2},equivSymbolic;equivSyntax:isMixedFraction,true
+338,"parentheses, EV1150",\left(2\right),2,equivLiteral,true
+339,"parentheses, EV1150",\left(2\right),3,equivLiteral,false
+340,"isExpanded with parenthesis EV-1154",x\left(x+3\right),"",isExpanded,false
+341,"isExpanded with parenthesis EV-1154",x\left(x+3\right),"x^2+3x",isExpanded,false
+342,"units equivalancy, EV-1853",5000\text{m},5\text{km},"equivValue;isUnit:allowedUnits=[m,cm,km]",true
+343,"units equivalancy, EV-1853",100\text{cm},1\text{m},"equivValue;isUnit:allowedUnits=[m,cm,km]",true
+344,"units equivalancy this works in mathquill, EV-1853",5000m,5km,"equivValue;isUnit:allowedUnits=[m,cm,km]",true
+345,"units equivalancy this works in mathquill, EV-1853",100cm,1m,"equivValue;isUnit:allowedUnits=[m,cm,km]",true
+346,"Eulers Number, EV-1087",e^x-1,\exp^x-1,equivSymbolic:allowEulersNumber,true
+347,"Eulers Number, EV-1087",\ln e^x,x,equivSymbolic:allowEulersNumber,true

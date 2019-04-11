@@ -9,12 +9,14 @@ import decimal
 decimal.getcontext().rounding = decimal.ROUND_HALF_UP
 
 from sympy import sympify
-from sympy import simplify
-from sympy import expand, factor
+from sympy import simplify 
+from sympy import expand, factor, logcombine, expand_log
 from sympy import srepr
 from sympy import nsimplify
+from sympy.core import Add, Basic, Mul
+from sympy.core.basic import preorder_traversal
+from sympy.core.singleton import S
 from latex2sympy.process_latex import process_sympy
-
 # default values and dictionaries ---------------------------------------------
 UNIT_FOLDER = 'units'
 SI_CSV = 'si.csv'
@@ -74,11 +76,12 @@ percent_re = re.compile(r'([0-9.]+)\s*\\%')
 log_re = re.compile(r'\\log_([^{])')
 multiple_spaces_re = re.compile(' {2,}')
 variable_before_parentheses_re = re.compile(r'\b([abcdxyz])\(')
-trailing_zeros_re = re.compile(r'(\.[0-9]*?)(0+)\b')
+trailing_zeros_re = re.compile(r'\.([0-9]*?)(0+)\b')
 trailing_decimal_sep_re = re.compile(r'(\.)(?![0-9])')
 neg_fraction_re = re.compile(r'-\\frac\{(.*?)\}\{(.*?)\}')
 closing_text_decorated_re = re.compile(r'\\text\{.*?\}$')
 closing_text_re = re.compile(r'[^0-9.}]*$')
+mixed_frac_re = re.compile(r'-?\s*[0-9]+(\s*\\frac{[^-]+?}{[^-]+?}|\s+\(?\d+\)?/\(?\d+\)?)')
 
 mixed_fraction_error_re = re.compile(r'[0-9] *\( *[0-9]+ */ *[0-9]+ *\)')
 
@@ -137,10 +140,12 @@ def preprocess_latex(input_latex,
                      thousand_sep=None,
                      decimal_sep=DEFAULT_DECIMAL_SEP,
                      preprocess_sep=True,
-                     ignore_text=False):
+                     ignore_text=False,
+                     euler_number=False):
     ''' Convert anything that latex2sympy can't handle,
         e.g., percentages and logarithms
     '''
+    
     # check for incorrect mixed fractions such as 1 (3/4)
     if mixed_fraction_error_re.search(input_latex) is not None:
         return None
@@ -157,7 +162,11 @@ def preprocess_latex(input_latex,
     if ignore_text:
         input_latex = closing_text_re.sub('', input_latex)
         input_latex = closing_text_decorated_re.sub('', input_latex)
-
+    #Euler Number handling
+    if euler_number:
+        input_latex = re.sub(r'(\\exp|e)','E',input_latex)
+    # \left,\right
+    input_latex = input_latex.replace(r'\left', '').replace(r'\right', '')
     # percent sign (\%)
     input_latex = percent_re.sub(convert_percent, input_latex)
     # \log_a -> \log_{a}
@@ -172,7 +181,6 @@ def preprocess_latex(input_latex,
     # fix fractions so that -\frac{1}{2} is not converted into -1/2
     if keep_neg_fraction_form:
         input_latex = neg_fraction_re.sub(convert_frac, input_latex)
-
     return input_latex
 
 def sympify_latex(input_latex, evaluate=None):
@@ -281,14 +289,15 @@ def equiv_symbolic(input_latex, expected_latex, options):
     input_latex = preprocess_latex(input_latex.strip(),
                                    thousand_sep=getThousandsSeparator(options),
                                    decimal_sep=getDecimalSeparator(options),
-                                   ignore_text=options.get('ignoreText', False))
+                                   ignore_text=options.get('ignoreText', False),
+                                   euler_number=options.get('allowEulersNumber',False))
     if input_latex is None:
         return ERROR
 
     expected_latex = preprocess_latex(expected_latex.strip(),
                                       thousand_sep=getThousandsSeparator(options),
-                                      decimal_sep=getDecimalSeparator(options))
-
+                                      decimal_sep=getDecimalSeparator(options),
+                                      euler_number=options.get('allowEulersNumber',False))
     # if suboption 'compareSides' is used,
     # we expect the expressions to be equalities
     if 'compareSides' in options:
@@ -301,7 +310,9 @@ def equiv_symbolic(input_latex, expected_latex, options):
         expected_latex, expected_result_latex = expected_latex.split('=', maxsplit=1)
         expected_symbolic = sympify_latex(expected_latex)
         expected_result_symbolic = sympify_latex(expected_result_latex)
-
+        if 'allowEulersNumber' in options:
+            input_symbolic = logcombine(expand_log(input_symbolic,force=True))
+            expected_symbolic = logcombine(expand_log(expected_symbolic,force=True))
         decimal_places = options.get('significantDecimalPlaces', None)
         if decimal_places is not None:
             try:
@@ -346,7 +357,9 @@ def equiv_symbolic(input_latex, expected_latex, options):
         expected_latex, expected_result_latex = expected_latex.split(separ, maxsplit=1)
         expected_symbolic = sympify_latex(expected_latex)
         expected_result_symbolic = sympify_latex(expected_result_latex)
-
+        if 'allowEulersNumber' in options:
+            input_symbolic = logcombine(expand_log(input_symbolic,force=True))
+            expected_symbolic = logcombine(expand_log(expected_symbolic,force=True))
         decimal_places = options.get('significantDecimalPlaces', None)
         if decimal_places is not None:
             try:
@@ -366,18 +379,20 @@ def equiv_symbolic(input_latex, expected_latex, options):
                     simplify(expected_result_symbolic)
 
         return result(xor(equiv, 'inverseResult' in options))
-
-    fraction_plus_re = r'(-?)\s*([0-9]+)(\s*(?=\\frac{.+}{.+})|\s+(?=[(\[-]{0,2}\d+[\])]?/[\[(-]{0,2}\d+[\])]?))'
+    if 'isMixedFraction' in options and not mixed_frac_re.search(input_latex):
+        return False
+         
+    fraction_plus_re = r'(-?)\s*([0-9]+)(\s*(?=\\frac{[^-]+}{[^-]+})|\s+(?=\(?\d+\)?/\(?\d+\)?))'
     input_latex = re.sub(fraction_plus_re,lambda x: '{}{}{}'.format(x.group(1),x.group(2),x.group(1) if x.group(1) else '+'),input_latex)
     expected_latex = re.sub(fraction_plus_re,lambda x: '{}{}{}'.format(x.group(1),x.group(2),x.group(1) if x.group(1) else '+'),expected_latex)
-
     input_symbolic = sympify_latex(input_latex)
-
     if input_symbolic is None:
         return ERROR
-
     expected_symbolic = sympify_latex(expected_latex)
-
+    if 'allowEulersNumber' in options:
+        input_symbolic = logcombine(expand_log(input_symbolic,force=True))
+        expected_symbolic = logcombine(expand_log(expected_symbolic,force=True))
+        
     # if expected answer evaluates to boolean
     # (most prominent case is when it's an equality),
     # evaluate if input evaluates to the same value
@@ -405,7 +420,7 @@ def equiv_symbolic(input_latex, expected_latex, options):
 coefficient_of_one_re = re.compile(r'(?<![0-9].)1' + times + r'(?=[a-z(\\])', flags=re.IGNORECASE)
 constituent_parts_re = re.compile(r'[^\s()*+-]')
 leading_zero_re = re.compile(r'\b0(?=\.)')
-trailing_zeros_re = re.compile(r'(?<=\.)([1-9]*)0+\b')
+trailing_zeros_re = re.compile(r'(\.[0-9]*?)0+\b')
 
 def equiv_literal(input_latex, expected_latex, options):
     ''' check equivLiteral
@@ -449,13 +464,11 @@ def equiv_literal(input_latex, expected_latex, options):
 
         preprocessed_input_latex = leading_zero_re.sub('', preprocessed_input_latex)
         preprocessed_expected_latex = leading_zero_re.sub('', preprocessed_expected_latex)
-
         if 'ignoreTrailingZeros' in options:
-            preprocessed_input_latex = trailing_zeros_re.sub(r'\1', preprocessed_input_latex)
+            preprocessed_input_latex = trailing_zeros_re.sub(lambda x: '' if x.group(1) == '.' else x.group(1), preprocessed_input_latex)
             preprocessed_input_latex = trailing_decimal_sep_re.sub(r'\1', preprocessed_input_latex)
-            preprocessed_expected_latex = trailing_zeros_re.sub(r'\1', preprocessed_expected_latex)
+            preprocessed_expected_latex = trailing_zeros_re.sub(lambda x: '' if (x.group(1) == '.') else x.group(1), preprocessed_expected_latex)
             preprocessed_expected_latex = trailing_decimal_sep_re.sub(r'\1', preprocessed_expected_latex)
-
         if 'ignoreCoefficientOfOne' in options:
             preprocessed_input_latex = coefficient_of_one_re.sub('', preprocessed_input_latex)
             preprocessed_expected_latex = coefficient_of_one_re.sub('', preprocessed_expected_latex)
@@ -469,16 +482,13 @@ def equiv_literal(input_latex, expected_latex, options):
 
         equiv = (str(input_symbolic) == str(expected_symbolic)) and\
                 input_parts == expected_parts
-
     return result(xor(equiv, 'inverseResult' in options))
 
 def equiv_value(input_latex, expected_latex, options):
     ''' check equivValue
     '''
-    unit_re = re.compile(r'^(.*?) *\\text\{(' +\
-                         '|'.join(sorted(UNITS, key=len, reverse=True)) +\
-                         ')\}$')
-
+    unit_re = re.compile('('+ '|'.join(UNITS.keys()) + ')')
+    unit_text_re = re.compile(r'\\text{('+ '|'.join(UNITS.keys()) + ')}')
     input_latex = preprocess_latex(input_latex,
                                    thousand_sep=getThousandsSeparator(options),
                                    decimal_sep=getDecimalSeparator(options))
@@ -487,27 +497,14 @@ def equiv_value(input_latex, expected_latex, options):
     expected_latex = preprocess_latex(expected_latex,
                                       thousand_sep=getThousandsSeparator(options),
                                       decimal_sep=getDecimalSeparator(options))
-
-    expected_unit_match = unit_re.match(expected_latex)
-    if expected_unit_match is not None:
-        input_unit_match = unit_re.match(input_latex)
-        if input_unit_match is not None:
-            try:
-                input_converted_value = float(simplify(sympify_latex(input_unit_match.group(1)))) *\
-                                        UNITS[input_unit_match.group(2)][2]
-                input_converted_unit = UNITS[input_unit_match.group(2)][1]
-                expected_converted_value = float(simplify(sympify_latex(expected_unit_match.group(1)))) *\
-                                           UNITS[expected_unit_match.group(2)][2]
-                expected_converted_unit = UNITS[expected_unit_match.group(2)][1]
-            except ValueError:
-                return ERROR
-
-            equiv = input_converted_value == expected_converted_value and\
-                    input_converted_unit == expected_converted_unit
-
-            return result(xor(equiv, 'inverseResult' in options))
-        else:
-            return 'false'
+    
+    #Updated units parsing, much more simple and faster
+    input_latex = unit_text_re.sub(lambda x: '*' + str(UNITS[x.group(1)][2]),input_latex)
+    expected_latex = unit_text_re.sub(lambda x: '*' + str(UNITS[x.group(1)][2]),expected_latex)
+    input_latex = unit_re.sub(lambda x: '*' + str(UNITS[x.group(1)][2]),input_latex)
+    expected_latex = unit_re.sub(lambda x: '*' + str(UNITS[x.group(1)][2]),expected_latex)
+    
+    
 
     if 'compareSides' in options:
         input_latex, input_result_latex = input_latex.split('=', maxsplit=1)
@@ -568,7 +565,6 @@ def equiv_value(input_latex, expected_latex, options):
                                 thousand_sep=getThousandsSeparator(options),
                                 decimal_sep=getDecimalSeparator(options),
                                 preprocess_sep=False)
-
     decimal_places = options.get('significantDecimalPlaces', None)
     if decimal_places is not None:
         try:
@@ -594,6 +590,9 @@ def string_match(input_latex, expected_latex, options):
     match = input_latex == expected_latex
     return result(xor(match, 'inverseResult' in options))
 
+parentheses_minus_re = re.compile(r'\((-?d*?)\)')
+#parentheses_around = re.compile(r'(^\s*|\+\s*)\((.*?)\)(\s*\+|\s*$)')
+#Remove non-efective parenheses might be used later
 def is_simplified(input_latex, expected_latex=None, options={}):
     ''' check isSimplified
     '''
@@ -602,6 +601,8 @@ def is_simplified(input_latex, expected_latex=None, options={}):
                              decimal_sep=getDecimalSeparator(options))
     if input_symbolic is None:
         return ERROR
+    
+    input_symbolic = parentheses_minus_re.sub(r'\1',str(input_symbolic))
     simplified = str(input_symbolic) ==\
                  str(expand(simplify(convert(input_latex,
                                      thousand_sep=getThousandsSeparator(options),
@@ -669,16 +670,14 @@ def is_unit(input_latex, expected_latex=None, options={}):
                                    decimal_sep=getDecimalSeparator(options))
     if input_latex is None or input_latex.count('.') > 1:
         return ERROR
-    is_unit_re = re.compile(r'^(.*?) *\\text\{(' +
-                            '|'.join(options['allowedUnits']) + ')\}$')
-    unit = is_unit_re.match(input_latex) is not None
+    is_unit_re = re.compile('('+ '|'.join(options['allowedUnits']) + ')')
+    unit = is_unit_re.search(input_latex) is not None
     return result(xor(unit, 'inverseResult' in options))
 
 # regular expressions for pattern checks for equivSyntax
 coeff = r'([A-Wa-w]|\d+(\.\d+)?|-?\d+/-?\d+|\\frac\{-?\d+\}\{-?\d+\}|\d+ *(\d+/\d+|\\frac\{\d+\}\{\d+\})|)'
 decimal_re_pattern = r'^\d+\.\d{{{}}}$'
 simple_frac_re = re.compile(r'^(-?\d+/-?\d+|-?\d+\\div-?\d+|-?\\frac\{-?\d+\}\{-?\d+\})$')
-mixed_frac_re = re.compile(r'^-?\d+ *(\d+/\d+|\\frac\{\d+\}\{\d+\})$')
 exp_re = re.compile(r'^(([A-Wa-w]+|\d+(\.\d+)?)\^(\{.*[x-z].*\}|[x-z])|exp\(.*[x-z].*\))$')
 standard_form_linear_re = re.compile(r'^-?{} *{} *x *[+-] *{} *{} *y *= *-?{}$'.format(coeff, times, coeff, times, coeff))
 standard_form_quadratic_re = re.compile(r'^-?{} *{} *x\^(2|[{{]2[}}]) *[+-] *{} *{} *x *[+-] *{} *= *0$'.format(coeff, times, coeff, times, coeff))
@@ -723,7 +722,7 @@ def equiv_syntax(input_latex, expected_latex=None, options={}):
                 if options.get(option, False):
                     pattern_re = pattern_dict[option]
     input_latex = input_latex.replace('\\left', '').replace('\\right', '')
-    equiv = pattern_re.match(input_latex.strip()) is not None
+    equiv = bool(pattern_re.match(input_latex.strip()))
     return result(xor(equiv, 'inverseResult' in options))
 
 def calculate(input_latex, expected_latex, options):
@@ -768,7 +767,9 @@ check_func = {
 # of option combinations passed to the script
 allowed_options = {
     'equivSymbolic': {
+        'allowEulersNumber',
         'isTrue',
+        'isMixedFraction',
         'setThousandsSeparator',
         'setDecimalSeparator',
         'inverseResult',
