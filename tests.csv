@@ -58,11 +58,11 @@
 58,"equivSymbolic:setThousandsSeparator=[',']: percent conversion","1,000\%",10,"equivSymbolic:setThousandsSeparator=[',']",true
 59,"equivSymbolic:setThousandsSeparator=[',']': simple fraction vs. decimal","\frac{1}{1,000}",0.001,"equivSymbolic:setThousandsSeparator=[',']",true
 60,"equivSymbolic:setThousandsSeparator=[',', ' ']': polynomial","x+1,2",x+1.2,"equivSymbolic:setThousandsSeparator=[',', ' ']",error
-61,equivSymbolic:compareSides: addition commutativity,3+4=7,4 + 3 = 7,equivSymbolic:compareSides,true
-62,equivSymbolic:compareSides: percent conversion,30\%+4.2=4.5,0.3 + 4.2 = 4.5,equivSymbolic:compareSides,true
-63,equivSymbolic:compareSides: wrong answer,3+4=9,4 + 3 = 7,equivSymbolic:compareSides,false
-64,equivSymbolic:compareSides: wrong expression,3+3=7,4 + 3 = 7,equivSymbolic:compareSides,false
-65,equivSymbolic:compareSides: wrong expression and answer,3+3=9,4 + 3 = 7,equivSymbolic:compareSides,false
+61,equivSymbolicEqn:compareSides: addition commutativity,3+4=7,4 + 3 = 7,equivSymbolicEqn:compareSides,true
+62,equivSymbolicEqn:compareSides: percent conversion,30\%+4.2=4.5,0.3 + 4.2 = 4.5,equivSymbolicEqn:compareSides,true
+63,equivSymbolicEqn:compareSides: wrong answer,3+4=9,4 + 3 = 7,equivSymbolicEqn:compareSides,false
+64,equivSymbolicEqn:compareSides: wrong expression,3+3=7,4 + 3 = 7,equivSymbolicEqn:compareSides,false
+65,equivSymbolicEqn:compareSides: wrong expression and answer,3+3=9,4 + 3 = 7,equivSymbolicEqn:compareSides,false
 66,isExpanded: simple polynomial,2x,,isExpanded,true
 67,isExpanded: simple polynomial,x^2+3x,,isExpanded,true
 68,isExpanded: simple polynomial with two variables,x^2+xy+3x+3y,,isExpanded,true
@@ -290,15 +290,15 @@
 288,equivSymbolic:EV-479,1+\frac{3}{4},\frac{7}{4},equivSymbolic,true
 289,equivSymbolic:EV-479,1\frac{3}{4},\frac{7}{4},equivSymbolic,true
 290,equivSymbolic:EV-479,1+3/4,7/4,equivSymbolic,true
-291,equivSymbolic: algebraic expression:EV-634,y=3x+20,y-20=3x,equivSymbolic:isTrue,true
-292,equivSymbolic: algebraic expression:EV-634,y=3x+20.1,y-20.1=3x,equivSymbolic:isTrue,true
-293,equivSymbolic: algebraic expression:EV-634,y=3x+20-5z,y-20+5z=3x,equivSymbolic:isTrue,true
-294,equivSymbolic: algebraic expression,y<3x+20-5z,y-20+5z<3x,equivSymbolic:isTrue,true
-295,equivSymbolic: algebraic expression,y>=3x+20-5z,y-20+5z>=3x,equivSymbolic:isTrue,true
-296,equivSymbolic: algebraic expression,y>3x+20-5z,y-20+5z<3x,equivSymbolic:isTrue,false
-297,equivSymbolic: algebraic expression,y-5>3x+20-5z,y-25+5z<3x,equivSymbolic:isTrue,false
-298,equivSymbolic: algebraic expression,y>3x^2+20-5z,y-20+5z<3x^2,equivSymbolic:isTrue,false
-299,equivSymbolic: algebraic expression,y>10w+3x+20-5z,y-20+5z<10w+3x,equivSymbolic:isTrue,false
+291,equivSymbolic: algebraic expression:EV-634,y=3x+20,y-20=3x,equivSymbolicEqn,true
+292,equivSymbolic: algebraic expression:EV-634,y=3x+20.1,y-20.1=3x,equivSymbolicEqn,true
+293,equivSymbolic: algebraic expression:EV-634,y=3x+20-5z,y-20+5z=3x,equivSymbolicEqn,true
+294,equivSymbolic: algebraic expression,y<3x+20-5z,y-20+5z<3x,equivSymbolicEqn,true
+295,equivSymbolic: algebraic expression,y>=3x+20-5z,y-20+5z>=3x,equivSymbolicEqn,true
+296,equivSymbolic: algebraic expression,y>3x+20-5z,y-20+5z<3x,equivSymbolicEqn,false
+297,equivSymbolic: algebraic expression,y-5>3x+20-5z,y-25+5z<3x,equivSymbolicEqn,false
+298,equivSymbolic: algebraic expression,y>3x^2+20-5z,y-20+5z<3x^2,equivSymbolicEqn,false
+299,equivSymbolic: algebraic expression,y>10w+3x+20-5z,y-20+5z<10w+3x,equivSymbolicEqn,false
 300,setEvaluation: any order,"-3,3","3,-3",setEvaluation,true
 301,setEvaluation: any order,"-6,-3,3","3,-3",setEvaluation,false
 302,setEvaluation: any order,"-6,-3,3","3,6,-3",setEvaluation,false
@@ -329,7 +329,7 @@
 327,equivSymbolic,2\frac{1}{2},\frac{5}{2},equivSymbolic:isMixedFraction,true
 328,simplification ,32,16\times2,equivSymbolic;isSimplified,true
 330,"parenthesis",x^2-15x+56,\left(x-7\right)\left(x-8\right),equivSymbolic,true
-331,"basic equivSymbolic",y=45x+40,y-45x=40,equivSymbolic,true
+331,"basic equivSymbolic",y=45x+40,y-45x=40,equivSymbolicEqn,true
 332,"EV-1097, handling trailing zeroe",1000.000,1000,equivLiteral:ignoreTrailingZeros,true
 333,"equivSymbolic;isSimplified",\frac{1}{2},\frac{3}{6},equivSymbolic;isSimplified,true
 334,"equivSymbolic;isSimplified",\frac{3}{7},\frac{1}{2},equivSymbolic;isSimplified,false
@@ -347,3 +347,14 @@
 345,"units equivalancy this works in mathquill, EV-1853",100cm,1m,"equivValue;isUnit:allowedUnits=[m,cm,km]",true
 346,"Eulers Number, EV-1087",e^x-1,\exp^x-1,equivSymbolic:allowEulersNumber,true
 347,"Eulers Number, EV-1087",\ln e^x,x,equivSymbolic:allowEulersNumber,true
+348,"Eulers Number, EV-1087",\ln e^x = 1,x = 1,equivSymbolicEqn:allowEulersNumber,true
+348,"Eulers Number, EV-1087",\ln e^x = 1,x = 1,equivSymbolicEqn:allowEulersNumber,true
+349,"Eulers Number, EV-1087",\ln e^x = 1,x-1 = 0,"equivSymbolicEqn:allowEulersNumber,compareSides",false
+350,"Eulers Number, EV-1087",\log 10 + \ln e^x = 0, 1 = -x,"equivSymbolicEqn:allowEulersNumber",true
+351,"Eulers Number, EV-1087",\log 10 + \ln e^x = 0, 1 = -x,"equivSymbolicEqn:allowEulersNumber",true
+352,compareSides:eq,1 = 2, 2 = 1,"equivSymbolicEqn:compareSides",true
+353,compareSides:eq,1 = 2, 1 = 2,"equivSymbolicEqn:compareSides",true
+354,compareSides:ineq,1 > 2, 2 < 1,"equivSymbolicEqn:compareSides",true
+355,compareSides:ineq,1 > 2, 2 > 1,"equivSymbolicEqn:compareSides",false
+356,ineq:compareSides,1 + x > 2, 2 - x < 1,"equivSymbolicEqn:compareSides",false
+357,ineq,1 + x > 2, 2 - x < 1,"equivSymbolicEqn",true
