@@ -4,6 +4,7 @@ import re
 import os
 import sys
 import json
+import itertools
 from collections import OrderedDict
 import decimal
 decimal.getcontext().rounding = decimal.ROUND_HALF_UP
@@ -68,6 +69,24 @@ UNITS = {
     'lb':  ('pound', 'oz', 16),
 }
 
+interval_opening = {
+    '(': True,
+    '[': False
+}
+
+interval_closing = {
+    ')': True,
+    ']': False
+}
+
+separator_pairs = {
+    '>=':'<=',
+    '<=':'>=',
+    '>':'<',
+    '<':'>',
+    '=':'='
+}
+
 # end of default values and dictionaries block --------------------------------
 
 # several functions and regexes for LaTeX-to-sympy conversions ----------------
@@ -82,6 +101,11 @@ closing_text_decorated_re = re.compile(r'\\text\{.*?\}$')
 closing_text_re = re.compile(r'[^0-9.}]*$')
 mixed_frac_re = re.compile(r'-?\s*[0-9]+(\s*\\frac{[^-]+?}{[^-]+?}|\s+\(?\d+\)?/\(?\d+\)?)')
 mixed_fraction_error_re = re.compile(r'[0-9] *\( *[0-9]+ */ *[0-9]+ *\)')
+matrix_form_re = re.compile(r'\{bmatrix\}(.*?)end{bmatrix}')
+interval_form_re = re.compile(r'^\s*([{}])(.*?),(.*?)([{}])\s*$'.format(re.escape(''.join(interval_opening.keys())),
+                                                                        re.escape(''.join(interval_closing.keys()))))
+not_latex_re = re.compile(r'^NotLatex:')
+format_latex_re = re.compile(r'Format\((.*?)\)Format')
 times = r'(\*|\\cdot ?|\\times ?)?'
 
 def load_units(units_csv_path):
@@ -103,6 +127,19 @@ def convert_frac(matchobj):
                         matchobj.group(2), r'}*(-1)'))
     return ''.join((r'\frac{', matchobj.group(1),
                     r'}{', matchobj.group(2), r'}*(-1)'))
+                    
+def convertMatrix(matrix_latex):
+    matrix_form = [[r'Format({0})Format'.format(cell) for cell in row.split(r'&')]
+                for row in matrix_latex.group(1).split(r'\\\\')]
+    return r'NotLatex:Matrix({})'.format(matrix_form)
+
+def convertInterval(interval_latex):
+    opening = interval_opening[interval_latex.group(1)]
+    closing = interval_closing[interval_latex.group(4)]
+    return r'NotLatex:Interval(Format({1})Format,Format({2})Format,{0},{3})'.format(opening,*interval_latex.groups()[1:3],closing)
+        
+    
+   
 
 def replace_separators(input_latex,
                        thousand=None,
@@ -138,7 +175,8 @@ def preprocess_latex(input_latex,
                      decimal_sep=DEFAULT_DECIMAL_SEP,
                      preprocess_sep=True,
                      ignore_text=False,
-                     euler_number=False):
+                     euler_number=False,
+                     complex_number=False):
     ''' Convert anything that latex2sympy can't handle,
         e.g., percentages and logarithms
     '''
@@ -161,6 +199,8 @@ def preprocess_latex(input_latex,
     #Euler Number handling
     if euler_number:
         input_latex = re.sub(r'(\\exp|e)','E',input_latex)
+    if complex_number:
+        input_latex = re.sub(r'(i)','I',input_latex)
     # \left,\right
     input_latex = input_latex.replace(r'\left', '').replace(r'\right', '')
     # percent sign (\%)
@@ -172,10 +212,16 @@ def preprocess_latex(input_latex,
     # trailing zeros
     if ignore_trailing_zeros:
         input_latex = trailing_zeros_re.sub(lambda x: '' if (x.group(1) == '.') else x.group(1), input_latex)
-
     # fix fractions so that -\frac{1}{2} is not converted into -1/2
     if keep_neg_fraction_form:
         input_latex = neg_fraction_re.sub(convert_frac, input_latex)
+    # Matrices preparation
+    if matrix_form_re.search(input_latex):
+        input_latex = matrix_form_re.sub(convertMatrix,input_latex)
+    #Interval preparation
+    interval_parts = interval_form_re.search(input_latex)
+    if interval_parts:
+        input_latex = convertInterval(interval_parts)
     return input_latex
 
 def sympify_latex(input_latex, evaluate=None):
@@ -188,8 +234,12 @@ def sympify_latex(input_latex, evaluate=None):
         # took into account something that authors of sympy 
         # consider in their definition of a 'standard expression form'
         # converting it to string and sympifying again does the trick
-        input_symbolic = sympify(str(process_sympy(input_latex)),
-                                 evaluate=evaluate)
+        if not_latex_re.search(input_latex):
+            input_latex = not_latex_re.sub('',input_latex)
+            input_latex = format_latex_re.sub(lambda x: str(process_sympy(x.group(1))),input_latex)
+        else:
+            input_latex = str(process_sympy(input_latex))
+        input_symbolic = sympify(input_latex,evaluate=evaluate)
     except:
         return None
     return input_symbolic
@@ -200,7 +250,9 @@ def convert(input_latex, evaluate=None,
             thousand_sep=None,
             decimal_sep=DEFAULT_DECIMAL_SEP,
             preprocess_sep=True,
-            ignore_text=False):
+            ignore_text=False,
+            complex_number=False,
+            euler_number=False):
     ''' All preprocessing in one function
     '''
     input_latex = preprocess_latex(input_latex,
@@ -209,7 +261,9 @@ def convert(input_latex, evaluate=None,
                                    thousand_sep=thousand_sep,
                                    decimal_sep=decimal_sep,
                                    preprocess_sep=preprocess_sep,
-                                   ignore_text=ignore_text)
+                                   ignore_text=ignore_text,
+                                   euler_number=euler_number,
+                                   complex_number=complex_number)
     if input_latex is None:
         return None
     input_symbolic = sympify_latex(input_latex, evaluate=evaluate)
@@ -281,26 +335,27 @@ def getDecimalSeparator(options):
 def equiv_symbolic(input_latex, expected_latex, options):
     ''' check equivSymbolic
     '''
+    #Checking specific patterns(matrix)
     input_latex = preprocess_latex(input_latex.strip(),
                                    thousand_sep=getThousandsSeparator(options),
                                    decimal_sep=getDecimalSeparator(options),
                                    ignore_text=options.get('ignoreText', False),
-                                   euler_number=options.get('allowEulersNumber',False))
+                                   euler_number=options.get('allowEulersNumber',False),
+                                   complex_number=options.get('complexType',False))
     if input_latex is None:
         return ERROR
 
     expected_latex = preprocess_latex(expected_latex.strip(),
                                       thousand_sep=getThousandsSeparator(options),
                                       decimal_sep=getDecimalSeparator(options),
-                                      euler_number=options.get('allowEulersNumber',False))
-                                      
+                                      euler_number=options.get('allowEulersNumber',False),
+                                      complex_number=options.get('complexType',False))                         
     if 'isMixedFraction' in options and not mixed_frac_re.search(input_latex):
         return False
-         
     fraction_plus_re = r'(-?)\s*([0-9]+)(\s*(?=\\frac{[^-]+}{[^-]+})|\s+(?=\(?\d+\)?/\(?\d+\)?))'
     input_latex = re.sub(fraction_plus_re,lambda x: '{}{}{}'.format(x.group(1),x.group(2),x.group(1) if x.group(1) else '+'),input_latex)
     expected_latex = re.sub(fraction_plus_re,lambda x: '{}{}{}'.format(x.group(1),x.group(2),x.group(1) if x.group(1) else '+'),expected_latex)
-    input_symbolic = sympify_latex(input_latex)
+    input_symbolic = sympify_latex(input_latex)  
     if input_symbolic is None:
         return ERROR
     expected_symbolic = sympify_latex(expected_latex)
@@ -321,12 +376,10 @@ def equiv_symbolic(input_latex, expected_latex, options):
             equiv = round(decimal.Decimal(str(float(simplify(input_symbolic)))), decimal_places) ==\
                     round(decimal.Decimal(str(float(simplify(expected_symbolic)))), decimal_places)
         except:
-            equiv = expand(simplify(input_symbolic)) -\
-                    expand(simplify(expected_symbolic)) == 0
+            equiv = simplify(expand(input_symbolic)) == simplify(expand(expected_symbolic))
     else:
         try:
-            equiv = expand(simplify(input_symbolic)) -\
-                    expand(simplify(expected_symbolic)) == 0
+            equiv = simplify(expand(input_symbolic)) == simplify(expand(expected_symbolic))
         except TypeError:
             return ERROR
 
@@ -339,17 +392,21 @@ def equiv_symbolic_eqn(input_latex, expected_latex, options):
     input_latex = preprocess_latex(input_latex.strip(),
                                    thousand_sep=getThousandsSeparator(options),
                                    decimal_sep=getDecimalSeparator(options),
-                                   euler_number=options.get('allowEulersNumber',False))
+                                   euler_number=options.get('allowEulersNumber',False),
+                                   complex_number=options.get('complexType',False))
     if input_latex is None:
         return ERROR
     expected_latex = preprocess_latex(expected_latex.strip(),
                                       thousand_sep=getThousandsSeparator(options),
                                       decimal_sep=getDecimalSeparator(options),
-                                      euler_number=options.get('allowEulersNumber',False))                            
-    separator_re = re.compile(r'(>=|<=|=|>|<)')
-    separator_pairs = {'>=':'<=','<=':'>=','>':'<','<':'>','=':'='}
-    a_sep = separator_re.search(input_latex).group(1)
-    s_sep = separator_re.search(expected_latex).group(1)
+                                      euler_number=options.get('allowEulersNumber',False),
+                                      complex_number=options.get('complexType',False))
+    separator_re = re.compile('|'.join(separator_pairs.keys()))
+    try:
+        a_sep = separator_re.search(input_latex).group(0)
+        s_sep = separator_re.search(expected_latex).group(0)
+    except ValueError:
+        return ERROR
     flipped = False
     if a_sep != s_sep:
         if separator_pairs[a_sep] == s_sep:
@@ -410,80 +467,74 @@ trailing_zeros_re = re.compile(r'(\.[0-9]*?)0+\b')
 def equiv_literal(input_latex, expected_latex, options):
     ''' check equivLiteral
     '''
-    if 'allowInterval' in options:
-        input_latex = preprocess_latex(input_latex,
-                                       thousand_sep=getThousandsSeparator(options),
-                                       decimal_sep=getDecimalSeparator(options))
-        if input_latex is None:
-            return ERROR
-        expected_latex = preprocess_latex(expected_latex,
-                                        thousand_sep=getThousandsSeparator(options),
-                                        decimal_sep=getDecimalSeparator(options))
+    ignore_trailing_zeros = 'ignoreTrailingZeros' in options
 
-        equiv = str(input_latex) == str(expected_latex)
-    else:
-        ignore_trailing_zeros = 'ignoreTrailingZeros' in options
+    input_symbolic = convert(input_latex.strip(), evaluate=False,
+                             ignore_trailing_zeros=ignore_trailing_zeros,
+                             keep_neg_fraction_form=True,
+                             thousand_sep=getThousandsSeparator(options),
+                             decimal_sep=getDecimalSeparator(options),
+                             euler_number=options.get('allowEulersNumber',False),
+                             complex_number=options.get('complexType',False))
+    if input_symbolic is None:
+        return ERROR
+    expected_symbolic = convert(expected_latex.strip(), evaluate=False,
+                                ignore_trailing_zeros=ignore_trailing_zeros,
+                                keep_neg_fraction_form=True,
+                                thousand_sep=getThousandsSeparator(options),
+                                decimal_sep=getDecimalSeparator(options),
+                                euler_number=options.get('allowEulersNumber',False),
+                                complex_number=options.get('complexType',False))
+    
+    preprocessed_input_latex = preprocess_latex(input_latex,
+                                                thousand_sep=getThousandsSeparator(options),
+                                                decimal_sep=getDecimalSeparator(options),
+                                                ignore_trailing_zeros=ignore_trailing_zeros,
+                                                euler_number=options.get('allowEulersNumber',False),
+                                                complex_number=options.get('complexType',False))
+    preprocessed_expected_latex = preprocess_latex(expected_latex,
+                                                   thousand_sep=getThousandsSeparator(options),
+                                                   decimal_sep=getDecimalSeparator(options),
+                                                   ignore_trailing_zeros=ignore_trailing_zeros,
+                                                   preprocess_sep=False,
+                                                   euler_number=options.get('allowEulersNumber',False),
+                                                   complex_number=options.get('complexType',False))
 
-        input_symbolic = convert(input_latex.strip(), evaluate=False,
-                                 ignore_trailing_zeros=ignore_trailing_zeros,
-                                 keep_neg_fraction_form=True,
-                                 thousand_sep=getThousandsSeparator(options),
-                                 decimal_sep=getDecimalSeparator(options))
-        if input_symbolic is None:
-            return ERROR
-        expected_symbolic = convert(expected_latex.strip(), evaluate=False,
-                                    ignore_trailing_zeros=ignore_trailing_zeros,
-                                    keep_neg_fraction_form=True,
-                                    thousand_sep=getThousandsSeparator(options),
-                                    decimal_sep=getDecimalSeparator(options))
+    preprocessed_input_latex = leading_zero_re.sub('', preprocessed_input_latex)
+    preprocessed_expected_latex = leading_zero_re.sub('', preprocessed_expected_latex)
+    if 'ignoreCoefficientOfOne' in options:
+        preprocessed_input_latex = coefficient_of_one_re.sub('', preprocessed_input_latex)
+        preprocessed_expected_latex = coefficient_of_one_re.sub('', preprocessed_expected_latex)
+    
+    input_parts = constituent_parts_re.findall(preprocessed_input_latex)
+    expected_parts = constituent_parts_re.findall(preprocessed_expected_latex)
+    if 'ignoreOrder' in options:
+        input_parts.sort()
+        expected_parts.sort()
 
-        preprocessed_input_latex = preprocess_latex(input_latex,
-                                                    thousand_sep=getThousandsSeparator(options),
-                                                    decimal_sep=getDecimalSeparator(options),
-                                                    ignore_trailing_zeros=ignore_trailing_zeros)
-        preprocessed_expected_latex = preprocess_latex(expected_latex,
-                                                       thousand_sep=getThousandsSeparator(options),
-                                                       decimal_sep=getDecimalSeparator(options),
-                                                       ignore_trailing_zeros=ignore_trailing_zeros,
-                                                       preprocess_sep=False)
-
-        preprocessed_input_latex = leading_zero_re.sub('', preprocessed_input_latex)
-        preprocessed_expected_latex = leading_zero_re.sub('', preprocessed_expected_latex)
-        if 'ignoreCoefficientOfOne' in options:
-            preprocessed_input_latex = coefficient_of_one_re.sub('', preprocessed_input_latex)
-            preprocessed_expected_latex = coefficient_of_one_re.sub('', preprocessed_expected_latex)
-
-        input_parts = constituent_parts_re.findall(preprocessed_input_latex)
-        expected_parts = constituent_parts_re.findall(preprocessed_expected_latex)
-
-        if 'ignoreOrder' in options:
-            input_parts.sort()
-            expected_parts.sort()
-
-        equiv = (str(input_symbolic) == str(expected_symbolic)) and\
-                input_parts == expected_parts
+    equiv = (str(input_symbolic) == str(expected_symbolic)) and\
+            input_parts == expected_parts
     return result(xor(equiv, 'inverseResult' in options))
 
 def equiv_value(input_latex, expected_latex, options):
     ''' check equivValue
     '''
-    unit_re = re.compile('('+ '|'.join(UNITS.keys()) + ')')
-    unit_text_re = re.compile(r'\\text{('+ '|'.join(UNITS.keys()) + ')}')
+    unit_text_re = re.compile(r'(?:\\text{)?('+ '|'.join(UNITS.keys()) + ')}?$')
     input_latex = preprocess_latex(input_latex,
                                    thousand_sep=getThousandsSeparator(options),
-                                   decimal_sep=getDecimalSeparator(options))
+                                   decimal_sep=getDecimalSeparator(options),
+                                   euler_number=options.get('allowEulersNumber',False),
+                                   complex_number=options.get('complexType',False))
     if input_latex is None:
         return ERROR
     expected_latex = preprocess_latex(expected_latex,
                                       thousand_sep=getThousandsSeparator(options),
-                                      decimal_sep=getDecimalSeparator(options))
-    
+                                      decimal_sep=getDecimalSeparator(options),
+                                      euler_number=options.get('allowEulersNumber',False),
+                                      complex_number=options.get('complexType',False))
     #Updated units parsing, much more simple and faster
     input_latex = unit_text_re.sub(lambda x: '*' + str(UNITS[x.group(1)][2]),input_latex)
     expected_latex = unit_text_re.sub(lambda x: '*' + str(UNITS[x.group(1)][2]),expected_latex)
-    input_latex = unit_re.sub(lambda x: '*' + str(UNITS[x.group(1)][2]),input_latex)
-    expected_latex = unit_re.sub(lambda x: '*' + str(UNITS[x.group(1)][2]),expected_latex)
-    
     
 
     if 'compareSides' in options:
@@ -492,12 +543,16 @@ def equiv_value(input_latex, expected_latex, options):
                              thousand_sep=getThousandsSeparator(options),
                              decimal_sep=getDecimalSeparator(options),
                              preprocess_sep=False,
-                             ignore_text=options.get('ignoreText', False))
+                             ignore_text=options.get('ignoreText', False),
+                             euler_number=options.get('allowEulersNumber',False),
+                             complex_number=options.get('complexType',False))
         input_result_symblic = convert(input_result_latex,
                              thousand_sep=getThousandsSeparator(options),
                              decimal_sep=getDecimalSeparator(options),
                              preprocess_sep=False,
-                             ignore_text=options.get('ignoreText', False))
+                             ignore_text=options.get('ignoreText', False),
+                             euler_number=options.get('allowEulersNumber',False),
+                             complex_number=options.get('complexType',False))
         if input_symbolic is None or input_result_symblic is None:
             return ERROR
 
@@ -505,11 +560,15 @@ def equiv_value(input_latex, expected_latex, options):
         expected_symbolic = convert(expected_latex,
                                     thousand_sep=getThousandsSeparator(options),
                                     decimal_sep=getDecimalSeparator(options),
-                                    preprocess_sep=False)
+                                    preprocess_sep=False,
+                                    euler_number=options.get('allowEulersNumber',False),
+                                    complex_number=options.get('complexType',False))
         expected_result_symbolic = convert(expected_result_latex,
                                     thousand_sep=getThousandsSeparator(options),
                                     decimal_sep=getDecimalSeparator(options),
-                                    preprocess_sep=False)      
+                                    preprocess_sep=False,
+                                    euler_number=options.get('allowEulersNumber',False),
+                                    complex_number=options.get('complexType',False))      
 
         decimal_places = options.get('significantDecimalPlaces', None)
         if decimal_places is not None:
@@ -537,14 +596,18 @@ def equiv_value(input_latex, expected_latex, options):
                              thousand_sep=getThousandsSeparator(options),
                              decimal_sep=getDecimalSeparator(options),
                              preprocess_sep=False,
-                             ignore_text=options.get('ignoreText', False))
+                             ignore_text=options.get('ignoreText', False),
+                             euler_number=options.get('allowEulersNumber',False),
+                             complex_number=options.get('complexType',False))
     if input_symbolic is None:
         return ERROR
 
     expected_symbolic = convert(expected_latex,
                                 thousand_sep=getThousandsSeparator(options),
                                 decimal_sep=getDecimalSeparator(options),
-                                preprocess_sep=False)
+                                preprocess_sep=False,
+                                euler_number=options.get('allowEulersNumber',False),
+                                complex_number=options.get('complexType',False))
     decimal_places = options.get('significantDecimalPlaces', None)
     if decimal_places is not None:
         try:
@@ -578,7 +641,9 @@ def is_simplified(input_latex, expected_latex=None, options={}):
     '''
     input_symbolic = convert(input_latex, evaluate=False,
                              thousand_sep=getThousandsSeparator(options),
-                             decimal_sep=getDecimalSeparator(options))
+                             decimal_sep=getDecimalSeparator(options),
+                             euler_number=options.get('allowEulersNumber',False),
+                             complex_number=options.get('complexType',False))
     if input_symbolic is None:
         return ERROR
     
@@ -586,7 +651,9 @@ def is_simplified(input_latex, expected_latex=None, options={}):
     simplified = str(input_symbolic) ==\
                  str(expand(simplify(convert(input_latex,
                                      thousand_sep=getThousandsSeparator(options),
-                                     decimal_sep=getDecimalSeparator(options)))))
+                                     decimal_sep=getDecimalSeparator(options),
+                                     euler_number=options.get('allowEulersNumber',False),
+                                     complex_number=options.get('complexType',False)))))
     return result(xor(simplified, 'inverseResult' in options))
 
 def is_expanded(input_latex, expected_latex=None, options={}):
@@ -594,7 +661,9 @@ def is_expanded(input_latex, expected_latex=None, options={}):
     '''
     input_symbolic = convert(input_latex,
                              thousand_sep=getThousandsSeparator(options),
-                             decimal_sep=getDecimalSeparator(options))
+                             decimal_sep=getDecimalSeparator(options),
+                             euler_number=options.get('allowEulersNumber',False),
+                             complex_number=options.get('complexType',False))
     if input_symbolic is None:
         return ERROR
     expanded = input_symbolic - expand(simplify(input_symbolic)) == 0
@@ -605,7 +674,9 @@ def is_factorised(input_latex, expected_latex=None, options={}):
     '''
     input_symbolic = convert(input_latex,
                              thousand_sep=getThousandsSeparator(options),
-                             decimal_sep=getDecimalSeparator(options))
+                             decimal_sep=getDecimalSeparator(options),
+                             euler_number=options.get('allowEulersNumber',False),
+                             complex_number=options.get('complexType',False))
     if input_symbolic is None:
         return ERROR
     
@@ -636,7 +707,9 @@ def is_true(input_latex, expected_latex=None, options={}):
     '''
     input_symbolic = convert(input_latex,
                              thousand_sep=getThousandsSeparator(options),
-                             decimal_sep=getDecimalSeparator(options))
+                             decimal_sep=getDecimalSeparator(options),
+                             euler_number=options.get('allowEulersNumber',False),
+                             complex_number=options.get('complexType',False))
     if input_symbolic is None:
         return ERROR
     true = bool(simplify(input_symbolic))
@@ -647,11 +720,14 @@ def is_unit(input_latex, expected_latex=None, options={}):
     '''
     input_latex = preprocess_latex(input_latex,
                                    thousand_sep=getThousandsSeparator(options),
-                                   decimal_sep=getDecimalSeparator(options))
+                                   decimal_sep=getDecimalSeparator(options),
+                                   euler_number=options.get('allowEulersNumber',False),
+                                   complex_number=options.get('complexType',False))
     if input_latex is None or input_latex.count('.') > 1:
         return ERROR
-    is_unit_re = re.compile('('+ '|'.join(options['allowedUnits']) + ')')
-    unit = is_unit_re.search(input_latex) is not None
+    is_unit_re = re.compile(r'^(.*?) *(?:\\text\{)?(' +
+                            '|'.join(options['allowedUnits']) + ')\}?$')
+    unit = is_unit_re.match(input_latex)
     return result(xor(unit, 'inverseResult' in options))
 
 # regular expressions for pattern checks for equivSyntax
@@ -755,14 +831,14 @@ allowed_options = {
         'inverseResult',
         'ignoreText',
         'significantDecimalPlaces',
-        'useEulerNumber'},
+        'complexType'},
     'equivSymbolicEqn': {
         'compareSides',
         'allowEulersNumber',
         'setThousandsSeparator',
         'setDecimalSeparator',
         'inverseResult',
-        'useEulerNumber'},
+        'complexType'},
     'equivLiteral': {
         'setThousandsSeparator',
         'setDecimalSeparator',
@@ -770,7 +846,8 @@ allowed_options = {
         'ignoreTrailingZeros',
         'ignoreOrder',
         'ignoreCoefficientOfOne',
-        'allowInterval'},
+        'allowEulersNumber',
+        'complexType'},
     'equivValue': {
         'tolerance',
         'setThousandsSeparator',
@@ -778,7 +855,9 @@ allowed_options = {
         'ignoreText',
         'compareSides',
         'inverseResult',
-        'significantDecimalPlaces'},
+        'significantDecimalPlaces',
+        'allowEulersNumber',
+        'complexType'},
     'isSimplified': {
         'setThousandsSeparator',
         'setDecimalSeparator',
@@ -788,21 +867,28 @@ allowed_options = {
         'setDecimalSeparator',
         'inverseResult',
         'realType',
+        'integerType',
         'complexType',
-        'integerType'},
+        'allowEulersNumber'},
     'isExpanded': {
         'setThousandsSeparator',
         'setDecimalSeparator',
-        'inverseResult'},
+        'inverseResult',
+        'allowEulersNumber',
+        'complexType'},
     'isTrue': {
         'setThousandsSeparator',
         'setDecimalSeparator',
-        'inverseResult'},
+        'inverseResult',
+        'allowEulersNumber',
+        'complexType'},
     'isUnit': {
         'allowedUnits',
         'setThousandsSeparator',
         'setDecimalSeparator',
-        'inverseResult'},
+        'inverseResult',
+        'allowEulersNumber',
+        'complexType'},
     'stringMatch': {
         'ignoreLeadingAndTrailingSpaces',
         'treatMultipleSpacesAsOne',
@@ -862,10 +948,20 @@ def parse_checks(options_str):
                     add, sep = add.split('=')
                     sep = sep.replace('<COMMA>', ',')
                     if add == 'allowedUnits':
-                        sep = sorted(unit.strip().strip("'").lower() for unit in sep.split(','))
+                        units = []
+                        sep_tmp = []
+                        for unit in sep.split(','):
+                            unplurar_units = str(re.sub('([a-z]+?)(?:es|s)?',r'\1',unit.strip().strip("'").lower()))
+                            divide_split = re.split(r'\/',unplurar_units)
+                            for split_i,split in enumerate(divide_split):
+                                units += re.split('\*',split)
+                            sep_tmp += [unit]
                         # sanity check for allowed units
-                        if any(unit not in UNITS for unit in sep):
-                            raise Exception('{} is not a valid SI or US Customary unit'.format(unit))
+                        units_list = [v[0] for v in UNITS.values()] + [k for k in UNITS.keys()]
+                        for unit in units:
+                            if unit not in units_list:
+                                raise Exception('{} is not a valid SI or US Customary unit'.format(unit))
+                        sep = sep_tmp
                     elif add == 'tolerance':
                         try:
                             sep = float(sep)

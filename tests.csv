@@ -230,11 +230,11 @@
 228,equivSyntax:isPointSlopeForm,y = x,,equivSyntax:isPointSlopeForm,true
 229,equivSyntax:isPointSlopeForm,x+y=0,,equivSyntax:isPointSlopeForm,false
 230,equivSyntax:isPointSlopeForm,3y-1=x,,equivSyntax:isPointSlopeForm,false
-231,equivLiteral:allowInterval,"[1, 2)","[1, 2)",equivLiteral:allowInterval,true
-232,equivLiteral:allowInterval,"[1, 2)","(1, 2)",equivLiteral:allowInterval,false
-233,equivLiteral:allowInterval,"[1.1, 2.2)","[1.1, 2.2)",equivLiteral:allowInterval,true
-234,equivLiteral:allowInterval,x,"[1, 2)",equivLiteral:allowInterval,false
-235,equivLiteral:allowInterval,"[1.0, 2.0)","[1, 2)",equivLiteral:allowInterval,false
+231,equivLiteral,"[1, 2)","[1, 2)",equivLiteral,true
+232,equivLiteral,"[1, 2)","(1, 2)",equivLiteral,false
+233,equivLiteral,"[1.1, 2.2)","[1.1, 2.2)",equivLiteral,true
+234,equivLiteral,x,"[1, 2)",equivLiteral,false
+235,equivLiteral,"[1.0, 2.0)","[1, 2)",equivLiteral,false
 236,equivSymbolic:significantDecimalPlaces,0.33,1/3,equivSymbolic:significantDecimalPlaces=2,true
 237,equivSymbolic:significantDecimalPlaces,0.33333333,1/3,equivSymbolic:significantDecimalPlaces=2,true
 238,equivSymbolic:significantDecimalPlaces,2/6,1/3,equivSymbolic:significantDecimalPlaces=2,true
@@ -358,3 +358,11 @@
 355,compareSides:ineq,1 > 2, 2 > 1,"equivSymbolicEqn:compareSides",false
 356,ineq:compareSides,1 + x > 2, 2 - x < 1,"equivSymbolicEqn:compareSides",false
 357,ineq,1 + x > 2, 2 - x < 1,"equivSymbolicEqn",true
+358,"big matrix EV-1963",{bmatrix}1&2&4\\\\3&4&5\\\\2&3&4 end{bmatrix},{bmatrix}1&2&4\\\\3&4&5\\\\2&3&4 end{bmatrix},equivSymbolic,true
+359,complex factorised,(x+i)(x-i),,isFactorised:complexType,true
+360,complex expanded,x^2 -1,,isExpanded:complexType,true
+361,isUnit,"\frac{1}{2}\text{g/s}",,"isUnit:allowedUnits=[g/s]",true
+362,isUnit,"\frac{1}{2}\text{cm/s}",,"isUnit:allowedUnits=[cm/s]",true
+363,isUnit,"\frac{1}{2}\text{pounds}",,"isUnit:allowedUnits=[ounce],inverseResult",true
+364,isUnit,"\frac{1}{2}\text{pound}",,"isUnit:allowedUnits=[pound, kg, lbs],inverseResult",false
+365,isUnit,"\frac{1}{2}\text{in}",,"isUnit:allowedUnits=[inches]",false
