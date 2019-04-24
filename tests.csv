@@ -366,3 +366,34 @@
 363,isUnit,"\frac{1}{2}\text{pounds}",,"isUnit:allowedUnits=[ounce],inverseResult",true
 364,isUnit,"\frac{1}{2}\text{pound}",,"isUnit:allowedUnits=[pound, kg, lbs],inverseResult",false
 365,isUnit,"\frac{1}{2}\text{in}",,"isUnit:allowedUnits=[inches]",false
+366,equivSymbolic:ignoreText,"3cm",3,equivSymbolic:ignoreText,true
+367,equivSymbolic:ignoreText,"3 cm",3,equivSymbolic:ignoreText,true
+368,equivSymbolic:ignoreText,"3 cm long",3,equivSymbolic:ignoreText,true
+369,equivSymbolic:ignoreText,"4 cm long",3,equivSymbolic:ignoreText,false
+370,isUnit,"7 ft",,"isUnit:allowedUnits=[ft]",true
+371,isUnit,"7ft",,"isUnit:allowedUnits=[ft,mi]",true
+372,isUnit,"10in",,"isUnit:allowedUnits=['ft', 'mi']",false
+373,isUnit,"1.01in",,"isUnit:allowedUnits=[in]",true
+374,isUnit,"1.0.1in",,"isUnit:allowedUnits=[in]",error
+375,isUnit,"7 ft",,"isUnit:allowedUnits=[ft],inverseResult",false
+376,isUnit,"10in",,"isUnit:allowedUnits=[ft, mi],inverseResult",true
+377,isUnit,"1.01in",,"isUnit:allowedUnits=[in],inverseResult",false
+378,isUnit,"1.0.1in",,"isUnit:allowedUnits=[in],inverseResult",error
+379,isUnit,"7,000 ft",,"isUnit:allowedUnits=[ft],setThousandsSeparator=[',']",true
+380,isUnit,"7 000ft",,"isUnit:allowedUnits=[ft, mi],setThousandsSeparator=[' ']",true
+381,isUnit,"10 000 in",,"isUnit:allowedUnits=['ft', 'mi'],setThousandsSeparator=[' ']",false
+382,isUnit,"1.01in",,"isUnit:allowedUnits=[in],setThousandsSeparator=[' ']",true
+383,isUnit,"1.0.1in",,"isUnit:allowedUnits=[in],setThousandsSeparator=[' ']",error
+384,equivValue with units,"1mi","1mi",equivValue,true
+385,equivValue with units,"5280ft","1mi",equivValue,true
+386,equivValue with units,63360in,1mi,equivValue,true
+387,equivValue with units,1.2m,1mi,equivValue,false
+388,Equivalent value with units,5000m,5km,"equivValue;isUnit:allowedUnits=[m,cm,km]",true
+389,Equivalent value with units,5km,5km,"equivValue;isUnit:allowedUnits=[m,cm,km]",true
+390,Equivalent value with units,500000cm,5km,"equivValue;isUnit:allowedUnits=[m,cm,km]",true
+391,"units equivalancy, EV-1853",5000m,5km,"equivValue;isUnit:allowedUnits=[m,cm,km]",true
+392,"units equivalancy, EV-1853",100cm,1m,"equivValue;isUnit:allowedUnits=[m,cm,km]",true
+393,"units equivalancy, EV-1853",1000g,1kg,"equivValue;isUnit:allowedUnits=[g,kg]",true
+394,equivValue with units,\frac{10560}{2} ft,1 mi,equivValue,true
+395,isUnit,"\frac{1}{2}ft",,"isUnit:allowedUnits=[ft, mi],inverseResult",false
+396,isUnit,"\frac{1}{2} Km",,"isUnit:allowedUnits=[km]",false
