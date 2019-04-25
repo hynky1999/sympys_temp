@@ -86,6 +86,14 @@ separator_pairs = {
     '<':'>',
     '=':'='
 }
+separator_functions = {
+    '>=': 'GreaterThan(Format({})Format,Format({})Format)',
+    '<=':'LessThan(Format({})Format,Format({})Format)',
+    '>':'StrictGreaterThan(Format({})Format,Format({})Format)',
+    '<':'StrictLessThan(Format({})Format,Format({})Format)',
+    '=':'Equality(Format({})Format,Format({})Format)',
+    '≠':'Unequality(Format({})Format,Format({})Format)'
+}
 
 # end of default values and dictionaries block --------------------------------
 
@@ -102,9 +110,11 @@ closing_text_re = re.compile(r'[^0-9.}]*$')
 mixed_frac_re = re.compile(r'-?\s*[0-9]+(\s*\\frac{[^-]+?}{[^-]+?}|\s+\(?\d+\)?/\(?\d+\)?)')
 mixed_fraction_error_re = re.compile(r'[0-9] *\( *[0-9]+ */ *[0-9]+ *\)')
 matrix_form_re = re.compile(r'\{bmatrix\}(.*?)end{bmatrix}')
-interval_form_re = re.compile(r'^\s*([{}])(.*?),(.*?)([{}])\s*$'.format(re.escape(''.join(interval_opening.keys())),
-                                                                        re.escape(''.join(interval_closing.keys()))))
-not_latex_re = re.compile(r'^NotLatex:')
+interval_form_re = re.compile(r'^\s*([{}])(.*?),(.*?)([{}])\s*$'.format(
+re.escape(''.join(interval_opening.keys())),re.escape(''.join(interval_closing.keys()))))
+set_form_re = re.compile(r'\{{\s*(?P<var>[a-zA-Z])\s*\|\s*(?:(?P<num1>\d*)\s*(?P<sign1>{0}))?\s*\1\s*(?:(?P<sign2>{0})\s*(?P<num2>\d*))?\s*\}}'.format(
+'|'.join(separator_functions.keys())))
+not_latex_re = re.compile(r'NotLatex:')
 format_latex_re = re.compile(r'Format\((.*?)\)Format')
 times = r'(\*|\\cdot ?|\\times ?)?'
 
@@ -131,12 +141,53 @@ def convert_frac(matchobj):
 def convertMatrix(matrix_latex):
     matrix_form = [[r'Format({0})Format'.format(cell) for cell in row.split(r'&')]
                 for row in matrix_latex.group(1).split(r'\\\\')]
+                
     return r'NotLatex:Matrix({})'.format(matrix_form)
 
 def convertInterval(interval_latex):
     opening = interval_opening[interval_latex.group(1)]
     closing = interval_closing[interval_latex.group(4)]
-    return r'NotLatex:Interval(Format({1})Format,Format({2})Format,{0},{3})'.format(opening,*interval_latex.groups()[1:3],closing)
+    
+    return r'NotLatex:Interval(Format({1})Format,Format({2})Format,{0},{3})'.format(
+    opening,*interval_latex.groups()[1:3],closing)
+def convertSet(set_latex):
+    input_latex = 'NotLatex:'
+    variable = set_latex.group('var')
+    if(set_latex.group('sign1') and set_latex.group('num1')
+    and set_latex.group('sign2') and set_latex.group('num2')): 
+    
+        func1 = separator_functions[set_latex.group('sign1')].format(
+        set_latex.group('num1'),variable)
+        func2 = separator_functions[set_latex.group('sign2')].format(
+        variable, set_latex.group('num2'))
+    
+        input_latex += r'Intersection(solveset({1},Format({0})Format,S.Reals),solveset({2},Format({0})Format,S.Reals))'.format(
+        variable,func1,func2)
+    
+    elif set_latex.group('sign1') and set_latex.group('num1'):
+    
+        func1 = separator_functions[set_latex.group('sign1')].format(
+        set_latex.group('num1'),set_latex.group('var'))
+        
+        input_latex += r'solveset({1},Format({0})Format,S.Reals)'.format(
+        variable,func1)
+        
+    elif set_latex.group('sign2') and set_latex.group('num2'):
+    
+        func2 = separator_functions[set_latex.group('sign2')].format(
+        set_latex.group('var'),set_latex.group('num2'))
+        
+        input_latex += r'solveset({1},Format({0})Format,S.Reals)'.format(
+        variable,func2)
+    else:
+    
+        input_latex += r'Interval(-oo,oo,True,True)'
+    assert(1,2)
+    
+    return input_latex
+        
+    
+    
         
     
    
@@ -212,6 +263,8 @@ def preprocess_latex(input_latex,
     # trailing zeros
     if ignore_trailing_zeros:
         input_latex = trailing_zeros_re.sub(lambda x: '' if (x.group(1) == '.') else x.group(1), input_latex)
+    
+    input_latex = re.sub(r'\\neq','≠',input_latex)
     # fix fractions so that -\frac{1}{2} is not converted into -1/2
     if keep_neg_fraction_form:
         input_latex = neg_fraction_re.sub(convert_frac, input_latex)
@@ -222,6 +275,11 @@ def preprocess_latex(input_latex,
     interval_parts = interval_form_re.search(input_latex)
     if interval_parts:
         input_latex = convertInterval(interval_parts)
+    #Form perparation
+    set_form = set_form_re.search(input_latex)
+    if set_form:
+        input_latex = set_form_re.sub(convertSet,input_latex)
+        
     return input_latex
 
 def sympify_latex(input_latex, evaluate=None):
@@ -369,19 +427,23 @@ def equiv_symbolic(input_latex, expected_latex, options):
     if type(expected_symbolic) == bool:
         equiv = expected_symbolic == input_symbolic
         return result(xor(equiv, 'inverseResult' in options))
-
     decimal_places = options.get('significantDecimalPlaces', None)
     if decimal_places is not None:
         try:
             equiv = round(decimal.Decimal(str(float(simplify(input_symbolic)))), decimal_places) ==\
                     round(decimal.Decimal(str(float(simplify(expected_symbolic)))), decimal_places)
+        except AttributeError:
+            equiv = simplify(input_symbolic) == simplfy(expected_symbolic)
         except:
-            equiv = simplify(expand(input_symbolic)) == simplify(expand(expected_symbolic))
+            return Error
+
     else:
         try:
-            equiv = simplify(expand(input_symbolic)) == simplify(expand(expected_symbolic))
-        except TypeError:
-            return ERROR
+            equiv = simplify(expand(input_symbolic)) == simplify(expand(expected_symbolic))          
+        except AttributeError:
+            equiv = simplify(input_symbolic) == simplify(expected_symbolic)
+        except:
+            return Error
 
     return result(xor(equiv, 'inverseResult' in options))
 
@@ -429,25 +491,37 @@ def equiv_symbolic_eqn(input_latex, expected_latex, options):
     expected_result_symbolic = sympify_latex(expected_result_latex)
     
     if options.get('compareSides'):
-    
-        if options.get('allowEulersNumber'):
-            input_symbolic = logcombine(expand_log(input_symbolic,force=True))
-            input_result_symbolic = logcombine(expand_log(input_result_symbolic,force=True))
-            expected_symbolic = logcombine(expand_log(expected_symbolic,force=True))
-            expected_result_symbolic = logcombine(expand_log(expected_result_symbolic,force=True))
+        
+        try:
+            if options.get('allowEulersNumber'):
+                input_symbolic = logcombine(expand_log(input_symbolic,force=True))
+                input_result_symbolic = logcombine(expand_log(input_result_symbolic,force=True))
+                expected_symbolic = logcombine(expand_log(expected_symbolic,force=True))
+                expected_result_symbolic = logcombine(expand_log(expected_result_symbolic,force=True))
             
-        La = expand(simplify(input_symbolic))
-        Ls = expand(simplify(expected_symbolic))
-        Ra = expand(simplify(input_result_symbolic))
-        Rs = expand(simplify(expected_result_symbolic))
+            La = expand(simplify(input_symbolic))
+            Ls = expand(simplify(expected_symbolic))
+            Ra = expand(simplify(input_result_symbolic))
+            Rs = expand(simplify(expected_result_symbolic))
+            
+        except AttributeError:
+            La = simplify(input_symbolic)
+            Ls = simplify(expected_symbolic)
+            Ra = simplify(input_result_symbolic)
+            Rs = simplify(expected_result_symbolic)
         
         equiv = (La == Ls and Ra == Rs)
         if a_sep == '=':
             equiv = equiv or (La == Rs and Ra == Ls)
     else:
-        input_one_side_1 = expand(simplify(input_symbolic-input_result_symbolic))
-        input_one_side_2 = expand(simplify(input_result_symbolic-input_symbolic))
-        expected_one_side= expand(simplify(expected_symbolic-expected_result_symbolic))
+        try:
+            input_one_side_1 = expand(simplify(input_symbolic-input_result_symbolic))
+            input_one_side_2 = expand(simplify(input_result_symbolic-input_symbolic))
+            expected_one_side = expand(simplify(expected_symbolic-expected_result_symbolic))
+        except AttributeError:
+            input_one_side_1 = simplify(input_symbolic-input_result_symbolic)
+            input_one_side_2 = simplify(input_result_symbolic-input_symbolic)
+            expected_one_side= simplify(expected_symbolic-expected_result_symbolic)
         
         if 'allowEulersNumber' in options:
             input_one_side_1 = logcombine(expand_log(input_one_side_1,force=True))

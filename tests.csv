@@ -397,3 +397,10 @@
 394,equivValue with units,\frac{10560}{2} ft,1 mi,equivValue,true
 395,isUnit,"\frac{1}{2}ft",,"isUnit:allowedUnits=[ft, mi],inverseResult",false
 396,isUnit,"\frac{1}{2} Km",,"isUnit:allowedUnits=[km]",false
+397,equivSymbolic,{x | x<2},"(-\infty,2)","equivSymbolic",true
+398,equivLiteral,{x | x<2},"(-\infty,2)","equivLiteral",false
+399,equivLiteral,{x | 1>x<2},"(-\infty,2)","equivSymbolic",false
+399,equivLiteral,{x | x \neq 2},"(\infty,8)","equivSymbolic",false
+399,equivLiteral,{x | 1<x<2},"(-\infty,2)","equivSymbolic",false
+399,equivLiteral,{x | 1<x<2},"(-\infty,1)","equivSymbolic",false
+400,equivSymbolic_eqn,{x | x<2} = {x | x > 2},"{x | x<2} = {x | x > 2}","equivSymbolicEqn",true
