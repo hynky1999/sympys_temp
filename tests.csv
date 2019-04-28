@@ -404,3 +404,15 @@
 399,equivLiteral,{x | 1<x<2},"(-\infty,2)","equivSymbolic",false
 399,equivLiteral,{x | 1<x<2},"(-\infty,1)","equivSymbolic",false
 400,equivSymbolic_eqn,{x | x<2} = {x | x > 2},"{x | x<2} = {x | x > 2}","equivSymbolicEqn",true
+401,"EV-2261",1m=100cm,1m=100cm,equivSymbolic:significantDecimalPlaces=10,true
+402,"EV-2261",x+y,x+y,equivSymbolic:significantDecimalPlaces=10,true
+403,"EV-2284",20\times4=80,20\times4=80,equivValue:compareSides,true
+404,"EV-2284",20 * 4 = 80,20 * 4 = 80,equivValue:compareSides,true
+405,"equivSymbolic:isSimplified",3x+y,x+x+x+y,equivSymbolic:isSimplified,true
+406,Mixed fraction simplification,4,8/2,equivSymbolic:isSimplified,true
+407,simplification ,32,16\times2,equivSymbolic:isSimplified,true
+408,"equivSymbolic:isSimplified",\frac{1}{2},\frac{3}{6},equivSymbolic:isSimplified,true
+409,"equivSymbolic:isSimplified",\frac{3}{7},\frac{1}{2},equivSymbolic:isSimplified,false
+410,"EquivValue-units",1 cm*km,10 m,equivValue,true
+411,"EquivValue-units",1 cmkm,10 m,equivValue,true
+412,"EquivValue-units",1 cm^{2},0.0001 m,equivValue,true

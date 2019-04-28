@@ -35,7 +35,6 @@ SEP_ERROR_PLACEHOLDER = '<SEPERROR>'
 DEFAULT_PRECISION = 10
 
 ERROR = 'error'
-
 UNITS = {
     # Unit, Description, ConvertTo, Coefficient
     # SI
@@ -68,6 +67,8 @@ UNITS = {
     'oz':  ('ounce', 'oz', 1),
     'lb':  ('pound', 'oz', 16),
 }
+
+units_list = [v[0] for v in UNITS.values()] + [k for k in UNITS.keys()]
 
 interval_opening = {
     '(': True,
@@ -110,14 +111,13 @@ closing_text_re = re.compile(r'[^0-9.}]*$')
 mixed_frac_re = re.compile(r'-?\s*[0-9]+(\s*\\frac{[^-]+?}{[^-]+?}|\s+\(?\d+\)?/\(?\d+\)?)')
 mixed_fraction_error_re = re.compile(r'[0-9] *\( *[0-9]+ */ *[0-9]+ *\)')
 matrix_form_re = re.compile(r'\{bmatrix\}(.*?)end{bmatrix}')
-interval_form_re = re.compile(r'^\s*([{}])(.*?),(.*?)([{}])\s*$'.format(
+interval_form_re = re.compile(r'\s*([{}])(.*?),(.*?)([{}])\s*'.format(
 re.escape(''.join(interval_opening.keys())),re.escape(''.join(interval_closing.keys()))))
 set_form_re = re.compile(r'\{{\s*(?P<var>[a-zA-Z])\s*\|\s*(?:(?P<num1>\d*)\s*(?P<sign1>{0}))?\s*\1\s*(?:(?P<sign2>{0})\s*(?P<num2>\d*))?\s*\}}'.format(
 '|'.join(separator_functions.keys())))
 not_latex_re = re.compile(r'NotLatex:')
 format_latex_re = re.compile(r'Format\((.*?)\)Format')
 times = r'(\*|\\cdot ?|\\times ?)?'
-
 def load_units(units_csv_path):
     ''' Load conversion tables for SI/US units
     '''
@@ -185,7 +185,29 @@ def convertSet(set_latex):
     assert(1,2)
     
     return input_latex
-        
+    
+def convertComplexUnit(unit_latex):
+    units_dict = dict(zip(units_list,[v[2] for v in UNITS.values()]*2))
+    def convertUnits(unit):
+        output=''
+        g = unit.groups()
+        for u_i,unit_mark in enumerate(g[::3]):
+            if not unit_mark:
+                continue
+            output += str(units_dict[unit_mark])
+            if g[3*u_i+1]:
+                output = '({})^{{{}}}'.format(output,str(g[3*u_i+1]))
+            output = r'*' + output
+            break
+        return output
+    units = [r'({})(?:\^{{?(-?\d*)}}?)?(\*)?'.format(u) for u in sorted(units_list,key=len,reverse=True)]
+    units_re = re.compile('|'.join(units))
+    output = '({})'.format(units_re.sub(convertUnits,unit_latex.group('up'))[1:])
+    if unit_latex.group(2):
+        output += r'/({})'.format(units_re.sub(convertUnits,unit_latex.group('down'))[2:])
+    #print(output,23432444)
+    return output
+    
     
     
         
@@ -231,7 +253,6 @@ def preprocess_latex(input_latex,
     ''' Convert anything that latex2sympy can't handle,
         e.g., percentages and logarithms
     '''
-    
     # check for incorrect mixed fractions such as 1 (3/4)
     if mixed_fraction_error_re.search(input_latex) is not None:
         return None
@@ -266,18 +287,18 @@ def preprocess_latex(input_latex,
     
     input_latex = re.sub(r'\\neq','≠',input_latex)
     # fix fractions so that -\frac{1}{2} is not converted into -1/2
+    #Interval preparation
+    if interval_form_re.search(input_latex) and decimal_sep != ',':
+        input_latex = interval_form_re.sub(convertInterval,input_latex)
+        
     if keep_neg_fraction_form:
         input_latex = neg_fraction_re.sub(convert_frac, input_latex)
+        
     # Matrices preparation
     if matrix_form_re.search(input_latex):
         input_latex = matrix_form_re.sub(convertMatrix,input_latex)
-    #Interval preparation
-    interval_parts = interval_form_re.search(input_latex)
-    if interval_parts:
-        input_latex = convertInterval(interval_parts)
     #Form perparation
-    set_form = set_form_re.search(input_latex)
-    if set_form:
+    if set_form_re.search(input_latex):
         input_latex = set_form_re.sub(convertSet,input_latex)
         
     return input_latex
@@ -296,7 +317,9 @@ def sympify_latex(input_latex, evaluate=None):
             input_latex = not_latex_re.sub('',input_latex)
             input_latex = format_latex_re.sub(lambda x: str(process_sympy(x.group(1))),input_latex)
         else:
+            #print(input_latex)
             input_latex = str(process_sympy(input_latex))
+        
         input_symbolic = sympify(input_latex,evaluate=evaluate)
     except:
         return None
@@ -393,7 +416,10 @@ def getDecimalSeparator(options):
 def equiv_symbolic(input_latex, expected_latex, options):
     ''' check equivSymbolic
     '''
-    #Checking specific patterns(matrix)
+    equiv = True
+    if 'isSimplified' in options:
+        equiv = is_simplified(input_latex, expected_latex,options)
+    
     input_latex = preprocess_latex(input_latex.strip(),
                                    thousand_sep=getThousandsSeparator(options),
                                    decimal_sep=getDecimalSeparator(options),
@@ -407,9 +433,11 @@ def equiv_symbolic(input_latex, expected_latex, options):
                                       thousand_sep=getThousandsSeparator(options),
                                       decimal_sep=getDecimalSeparator(options),
                                       euler_number=options.get('allowEulersNumber',False),
-                                      complex_number=options.get('complexType',False))                         
+                                      complex_number=options.get('complexType',False))
+    
     if 'isMixedFraction' in options and not mixed_frac_re.search(input_latex):
-        return False
+        equiv = False and equiv
+    
     fraction_plus_re = r'(-?)\s*([0-9]+)(\s*(?=\\frac{[^-]+}{[^-]+})|\s+(?=\(?\d+\)?/\(?\d+\)?))'
     input_latex = re.sub(fraction_plus_re,lambda x: '{}{}{}'.format(x.group(1),x.group(2),x.group(1) if x.group(1) else '+'),input_latex)
     expected_latex = re.sub(fraction_plus_re,lambda x: '{}{}{}'.format(x.group(1),x.group(2),x.group(1) if x.group(1) else '+'),expected_latex)
@@ -430,20 +458,20 @@ def equiv_symbolic(input_latex, expected_latex, options):
     decimal_places = options.get('significantDecimalPlaces', None)
     if decimal_places is not None:
         try:
-            equiv = round(decimal.Decimal(str(float(simplify(input_symbolic)))), decimal_places) ==\
-                    round(decimal.Decimal(str(float(simplify(expected_symbolic)))), decimal_places)
+            equiv = equiv and (round(decimal.Decimal(str(float(simplify(input_symbolic)))), decimal_places) ==
+                    round(decimal.Decimal(str(float(simplify(expected_symbolic)))), decimal_places))
         except AttributeError:
-            equiv = simplify(input_symbolic) == simplfy(expected_symbolic)
+            equiv = (simplify(input_symbolic) == simplfy(expected_symbolic)) and equiv
         except:
-            return Error
+            equiv = (simplify(expand(input_symbolic)) == simplify(expand(expected_symbolic))) and equiv
 
     else:
         try:
-            equiv = simplify(expand(input_symbolic)) == simplify(expand(expected_symbolic))          
+            equiv = (simplify(expand(input_symbolic)) == simplify(expand(expected_symbolic))) and equiv          
         except AttributeError:
-            equiv = simplify(input_symbolic) == simplify(expected_symbolic)
+            equiv = (simplify(input_symbolic) == simplify(expected_symbolic)) and equiv
         except:
-            return Error
+            return ERROR
 
     return result(xor(equiv, 'inverseResult' in options))
 
@@ -593,7 +621,11 @@ def equiv_literal(input_latex, expected_latex, options):
 def equiv_value(input_latex, expected_latex, options):
     ''' check equivValue
     '''
-    unit_text_re = re.compile(r'(?:\\text{)?('+ '|'.join(UNITS.keys()) + ')}?$')
+    units = [r'{}(?:\^{{?-?\d*}}?)?(?:{})?'.format(u,times) for u in sorted(units_list,key=len,reverse=True)]
+    unit_text_re = re.compile(r'(?:\\text{{)?(?P<up>(?:{0})+)(?P<down>\/(?:{0})+)?(?:}})?(?:(?=\=)|$)'.format('|'.join(units)))
+    input_latex = unit_text_re.sub(convertComplexUnit,input_latex)
+    expected_latex = unit_text_re.sub(convertComplexUnit,expected_latex)
+    #print(input_latex,expected_latex)
     input_latex = preprocess_latex(input_latex,
                                    thousand_sep=getThousandsSeparator(options),
                                    decimal_sep=getDecimalSeparator(options),
@@ -606,10 +638,6 @@ def equiv_value(input_latex, expected_latex, options):
                                       decimal_sep=getDecimalSeparator(options),
                                       euler_number=options.get('allowEulersNumber',False),
                                       complex_number=options.get('complexType',False))
-    #Updated units parsing, much more simple and faster
-    input_latex = unit_text_re.sub(lambda x: '*' + str(UNITS[x.group(1)][2]),input_latex)
-    expected_latex = unit_text_re.sub(lambda x: '*' + str(UNITS[x.group(1)][2]),expected_latex)
-    
 
     if 'compareSides' in options:
         input_latex, input_result_latex = input_latex.split('=', maxsplit=1)
@@ -661,7 +689,6 @@ def equiv_value(input_latex, expected_latex, options):
             input_result_numeric = simplify(input_result_symblic)
             expected_numeric = expand(simplify(expected_symbolic))
             expected_result_numeric = simplify(expected_result_symbolic)
-
         equiv = input_numeric == expected_numeric and\
                 abs(input_result_numeric - expected_result_numeric) <= options.get('tolerance', 0.0)
         return result(xor(equiv, 'inverseResult' in options))
@@ -675,7 +702,7 @@ def equiv_value(input_latex, expected_latex, options):
                              complex_number=options.get('complexType',False))
     if input_symbolic is None:
         return ERROR
-
+    #print(input_latex)
     expected_symbolic = convert(expected_latex,
                                 thousand_sep=getThousandsSeparator(options),
                                 decimal_sep=getDecimalSeparator(options),
@@ -693,8 +720,8 @@ def equiv_value(input_latex, expected_latex, options):
     else:
         input_numeric = simplify(input_symbolic)
         expected_numeric = simplify(expected_symbolic)
-
-    equiv = abs(input_numeric - expected_numeric) <= options.get('tolerance', 0.0)
+    equiv = abs(simplify(input_numeric - expected_numeric)) <= options.get('tolerance', 0.0)
+    #print(equiv)
     return result(xor(equiv, 'inverseResult' in options))
 
 def string_match(input_latex, expected_latex, options):
@@ -900,6 +927,7 @@ allowed_options = {
     'equivSymbolic': {
         'allowEulersNumber',
         'isMixedFraction',
+        'isSimplified',
         'setThousandsSeparator',
         'setDecimalSeparator',
         'inverseResult',
@@ -1031,7 +1059,6 @@ def parse_checks(options_str):
                                 units += re.split('\*',split)
                             sep_tmp += [unit]
                         # sanity check for allowed units
-                        units_list = [v[0] for v in UNITS.values()] + [k for k in UNITS.keys()]
                         for unit in units:
                             if unit not in units_list:
                                 raise Exception('{} is not a valid SI or US Customary unit'.format(unit))
