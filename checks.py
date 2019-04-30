@@ -982,6 +982,7 @@ allowed_options = {
         'setThousandsSeparator',
         'setDecimalSeparator',
         'inverseResult',
+        'significantDecimalPlaces',
         'allowEulersNumber',
         'complexType'},
     'isUnit': {
