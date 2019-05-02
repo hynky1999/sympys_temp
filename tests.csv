@@ -358,7 +358,7 @@
 355,compareSides:ineq,1 > 2, 2 > 1,"equivSymbolicEqn:compareSides",false
 356,ineq:compareSides,1 + x > 2, 2 - x < 1,"equivSymbolicEqn:compareSides",false
 357,ineq,1 + x > 2, 2 - x < 1,"equivSymbolicEqn",true
-358,"big matrix EV-1963",{bmatrix}1&2&4\\\\3&4&5\\\\2&3&4 end{bmatrix},{bmatrix}1&2&4\\\\3&4&5\\\\2&3&4 end{bmatrix},equivSymbolic,true
+358,"big matrix EV-1963",\begin{bmatrix}1&2&4\\3&4&5\\2&3&4\end{bmatrix},\begin{bmatrix}1&2&4\\3&4&5\\2&3&4\end{bmatrix},equivSymbolic,true
 359,complex factorised,(x+i)(x-i),,isFactorised:complexType,true
 360,complex expanded,x^2 -1,,isExpanded:complexType,true
 361,isUnit,"\frac{1}{2}\text{g/s}",,"isUnit:allowedUnits=[g/s]",true
@@ -416,3 +416,9 @@
 410,"EquivValue-units",1 cm*km,10 m,equivValue,true
 411,"EquivValue-units",1 cmkm,10 m,equivValue,true
 412,"EquivValue-units",1 cm^{2},0.0001 m,equivValue,true
+413,"Matrices bug EV-2574",\begin{bmatrix}1&1\\1&1\end{bmatrix}+\begin{bmatrix}1&1\\1&1\end{bmatrix}=\begin{bmatrix}2&2\\2&2\end{bmatrix},\begin{bmatrix}1&1\\1&1\end{bmatrix}+\begin{bmatrix}1&1\\1&1\end{bmatrix}=\begin{bmatrix}2&2\\2&2 \end{bmatrix},equivSymbolicEqn,true
+414,"scientific-notation",1e-2,0.01,equivSymbolic,true
+415,"scientific-notation",1e-2,0.01,equivLiteral,false
+416,"scientific-notation",0.5e-2,0.005,equivSymbolic,true
+417,"scientific-notation",0.5e-2=1,1=0.005,equivSymbolicEqn,true
+418,"scientific-notation",0.5E1,5,equivSymbolic,true

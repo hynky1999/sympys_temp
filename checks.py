@@ -110,13 +110,14 @@ closing_text_decorated_re = re.compile(r'\\text\{.*?\}$')
 closing_text_re = re.compile(r'[^0-9.}]*$')
 mixed_frac_re = re.compile(r'-?\s*[0-9]+(\s*\\frac{[^-]+?}{[^-]+?}|\s+\(?\d+\)?/\(?\d+\)?)')
 mixed_fraction_error_re = re.compile(r'[0-9] *\( *[0-9]+ */ *[0-9]+ *\)')
-matrix_form_re = re.compile(r'\{bmatrix\}(.*?)end{bmatrix}')
+matrix_form_re = re.compile(r'\\begin\{bmatrix\}(.*?)\\end{bmatrix}')
 interval_form_re = re.compile(r'\s*([{}])(.*?),(.*?)([{}])\s*'.format(
 re.escape(''.join(interval_opening.keys())),re.escape(''.join(interval_closing.keys()))))
 set_form_re = re.compile(r'\{{\s*(?P<var>[a-zA-Z])\s*\|\s*(?:(?P<num1>\d*)\s*(?P<sign1>{0}))?\s*\1\s*(?:(?P<sign2>{0})\s*(?P<num2>\d*))?\s*\}}'.format(
 '|'.join(separator_functions.keys())))
 not_latex_re = re.compile(r'NotLatex:')
 format_latex_re = re.compile(r'Format\((.*?)\)Format')
+scientific_re = re.compile(r'e(-?\d+)',re.IGNORECASE)
 times = r'(\*|\\cdot ?|\\times ?)?'
 def load_units(units_csv_path):
     ''' Load conversion tables for SI/US units
@@ -140,7 +141,7 @@ def convert_frac(matchobj):
                     
 def convertMatrix(matrix_latex):
     matrix_form = [[r'Format({0})Format'.format(cell) for cell in row.split(r'&')]
-                for row in matrix_latex.group(1).split(r'\\\\')]
+                for row in matrix_latex.group(1).split('\\\\')]
                 
     return r'NotLatex:Matrix({})'.format(matrix_form)
 
@@ -182,7 +183,6 @@ def convertSet(set_latex):
     else:
     
         input_latex += r'Interval(-oo,oo,True,True)'
-    assert(1,2)
     
     return input_latex
     
@@ -205,7 +205,6 @@ def convertComplexUnit(unit_latex):
     output = '({})'.format(units_re.sub(convertUnits,unit_latex.group('up'))[1:])
     if unit_latex.group(2):
         output += r'/({})'.format(units_re.sub(convertUnits,unit_latex.group('down'))[2:])
-    #print(output,23432444)
     return output
     
     
@@ -271,6 +270,8 @@ def preprocess_latex(input_latex,
     #Euler Number handling
     if euler_number:
         input_latex = re.sub(r'(\\exp|e)','E',input_latex)
+    else:
+        input_latex = scientific_re.sub(r'*10^{\1}',input_latex)
     if complex_number:
         input_latex = re.sub(r'(i)','I',input_latex)
     # \left,\right
@@ -300,7 +301,6 @@ def preprocess_latex(input_latex,
     #Form perparation
     if set_form_re.search(input_latex):
         input_latex = set_form_re.sub(convertSet,input_latex)
-        
     return input_latex
 
 def sympify_latex(input_latex, evaluate=None):
@@ -317,7 +317,7 @@ def sympify_latex(input_latex, evaluate=None):
             input_latex = not_latex_re.sub('',input_latex)
             input_latex = format_latex_re.sub(lambda x: str(process_sympy(x.group(1))),input_latex)
         else:
-            #print(input_latex)
+            
             input_latex = str(process_sympy(input_latex))
         
         input_symbolic = sympify(input_latex,evaluate=evaluate)
@@ -437,11 +437,10 @@ def equiv_symbolic(input_latex, expected_latex, options):
     
     if 'isMixedFraction' in options and not mixed_frac_re.search(input_latex):
         equiv = False and equiv
-    
     fraction_plus_re = r'(-?)\s*([0-9]+)(\s*(?=\\frac{[^-]+}{[^-]+})|\s+(?=\(?\d+\)?/\(?\d+\)?))'
     input_latex = re.sub(fraction_plus_re,lambda x: '{}{}{}'.format(x.group(1),x.group(2),x.group(1) if x.group(1) else '+'),input_latex)
     expected_latex = re.sub(fraction_plus_re,lambda x: '{}{}{}'.format(x.group(1),x.group(2),x.group(1) if x.group(1) else '+'),expected_latex)
-    input_symbolic = sympify_latex(input_latex)  
+    input_symbolic = sympify_latex(input_latex)
     if input_symbolic is None:
         return ERROR
     expected_symbolic = sympify_latex(expected_latex)
@@ -472,7 +471,6 @@ def equiv_symbolic(input_latex, expected_latex, options):
             equiv = (simplify(input_symbolic) == simplify(expected_symbolic)) and equiv
         except:
             return ERROR
-
     return result(xor(equiv, 'inverseResult' in options))
 
 
@@ -625,7 +623,6 @@ def equiv_value(input_latex, expected_latex, options):
     unit_text_re = re.compile(r'(?:\\text{{)?(?P<up>(?:{0})+)(?P<down>\/(?:{0})+)?(?:}})?(?:(?=\=)|$)'.format('|'.join(units)))
     input_latex = unit_text_re.sub(convertComplexUnit,input_latex)
     expected_latex = unit_text_re.sub(convertComplexUnit,expected_latex)
-    #print(input_latex,expected_latex)
     input_latex = preprocess_latex(input_latex,
                                    thousand_sep=getThousandsSeparator(options),
                                    decimal_sep=getDecimalSeparator(options),
@@ -702,7 +699,6 @@ def equiv_value(input_latex, expected_latex, options):
                              complex_number=options.get('complexType',False))
     if input_symbolic is None:
         return ERROR
-    #print(input_latex)
     expected_symbolic = convert(expected_latex,
                                 thousand_sep=getThousandsSeparator(options),
                                 decimal_sep=getDecimalSeparator(options),
@@ -721,7 +717,6 @@ def equiv_value(input_latex, expected_latex, options):
         input_numeric = simplify(input_symbolic)
         expected_numeric = simplify(expected_symbolic)
     equiv = abs(simplify(input_numeric - expected_numeric)) <= options.get('tolerance', 0.0)
-    #print(equiv)
     return result(xor(equiv, 'inverseResult' in options))
 
 def string_match(input_latex, expected_latex, options):
