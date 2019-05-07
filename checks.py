@@ -115,6 +115,7 @@ interval_form_re = re.compile(r'\s*([{}])(.*?),(.*?)([{}])\s*'.format(
 re.escape(''.join(interval_opening.keys())),re.escape(''.join(interval_closing.keys()))))
 set_form_re = re.compile(r'\{{\s*(?P<var>[a-zA-Z])\s*\|\s*(?:(?P<num1>\d*)\s*(?P<sign1>{0}))?\s*\1\s*(?:(?P<sign2>{0})\s*(?P<num2>\d*))?\s*\}}'.format(
 '|'.join(separator_functions.keys())))
+eq_form_re = re.compile(r'^(?P<l>.*?)(?P<sign>{})(?P<r>.*)$'.format('|'.join(separator_functions.keys())))
 not_latex_re = re.compile(r'NotLatex:')
 format_latex_re = re.compile(r'Format\((.*?)\)Format')
 scientific_re = re.compile(r'e(-?\d+)',re.IGNORECASE)
@@ -183,6 +184,7 @@ def convertSet(set_latex):
     else:
     
         input_latex += r'Interval(-oo,oo,True,True)'
+    assert(1,2)
     
     return input_latex
     
@@ -206,12 +208,11 @@ def convertComplexUnit(unit_latex):
     if unit_latex.group(2):
         output += r'/({})'.format(units_re.sub(convertUnits,unit_latex.group('down'))[2:])
     return output
-    
-    
-    
-        
-    
-   
+
+def convertEquation(eq_latex):
+    eq = 'NotLatex:{}'.format(separator_functions[eq_latex.group('sign')])
+    eq = eq.format(eq_latex.group('l'),eq_latex.group('r'))
+    return eq
 
 def replace_separators(input_latex,
                        thousand=None,
@@ -317,8 +318,8 @@ def sympify_latex(input_latex, evaluate=None):
             input_latex = not_latex_re.sub('',input_latex)
             input_latex = format_latex_re.sub(lambda x: str(process_sympy(x.group(1))),input_latex)
         else:
-            
             input_latex = str(process_sympy(input_latex))
+
         
         input_symbolic = sympify(input_latex,evaluate=evaluate)
     except:
@@ -417,6 +418,7 @@ def equiv_symbolic(input_latex, expected_latex, options):
     ''' check equivSymbolic
     '''
     equiv = True
+    equation = False
     if 'isSimplified' in options:
         equiv = is_simplified(input_latex, expected_latex,options)
     
@@ -434,6 +436,78 @@ def equiv_symbolic(input_latex, expected_latex, options):
                                       decimal_sep=getDecimalSeparator(options),
                                       euler_number=options.get('allowEulersNumber',False),
                                       complex_number=options.get('complexType',False))
+    
+    separator_re = re.compile('|'.join(separator_pairs.keys()))
+    
+    if separator_re.search(input_latex) and separator_re.search(expected_latex) or 'compareSides' in options:
+        separator_re = re.compile('|'.join(separator_pairs.keys()))
+        try:
+            a_sep = separator_re.search(input_latex).group(0)
+            s_sep = separator_re.search(expected_latex).group(0)
+        except ValueError:
+            return ERROR
+        flipped = False
+        if a_sep != s_sep:
+            if separator_pairs[a_sep] == s_sep:
+                flipped = True
+            else:
+                return 'Error: Signs {},{} are not pairs'.format('<=','<')
+        input_latex, input_result_latex = input_latex.split(a_sep, maxsplit=1)
+        input_symbolic = sympify_latex(input_latex)
+        input_result_symbolic = sympify_latex(input_result_latex)
+        
+        if flipped:
+            input_symbolic,input_result_symbolic = input_result_symbolic ,input_symbolic
+        
+        if input_symbolic is None or input_result_symbolic is None:
+            return ERROR
+
+        expected_latex, expected_result_latex = expected_latex.split(s_sep, maxsplit=1)
+        expected_symbolic = sympify_latex(expected_latex)
+        expected_result_symbolic = sympify_latex(expected_result_latex)
+        
+        if options.get('compareSides'):
+            
+            try:
+                if options.get('allowEulersNumber'):
+                    input_symbolic = logcombine(expand_log(input_symbolic,force=True))
+                    input_result_symbolic = logcombine(expand_log(input_result_symbolic,force=True))
+                    expected_symbolic = logcombine(expand_log(expected_symbolic,force=True))
+                    expected_result_symbolic = logcombine(expand_log(expected_result_symbolic,force=True))
+                
+                La = expand(simplify(input_symbolic))
+                Ls = expand(simplify(expected_symbolic))
+                Ra = expand(simplify(input_result_symbolic))
+                Rs = expand(simplify(expected_result_symbolic))
+                
+            except AttributeError:
+                La = simplify(input_symbolic)
+                Ls = simplify(expected_symbolic)
+                Ra = simplify(input_result_symbolic)
+                Rs = simplify(expected_result_symbolic)
+            
+            equiv = (La == Ls and Ra == Rs)
+            if a_sep == '=':
+                equiv = equiv or (La == Rs and Ra == Ls)
+        else:
+            try:
+                input_one_side_1 = expand(simplify(input_symbolic-input_result_symbolic))
+                input_one_side_2 = expand(simplify(input_result_symbolic-input_symbolic))
+                expected_one_side = expand(simplify(expected_symbolic-expected_result_symbolic))
+            except AttributeError:
+                input_one_side_1 = simplify(input_symbolic-input_result_symbolic)
+                input_one_side_2 = simplify(input_result_symbolic-input_symbolic)
+                expected_one_side= simplify(expected_symbolic-expected_result_symbolic)
+            
+            if 'allowEulersNumber' in options:
+                input_one_side_1 = logcombine(expand_log(input_one_side_1,force=True))
+                input_one_side_2 = logcombine(expand_log(input_one_side_2,force=True))
+                expected_one_side = logcombine(expand_log(expected_one_side,force=True))
+            equiv = (input_one_side_1 == expected_one_side)
+            if a_sep == '=':
+                equiv = equiv or (input_one_side_2 == expected_one_side)
+
+        return result(xor(equiv, 'inverseResult' in options))
     
     if 'isMixedFraction' in options and not mixed_frac_re.search(input_latex):
         equiv = False and equiv
@@ -471,92 +545,6 @@ def equiv_symbolic(input_latex, expected_latex, options):
             equiv = (simplify(input_symbolic) == simplify(expected_symbolic)) and equiv
         except:
             return ERROR
-    return result(xor(equiv, 'inverseResult' in options))
-
-
-def equiv_symbolic_eqn(input_latex, expected_latex, options):
-    ''' check equivSymbolic
-    '''
-    input_latex = preprocess_latex(input_latex.strip(),
-                                   thousand_sep=getThousandsSeparator(options),
-                                   decimal_sep=getDecimalSeparator(options),
-                                   euler_number=options.get('allowEulersNumber',False),
-                                   complex_number=options.get('complexType',False))
-    if input_latex is None:
-        return ERROR
-    expected_latex = preprocess_latex(expected_latex.strip(),
-                                      thousand_sep=getThousandsSeparator(options),
-                                      decimal_sep=getDecimalSeparator(options),
-                                      euler_number=options.get('allowEulersNumber',False),
-                                      complex_number=options.get('complexType',False))
-    separator_re = re.compile('|'.join(separator_pairs.keys()))
-    try:
-        a_sep = separator_re.search(input_latex).group(0)
-        s_sep = separator_re.search(expected_latex).group(0)
-    except ValueError:
-        return ERROR
-    flipped = False
-    if a_sep != s_sep:
-        if separator_pairs[a_sep] == s_sep:
-            flipped = True
-        else:
-            return ERROR
-                
-    input_latex, input_result_latex = input_latex.split(a_sep, maxsplit=1)
-    input_symbolic = sympify_latex(input_latex)
-    input_result_symbolic = sympify_latex(input_result_latex)
-    
-    if flipped:
-        input_symbolic,input_result_symbolic = input_result_symbolic ,input_symbolic
-    
-    if input_symbolic is None or input_result_symbolic is None:
-        return ERROR
-
-    expected_latex, expected_result_latex = expected_latex.split(s_sep, maxsplit=1)
-    expected_symbolic = sympify_latex(expected_latex)
-    expected_result_symbolic = sympify_latex(expected_result_latex)
-    
-    if options.get('compareSides'):
-        
-        try:
-            if options.get('allowEulersNumber'):
-                input_symbolic = logcombine(expand_log(input_symbolic,force=True))
-                input_result_symbolic = logcombine(expand_log(input_result_symbolic,force=True))
-                expected_symbolic = logcombine(expand_log(expected_symbolic,force=True))
-                expected_result_symbolic = logcombine(expand_log(expected_result_symbolic,force=True))
-            
-            La = expand(simplify(input_symbolic))
-            Ls = expand(simplify(expected_symbolic))
-            Ra = expand(simplify(input_result_symbolic))
-            Rs = expand(simplify(expected_result_symbolic))
-            
-        except AttributeError:
-            La = simplify(input_symbolic)
-            Ls = simplify(expected_symbolic)
-            Ra = simplify(input_result_symbolic)
-            Rs = simplify(expected_result_symbolic)
-        
-        equiv = (La == Ls and Ra == Rs)
-        if a_sep == '=':
-            equiv = equiv or (La == Rs and Ra == Ls)
-    else:
-        try:
-            input_one_side_1 = expand(simplify(input_symbolic-input_result_symbolic))
-            input_one_side_2 = expand(simplify(input_result_symbolic-input_symbolic))
-            expected_one_side = expand(simplify(expected_symbolic-expected_result_symbolic))
-        except AttributeError:
-            input_one_side_1 = simplify(input_symbolic-input_result_symbolic)
-            input_one_side_2 = simplify(input_result_symbolic-input_symbolic)
-            expected_one_side= simplify(expected_symbolic-expected_result_symbolic)
-        
-        if 'allowEulersNumber' in options:
-            input_one_side_1 = logcombine(expand_log(input_one_side_1,force=True))
-            input_one_side_2 = logcombine(expand_log(input_one_side_2,force=True))
-            expected_one_side = logcombine(expand_log(expected_one_side,force=True))
-        equiv = (input_one_side_1 == expected_one_side)
-        if a_sep == '=':
-            equiv = equiv or (input_one_side_2 == expected_one_side)
-
     return result(xor(equiv, 'inverseResult' in options))
 
 coefficient_of_one_re = re.compile(r'(?<![0-9].)1' + times + r'(?=[a-z(\\])', flags=re.IGNORECASE)
@@ -801,14 +789,21 @@ def set_evaluation(input_latex, expected_latex=None, options={}):
 def is_true(input_latex, expected_latex=None, options={}):
     ''' check isTrue
     '''
-    input_symbolic = convert(input_latex,
+    input_latex = preprocess_latex(input_latex,
                              thousand_sep=getThousandsSeparator(options),
                              decimal_sep=getDecimalSeparator(options),
                              euler_number=options.get('allowEulersNumber',False),
                              complex_number=options.get('complexType',False))
+    if eq_form_re.search(input_latex):
+        input_latex = eq_form_re.sub(convertEquation,input_latex)
+    input_symbolic = sympify_latex(input_latex)
     if input_symbolic is None:
         return ERROR
-    true = bool(simplify(input_symbolic))
+    try:
+        true = bool(simplify(input_symbolic))
+    except TypeError:
+        return 'Cannot determine the truth value'
+        
     return result(xor(true, 'inverseResult' in options))
 
 def is_unit(input_latex, expected_latex=None, options={}):
@@ -901,7 +896,6 @@ def calculate(input_latex, expected_latex, options):
 # a dictionary mapping option names to functions performing the checks
 check_func = {
     'equivSymbolic': equiv_symbolic,
-    'equivSymbolicEqn': equiv_symbolic_eqn,
     'equivLiteral': equiv_literal,
     'equivValue': equiv_value,
     'stringMatch': string_match,
@@ -928,14 +922,8 @@ allowed_options = {
         'inverseResult',
         'ignoreText',
         'significantDecimalPlaces',
-        'complexType'},
-    'equivSymbolicEqn': {
-        'compareSides',
-        'allowEulersNumber',
-        'setThousandsSeparator',
-        'setDecimalSeparator',
-        'inverseResult',
-        'complexType'},
+        'complexType',
+        'compareSides'},
     'equivLiteral': {
         'setThousandsSeparator',
         'setDecimalSeparator',
@@ -977,7 +965,6 @@ allowed_options = {
         'setThousandsSeparator',
         'setDecimalSeparator',
         'inverseResult',
-        'significantDecimalPlaces',
         'allowEulersNumber',
         'complexType'},
     'isUnit': {
