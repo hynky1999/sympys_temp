@@ -438,13 +438,12 @@ def equiv_symbolic(input_latex, expected_latex, options):
                                       complex_number=options.get('complexType',False))
     
     separator_re = re.compile('|'.join(separator_pairs.keys()))
-    
-    if separator_re.search(input_latex) and separator_re.search(expected_latex) or 'compareSides' in options:
+    if separator_re.search(input_latex) or separator_re.search(expected_latex) or 'compareSides' in options:
         separator_re = re.compile('|'.join(separator_pairs.keys()))
         try:
             a_sep = separator_re.search(input_latex).group(0)
             s_sep = separator_re.search(expected_latex).group(0)
-        except ValueError:
+        except:
             return ERROR
         flipped = False
         if a_sep != s_sep:
@@ -525,6 +524,7 @@ def equiv_symbolic(input_latex, expected_latex, options):
     # if expected answer evaluates to boolean
     # (most prominent case is when it's an equality),
     # evaluate if input evaluates to the same value
+    #print(input_symbolic)
     if type(expected_symbolic) == bool:
         equiv = expected_symbolic == input_symbolic
         return result(xor(equiv, 'inverseResult' in options))
