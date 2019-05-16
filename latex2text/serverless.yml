@@ -1,0 +1,38 @@
+service: aws
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  stage: dev
+  region: us-east-1
+  environment:
+    PAGE_LOAD_TIMEOUT: 20000
+    LOGGING: true
+
+plugins:
+  - serverless-plugin-chrome
+  - serverless-webpack
+
+custom:
+  chrome:
+    flags:
+      - --window-size=1280,1696
+      - --hide-scrollbars
+
+functions:
+  latexToText:
+    description: Latex to speakable text using
+    memorySize: 1536
+    timeout: 30
+    handler: src/handlers/latexToText.default
+    events:
+      - http:
+          path: latexToText
+          method: get
+
+resources:
+  Resources:
+    ApiGatewayRestApi:
+      Properties:
+        BinaryMediaTypes:
+          - "*/*"
