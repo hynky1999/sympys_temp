@@ -1,13 +1,13 @@
 import latexToText from '../chrome/latexToText'
 import path from "path"
+import qs from "querystring"
 
 export const handler = async (event, context, callback) => {
-    const queryStringParameters = event.queryStringParameters || {}
-    const url = `file:///${path.resolve("../html/index.html")}`;
-    console.log(url)
+    const body = event.body && qs.parse(event.body) || ""
+    const url = `file:///${path.resolve("./src/html/index.html")}`;
     const {
     latexData = ""
-    } = queryStringParameters
+    } = body    
 
     let data = {}
 
