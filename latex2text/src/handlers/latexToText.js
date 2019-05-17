@@ -3,6 +3,8 @@ import path from "path"
 import qs from "querystring"
 
 export const handler = async (event, context, callback) => {
+    console.log("Event received:"+JSON.stringify(event, null, 2))
+
     const body = event.body && qs.parse(event.body) || ""
     const url = `file:///${path.resolve("./src/html/index.html")}`;
     const {
