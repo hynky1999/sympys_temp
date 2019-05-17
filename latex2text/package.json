@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "chrome-remote-interface": "0.25.3",
-    "mathlive": "^0.29.0"
+    "querystring": "^0.2.0"
   },
   "devDependencies": {
     "ava": "0.23.0",
@@ -36,6 +36,7 @@
     "babel-register": "6.26.0",
     "chrome-launcher": "^0.10.7",
     "serverless": "1.24.1",
+    "serverless-offline": "^4.10.3",
     "serverless-plugin-chrome": "1.0.0-55",
     "serverless-webpack": "4.0.0",
     "webpack": "3.8.1"
