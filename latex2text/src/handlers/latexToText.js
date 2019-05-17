@@ -1,11 +1,17 @@
 import latexToText from '../chrome/latexToText'
 import path from "path"
 import qs from "querystring"
+import base64 from "base-64";
 
 export const handler = async (event, context, callback) => {
     console.log("Event received:"+JSON.stringify(event, null, 2))
-
-    const body = event.body && qs.parse(event.body) || ""
+    let {body} = event;
+    console.log("Http payload:"+body)
+    if(event.isBase64Encoded) {
+        body = base64.decode(body)
+        console.log("Decoded http payload:"+body)
+    }
+    body = body && qs.parse(body) || ""
     const url = `file:///${path.resolve("./src/html/index.html")}`;
     const {
     latexData = ""

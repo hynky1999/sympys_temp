@@ -22,6 +22,7 @@
     "upgrade-dependencies": "yarn upgrade-interactive --latest --exact"
   },
   "dependencies": {
+    "base-64": "^0.1.0",
     "chrome-remote-interface": "0.25.3",
     "querystring": "^0.2.0"
   },
