@@ -12,7 +12,7 @@ export const handler = async (event, context, callback) => {
         console.log("Decoded http payload:"+body)
     }
     body = body && qs.parse(body) || ""
-    const url = `file:///${path.resolve("./src/html/index.html")}`;
+    const url =`https://edureact-dev.s3.amazonaws.com/mathlive-index.html`;
     const {
     latexData = ""
     } = body    

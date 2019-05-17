@@ -40,6 +40,7 @@ export const latexToText = async (url, latexData) => {
       `,
       returnByValue: true,
     })
+    console.log(`Browser response:${JSON.stringify(result, null, 2)}`)
   } catch (error) {
     console.error(error)
   }
