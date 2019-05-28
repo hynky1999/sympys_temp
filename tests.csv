@@ -40,24 +40,24 @@
 40,equivSymbolic: addition and multiplication non-associativity,x+y*z,(x+y) \times z,equivSymbolic,false
 41,equivSymbolic: addition associativity,x+(y+z),(x+y)+z,equivSymbolic,true
 42,equivSymbolic: addition commutativity,x+y,y+x,equivSymbolic,true
-43,equivSymbolic: division without divisor,a / b /,a / b / c,equivSymbolic,error
-44,equivSymbolic: fraction with missing closing '}',\frac{1}{10,0.1,equivSymbolic,error
+43,equivSymbolic: division without divisor,a / b /,a / b / c,equivSymbolic,Sympy_Parsing_Error
+44,equivSymbolic: fraction with missing closing '}',\frac{1}{10,0.1,equivSymbolic,Sympy_Parsing_Error
 45,equivSymbolic: percent conversion,10\%,0.1,equivSymbolic,true
 46,equivSymbolic: simple fraction vs. decimal,\frac{1}{10},0.1,equivSymbolic,true
 47,equivSymbolic: sin without backslash,sin x,\sin x,equivSymbolic,false
 48,equivSymbolic: sin/cos equivalency to tangent,\frac{\sin x}{\cos x},\tan x,equivSymbolic,true
-49,equivSymbolic: sin/cos with missing x,\frac{\sin}{\cos},\tan x,equivSymbolic,error
+49,equivSymbolic: sin/cos with missing x,\frac{\sin}{\cos},\tan x,equivSymbolic,Sympy_Parsing_Error
 50,equivSymbolic: squares expansion,(x+y)^2,x^2 + 2xy + y^2,equivSymbolic,true
 51,"equivSymbolic:setDecimalSeparator=',': percent conversion","10,1\%","0,101","equivSymbolic:setDecimalSeparator=','",true
 52,"equivSymbolic:setDecimalSeparator=',': simple fraction vs. decimal","\frac{1,0}{10}",0.1,"equivSymbolic:setDecimalSeparator=','",true
 53,"equivSymbolic:setDecimalSeparator=',': floats","1,01",1.01,"equivSymbolic:setDecimalSeparator=','",true
-54,"equivSymbolic:setDecimalSeparator=',': enumeration","1, 2, 3","1, 2, 3","equivSymbolic:setDecimalSeparator=','",error
+54,"equivSymbolic:setDecimalSeparator=',': enumeration","1, 2, 3","1, 2, 3","equivSymbolic:setDecimalSeparator=','",Sympy_Parsing_Error
 55,"equivSymbolic:setDecimalSeparator=',': polynomial","x+1,2",x+1.2,"equivSymbolic:setDecimalSeparator=','",true
 56,"equivSymbolic:setThousandsSeparator=[' ']: percent conversion","1 000\%",1000,"equivSymbolic:setThousandsSeparator=[' ']",false
 57,"equivSymbolic:setThousandsSeparator=[' ']': simple fraction vs. decimal","\frac{1}{1 000}",0.001,"equivSymbolic:setThousandsSeparator=[' ']",true
 58,"equivSymbolic:setThousandsSeparator=[',']: percent conversion","1,000\%",10,"equivSymbolic:setThousandsSeparator=[',']",true
 59,"equivSymbolic:setThousandsSeparator=[',']': simple fraction vs. decimal","\frac{1}{1,000}",0.001,"equivSymbolic:setThousandsSeparator=[',']",true
-60,"equivSymbolic:setThousandsSeparator=[',', ' ']': polynomial","x+1,2",x+1.2,"equivSymbolic:setThousandsSeparator=[',', ' ']",error
+60,"equivSymbolic:setThousandsSeparator=[',', ' ']': polynomial","x+1,2",x+1.2,"equivSymbolic:setThousandsSeparator=[',', ' ']",Sympy_Parsing_Error
 61,equivSymbolic:compareSides: addition commutativity,3+4=7,4 + 3 = 7,equivSymbolic:compareSides,true
 62,equivSymbolic:compareSides: percent conversion,30\%+4.2=4.5,0.3 + 4.2 = 4.5,equivSymbolic:compareSides,true
 63,equivSymbolic:compareSides: wrong answer,3+4=9,4 + 3 = 7,equivSymbolic:compareSides,false
@@ -163,11 +163,12 @@
 163,"stringMatch:treatMultipleSpacesAsOne",\dot,\cdot,stringMatch:treatMultipleSpacesAsOne,false
 164,"stringMatch:treatMultipleSpacesAsOne",\times,\cdot,stringMatch:treatMultipleSpacesAsOne,false
 165,"stringMatch:treatMultipleSpacesAsOne",*,*,stringMatch:treatMultipleSpacesAsOne,true
-166,equivSymbolic:ignoreText,"3 dogs",3,equivSymbolic:ignoreText,true
-167,equivSymbolic:ignoreText,"4 dogs",3,equivSymbolic:ignoreText,false
+166,equivSymbolic:ignoreText,"3 \text{dogs}",3,equivSymbolic:ignoreText,true
+166b,equivSymbolic ignoreText is only for Latex Text,"3 dogs",3,equivSymbolic,false
+167,equivSymbolic:ignoreText,"4 \text{dogs}",3,equivSymbolic:ignoreText,false
 168,equivSymbolic:ignoreText,"3 \text{cm}",3,equivSymbolic:ignoreText,true
-169,equivSymbolic:ignoreText,"3 \text{cm} long",3,equivSymbolic:ignoreText,true
-170,equivSymbolic:ignoreText,"4 \text{cm} long",3,equivSymbolic:ignoreText,false
+169,equivSymbolic:ignoreText,"3 \text{cm long}",3,equivSymbolic:ignoreText,true
+170,equivSymbolic:ignoreText,"4 \text{cm long}",3,equivSymbolic:ignoreText,false
 171,isUnit,"7 \text{ft}",,"isUnit:allowedUnits=[ft]",true
 172,isUnit,"7\text{ft}",,"isUnit:allowedUnits=[ft,mi]",true
 173,isUnit,"10\text{in}",,"isUnit:allowedUnits=['ft', 'mi']",false
@@ -200,11 +201,11 @@
 198,equivSyntax:isSimpleFraction with -\frac,-\frac{1}{2},,equivSyntax:isSimpleFraction,true
 199,equivSyntax:isSimpleFraction with \frac and decimal,\frac{1.0}{2.0},,equivSyntax:isSimpleFraction,false
 200,equivSyntax:isSimpleFraction with mixed fraction,1\frac{1}{2},,equivSyntax:isSimpleFraction,false
-201,equivSyntax:isMixedFraction with 1 1/2,1 1/2,,equivSyntax:isMixedFraction,true
-202,equivSyntax:isMixedFraction with \frac and space,1 \frac{1}{2},,equivSyntax:isMixedFraction,true
-203,equivSyntax:isMixedFraction with \frac and no space,1\frac{1}{2},,equivSyntax:isMixedFraction,true
-204,equivSyntax:isMixedFraction with minus in enumerator,1\frac{-1}{2},,equivSyntax:isMixedFraction,false
-205,equivSyntax:isMixedFraction with decimal,1.0\frac{1}{2},,equivSyntax:isMixedFraction,false
+201,equivSyntax:isMixedFraction with 1 1/2,1 1/2,1 1/2,equivSymbolic:isMixedFraction,true
+202,equivSyntax:isMixedFraction with \frac and space,1 \frac{1}{2},1 \frac{1}{2},equivSymbolic:isMixedFraction,true
+203,equivSyntax:isMixedFraction with \frac and no space,1\frac{1}{2},1\frac{1}{2},equivSymbolic:isMixedFraction,true
+204,equivSyntax:isMixedFraction with minus in enumerator,1\frac{-1}{2},1\frac{-1}{2},equivSymbolic:isMixedFraction,false
+205,equivSyntax:isMixedFraction with decimal,1.0\frac{1}{2},1.0\frac{1}{2},equivSymbolic:isMixedFraction,false
 206,equivSyntax:isExponent,e^x,,equivSyntax:isExponent,true
 207,equivSyntax:isExponent,exp(x),,equivSyntax:isExponent,true
 208,equivSyntax:isExponent,3.5^x,,equivSyntax:isExponent,true
@@ -279,9 +280,9 @@
 277,Simplification with paranthesis,x(x+1/4),x^2 + x/4,equivSymbolic;isSimplified,false
 278,Simplification with paranthesis,x(x+1/4),x(x+ 1/4),equivSymbolic;isSimplified,false
 279,Simplification with paranthesis,x^2 + x/4,x^2 + x/4,equivSymbolic;isSimplified,true
-280,Mixed fraction simplification,1 (3/4),1 3/4,equivSymbolic;isSimplified,error
-281,Mixed fraction simplification,7/4,1 3/4,equivSymbolic;isSimplified;equivSyntax:isMixedFraction,false
-282,Mixed fraction simplification,1 6/8,1 3/4,equivSymbolic;isSimplified;equivSyntax:isMixedFraction,false
+280,Mixed fraction simplification,1 (3/4),1 3/4,equivSymbolic;isSimplified,Parsing_Error
+281,Mixed fraction simplification,7/4,1 3/4,"equivSymbolic:isMixedFraction,isSimplified",false
+282,Mixed fraction simplification,1 6/8,1 3/4,isSimplified;equivSymbolic:isMixedFraction,false
 283,equivSymbolic without compareSides but with equalities,3+4=7,4 + 3 = 7,equivSymbolic,true
 284,equivSymbolic without compareSides but with equalities: wrong answer,3+4=9,4 + 3 = 7,equivSymbolic,false
 285,equivSymbolic without compareSides but with equalities: wrong equality that evaluates to True,3+3=6,4 + 3 = 7,equivSymbolic,true
@@ -325,7 +326,7 @@
 323,Mixed fraction simplification,4,8/2,equivSymbolic;isSimplified,true
 324,Mixed fraction simplification different notations,2\frac{1}{2},5/2,equivSymbolic,true
 325,Mixed fraction simplification different notations,-2\frac{1}{2},-5/2,equivSymbolic,true
-326,equivSymbolic,2\frac{1}{2},\frac{5}{2},equivSymbolic;equivSyntax:isMixedFraction,true
+326,equivSymbolic,2\frac{1}{2},\frac{5}{2},equivSymbolic:isMixedFraction,true
 327,equivSymbolic,2\frac{1}{2},\frac{5}{2},equivSymbolic:isMixedFraction,true
 328,simplification ,32,16\times2,equivSymbolic;isSimplified,true
 330,"parenthesis",x^2-15x+56,\left(x-7\right)\left(x-8\right),equivSymbolic,true
@@ -336,7 +337,7 @@
 335,"equivSymbolic;isSimplified",x+x+y,2x+y,equivSymbolic;isSimplified,false
 336,"equivSymbolic;isSimplified",x+x+y,3x+y,equivSymbolic;isSimplified,false
 336,"equivSymbolic;isSimplified",3x+y,x+x+x+y,equivSymbolic;isSimplified,true
-337,"equivSymbolic;equivSyntax:isMixedFraction",2\frac{1}{2},\frac{5}{2},equivSymbolic;equivSyntax:isMixedFraction,true
+337,"equivSymbolic;equivSyntax:isMixedFraction",2\frac{1}{2},\frac{5}{2},equivSymbolic:isMixedFraction,true
 338,"parentheses, EV1150",\left(2\right),2,equivLiteral,true
 339,"parentheses, EV1150",\left(2\right),3,equivLiteral,false
 340,"isExpanded with parenthesis EV-1154",x\left(x+3\right),"",isExpanded,false
@@ -366,10 +367,10 @@
 363,isUnit,"\frac{1}{2}\text{pounds}",,"isUnit:allowedUnits=[ounce],inverseResult",true
 364,isUnit,"\frac{1}{2}\text{pound}",,"isUnit:allowedUnits=[pound, kg, lbs],inverseResult",false
 365,isUnit,"\frac{1}{2}\text{in}",,"isUnit:allowedUnits=[inches]",false
-366,equivSymbolic:ignoreText,"3cm",3,equivSymbolic:ignoreText,true
-367,equivSymbolic:ignoreText,"3 cm",3,equivSymbolic:ignoreText,true
-368,equivSymbolic:ignoreText,"3 cm long",3,equivSymbolic:ignoreText,true
-369,equivSymbolic:ignoreText,"4 cm long",3,equivSymbolic:ignoreText,false
+366,equivSymbolic:ignoreText,"3 \text{cm}",3,equivSymbolic:ignoreText,true
+367,equivSymbolic:ignoreText,"3 cm",3,equivSymbolic:ignoreText,false
+368,equivSymbolic ignoreText only works for Latext text,"3 cm long",3,equivSymbolic:ignoreText,Sympy_Parsing_Error
+369,equivSymbolic ignoreText only works for Latext text,"4 cm long",3,equivSymbolic:ignoreText,Sympy_Parsing_Error
 370,isUnit,"7 ft",,"isUnit:allowedUnits=[ft]",true
 371,isUnit,"7ft",,"isUnit:allowedUnits=[ft,mi]",true
 372,isUnit,"10in",,"isUnit:allowedUnits=['ft', 'mi']",false
@@ -423,28 +424,62 @@
 417,"scientific-notation",0.5e-2=1,1=0.005,equivSymbolic,true
 418,"scientific-notation",0.5E1,5,equivSymbolic,true
 419,case 1.1,x+1 < y,x+1<y,equivSymbolic,true
-420,case 1.2 ,x+1 < y,x-y+1<0,equivSymbolic,true
-421,case 1.3 ,x+1 < y,0<y-x-1,equivSymbolic,true
-420,case 1.4,x+1 < y,x+1>y,equivSymbolic,false
-422,case 2.1,x+1 < y,x+1<y,equivSymbolic:compareSides,true
-423,case 2.2,x+1 < y,x-y+1<0,equivSymbolic:compareSides,false
-424,case 2.3,x+1 < y,0<y-x-1,equivSymbolic:compareSides,false
-425,case 2.4,x+1 < y,x+1>y,equivSymbolic:compareSides,false
-426,case 3.1,3+4=7,5+2=7,equivSymbolic:compareSides,true
-427,case 3.2,3+4=7,4+3=7,equivSymbolic:compareSides,true
-428,case 3.3,3+4=7,5=7-2,equivSymbolic:compareSides,false
-429,case 4.4,2<5,,isTrue,true
-430,case 4.1,4>5,,isTrue,false
-431,case 4.3,x,,isTrue,true
-432,case 4.4,1+6<10,,isTrue,true
-433,case 4.5 : 1+6<=7,1+6<=7,,isTrue,true
-434,case 4.6 : 1-6<=7,1-6<=7,,isTrue,true
-425,case 4.7 : 1-6>=7,1-6>=7,,isTrue,false
-426,"matrix 1",\begin{bmatrix}4&0\\1&1\end{bmatrix}+\begin{bmatrix}4&0\\1&1\end{bmatrix}=\begin{bmatrix}8&0\\2&2\end{bmatrix},\begin{bmatrix}4&0\\1&1\end{bmatrix}+\begin{bmatrix}4&0\\1&1\end{bmatrix}=\begin{bmatrix}8&0\\2&2\end{bmatrix},equivSymbolic:compareSides,true
-427,"Matrix 2",\begin{bmatrix}1&1\\1&1\end{bmatrix}+\begin{bmatrix}1&1\\1&1\end{bmatrix}=\begin{bmatrix}2&2\\2&2\end{bmatrix},\begin{bmatrix}1&1\\1&1\end{bmatrix}+\begin{bmatrix}1&1\\1&1\end{bmatrix}=\begin{bmatrix}2&2\\2&2\end{bmatrix},equivSymbolic:compareSides,true
-428,"Matrix 3",\begin{bmatrix}1&1\\1&1\end{bmatrix}-\begin{bmatrix}1&1\\1&1\end{bmatrix}=\begin{bmatrix}0&0\\0&0\end{bmatrix},\begin{bmatrix}1&1\\1&1\end{bmatrix}-\begin{bmatrix}1&1\\1&1\end{bmatrix}=\begin{bmatrix}0&0\\0&0\end{bmatrix},equivSymbolic:compareSides,true
-429,"Matrix 4",\begin{bmatrix}1&1\\1&1\end{bmatrix}*\begin{bmatrix}2&1\\1&0\end{bmatrix}=\begin{bmatrix}3&1\\3&1\end{bmatrix},\begin{bmatrix}1&1\\1&1\end{bmatrix}*\begin{bmatrix}2&1\\1&0\end{bmatrix}=\begin{bmatrix}3&1\\3&1\end{bmatrix},equivSymbolic:compareSides,true
-430,"Matrix 5",\begin{bmatrix}5&1\\1&1\end{bmatrix}*\begin{bmatrix}2&1\\1&0\end{bmatrix}=\begin{bmatrix}11&5\\3&1\end{bmatrix},\begin{bmatrix}5&1\\1&1\end{bmatrix}*\begin{bmatrix}2&1\\1&0\end{bmatrix}=\begin{bmatrix}11&5\\3&1\end{bmatrix},equivSymbolic:compareSides,true
-431,"Matrix 6",\begin{bmatrix}5&1\\1&1\end{bmatrix}*\begin{bmatrix}2&1\\1&0\end{bmatrix}=\begin{bmatrix}11&0\\3&1\end{bmatrix},\begin{bmatrix}4&1\\1&1\end{bmatrix}*\begin{bmatrix}2&1\\1&0\end{bmatrix}=\begin{bmatrix}11&0\\3&1\end{bmatrix},equivSymbolic:compareSides,false
-432,"Matrices 7",\begin{bmatrix}1&1\\1&1\end{bmatrix}+\begin{bmatrix}1&1\\1&1\end{bmatrix}=\begin{bmatrix}2&2\\2&2\end{bmatrix},\begin{bmatrix}1&1\\1&1\end{bmatrix}+\begin{bmatrix}1&1\\1&1\end{bmatrix}=\begin{bmatrix}2&2\\2&2 \end{bmatrix},equivSymbolic:compareSides,true
-433,needs comma 3.2,3+4=7,4+3=7,"equivSymbolic:compareSides,significantDecimalPlaces=10",true
+420,case 1.2 *BUG*,x+1 < y,x-y+1<0,equivSymbolic,true
+421,case 1.3 *BUG*,x+1 < y,0<y-x-1,equivSymbolic,true
+422,case 1.4,x+1 < y,x+1>y,equivSymbolic,false
+423,case 2.1,x+1 < y,x+1<y,equivSymbolic:compareSides,true
+424,case 2.2,x+1 < y,x-y+1<0,equivSymbolic:compareSides,false
+425,case 2.3,x+1 < y,0<y-x-1,equivSymbolic:compareSides,false
+426,case 2.4,x+1 < y,x+1>y,equivSymbolic:compareSides,false
+427,case 3.1,3+4=7,5+2=7,equivSymbolic:compareSides,true
+428,case 3.2,3+4=7,4+3=7,equivSymbolic:compareSides,true
+429,case 3.3,3+4=7,5=7-2,equivSymbolic:compareSides,false
+430,case 4.4,2<5,,isTrue,true
+431,case 4.1,4>5,,isTrue,false
+433,case 4.3,x,,isTrue,true
+434,case 4.4,1+6<10,,isTrue,true
+435,case 4.5 *ERROR* : 1+6<=7,1+6<=7,,isTrue,true
+436,case 4.6 *ERROR* : 1-6<=7,1-6<=7,,isTrue,true
+437,case 4.7 *ERROR* : 1-6>=7,1-6>=7,,isTrue,false
+438,thousands space,"1000","1 000","equivSymbolic:setThousandsSeparator=' '",true
+439,thousands comma,"1000","1,000","equivSymbolic:setThousandsSeparator=','",true
+440,spaces,"1, 2, 3 ","1, 2, 3",stringMatch:ignoreLeadingAndTrailingSpaces,true
+441,spaces,"1, 2,  3","1, 2, 3",stringMatch:treatMultipleSpacesAsOne,true
+442,isExpanded: simple polynomial,x^2+3x,,isExpanded,true
+443,isFactorised: integer factorised,x^2-4x+4,,isFactorised:integerType,false
+444,isFactorised: real factorised,x^2+1.5x+4.4,,isFactorised:realType,false
+445,equivSymbolic:allowInterval,"[1, 2)","[1, 2)",equivSymbolic,true
+446,equivSymbolic:allowInterval,"[1, 2)","(1, 2)",equivSymbolic,false
+447,equivSymbolic:allowInterval,"[1.1, 2.2)","[1.1, 2.2)",equivSymbolic,true
+448,equivSymbolic:allowInterval,x,"[1, 2)",equivSymbolic,false
+449,aria equivLiteral,"1","1",equivLiteral,true
+450,equivLiteral:allowThousandsSeparator space,"1000","1 000","equivLiteral:setThousandsSeparator=' '",true
+451,equivLiteral:allowThousandsSeparator comma,"1000","1,000","equivLiteral:setThousandsSeparator=','",true
+452,equivLiteral:allowInterval,"[1, 2)","[1, 2)",equivLiteral,true
+453,equivLiteral:allowInterval,"[1, 2)","(1, 2)",equivLiteral,false
+454,equivLiteral:allowInterval,"[1.1, 2.2)","[1.1, 2.2)",equivLiteral,true
+455,equivLiteral:allowInterval,x,"[1, 2)",equivLiteral,false
+456,equivValue:isMixedFraction with,1\frac{-1}{2},,equivSyntax:isMixedFraction,false
+457,equivValue:isMixedFraction with 1 1/2,1 1/2,,equivSyntax:isMixedFraction,true
+458,equivValue:isSimpleFraction with -1/2,-1/2,,equivSyntax:isSimpleFraction,true
+459,equivValue:isSimpleFraction,1\frac{1}{2},,equivSyntax:isSimpleFraction,false
+460,equivValue ignoring trailing zeros,0.50,0.5,equivLiteral:ignoreTrailingZeros,true
+462,equivValue thousands space,"1000","1 000","equivValue:setThousandsSeparator=' '",true
+463,equivValue thousands comma,"1000","1,000","equivValue:setThousandsSeparator=','",true
+465,'isRationalized 1',1.2,,isRationalized,false
+462,'isRationalized 2',-1.999,,isRationalized,false
+463,'isRationalized 3',1/2,,isRationalized,true
+464,'isRationalized 4',-1/2,,isRationalized,true
+465,'isRationalized 5',1/-2,,isRationalized,false
+466,'isRationalized 6',-1/-2,,isRationalized,false
+467,'isRationalized 7',2/4,,isRationalized,false
+468,'isRationalized 8',5,,isRationalized,true
+469,'isRationalized 9',2/1^{0.5},,isRationalized,false
+470,'isRationalized 10',2/2^{0.7},,isRationalized,false
+471,'isRationalized 11',2^{0.7}/2,,isRationalized,true
+472,'isRationalized 12',\sqrt{2}/2,,isRationalized,true
+473,'isRationalized 13',2/\sqrt{2},,isRationalized,false
+474,"EV-3030",\begin{bmatrix}1&4&0\end{bmatrix}*\begin{bmatrix}2\\-1\\5\end{bmatrix}=\begin{bmatrix}-2\end{bmatrix},\begin{bmatrix}1&4&0\end{bmatrix}*\begin{bmatrix}2\\-1\\5\end{bmatrix}=\begin{bmatrix}-2\end{bmatrix},equivSymbolic,true
+475,"EV-3030",\begin{bmatrix}1&4&0\end{bmatrix}*\begin{bmatrix}2\\-1\\5\end{bmatrix}=\begin{bmatrix}-2\end{bmatrix},\begin{bmatrix}1&4&0\end{bmatrix}*\begin{bmatrix}2\\-1\\5\end{bmatrix}=\begin{bmatrix}-2\end{bmatrix},equivSymbolic,true
+476,"EV-3030",\begin{bmatrix}1&4&0\end{bmatrix}*\begin{bmatrix}2\\-1\\5\end{bmatrix}=\begin{bmatrix}-2\end{bmatrix},\begin{bmatrix}1&4&0\end{bmatrix}*\begin{bmatrix}2\\-1\\5\end{bmatrix}=\begin{bmatrix}-2\end{bmatrix},equivSymbolic:compareSides,true
+477,"EV-3030",\begin{bmatrix}1&4&0\end{bmatrix}*\begin{bmatrix}2\\-1\\5\end{bmatrix}=\begin{bmatrix}-2\end{bmatrix},\begin{bmatrix}1&4&0\end{bmatrix}*\begin{bmatrix}2\\-1\\5\end{bmatrix}=\begin{bmatrix}-2\end{bmatrix},equivSymbolic:compareSides,true
