@@ -483,3 +483,20 @@
 475,"EV-3030",\begin{bmatrix}1&4&0\end{bmatrix}*\begin{bmatrix}2\\-1\\5\end{bmatrix}=\begin{bmatrix}-2\end{bmatrix},\begin{bmatrix}1&4&0\end{bmatrix}*\begin{bmatrix}2\\-1\\5\end{bmatrix}=\begin{bmatrix}-2\end{bmatrix},equivSymbolic,true
 476,"EV-3030",\begin{bmatrix}1&4&0\end{bmatrix}*\begin{bmatrix}2\\-1\\5\end{bmatrix}=\begin{bmatrix}-2\end{bmatrix},\begin{bmatrix}1&4&0\end{bmatrix}*\begin{bmatrix}2\\-1\\5\end{bmatrix}=\begin{bmatrix}-2\end{bmatrix},equivSymbolic:compareSides,true
 477,"EV-3030",\begin{bmatrix}1&4&0\end{bmatrix}*\begin{bmatrix}2\\-1\\5\end{bmatrix}=\begin{bmatrix}-2\end{bmatrix},\begin{bmatrix}1&4&0\end{bmatrix}*\begin{bmatrix}2\\-1\\5\end{bmatrix}=\begin{bmatrix}-2\end{bmatrix},equivSymbolic:compareSides,true
+478,degrees,142\degree,128\degree,equivSymbolic,false
+479,degrees,128\degree,128\degree,equivSymbolic,true
+480,support dollar as in mathquill,\$128,\$128,equivSymbolic,true
+481,support dollar as in mathquill,\$129,\$128,equivSymbolic,false
+482,inequality support,y=x,y<x,equivSymbolic,false
+483,inequality support,y>x,y=x,equivSymbolic,false
+484,inequality support,y=x+3,y<x+3,equivSymbolic,false
+485,inequality support,y=x+3,y<x+3,equivSymbolic:compareSides,false
+486,inequality support,y \ge x,y = x,equivSymbolic,false
+487,"equivSymbolic:setThousandSeparator=['.'],setDecimalSeparator=[',']","1.000,0","1.000,0","equivSymbolic:setThousandsSeparator=['.'],setDecimalSeparator=[',']",true
+488,circ is an alternative for degree,128^{\circ},128^{\circ},equivSymbolic,true
+489,polynomial test,\left(-5\right)^{2},\left(-5\right)^{2},equivSymbolic,true
+490,fraction test,6/10,\frac{3}{5},equivSymbolic,true
+491,reversing inequality,y>x,x<y,equivSymbolic,true
+492,reversing inequality,y>x,y<x,equivSymbolic,false
+493,support of le and ge,y \ge x,y \le x,equivSymbolic,false
+494,support of le and ge,y \le x,y \le x,equivSymbolic,true

@@ -67,6 +67,8 @@ UNITS = {
     'gal': ('gallon', 'fl', 128),
     'oz':  ('ounce', 'oz', 1),
     'lb':  ('pound', 'oz', 16),
+    r'\\degree': (r'\degree', r'\degree', r'2*\pi'),
+    r'\\\$': (r'\$', r'\$', '1')
 }
 
 units_list = [v[0] for v in UNITS.values()] + [k for k in UNITS.keys()]
@@ -101,7 +103,6 @@ latex_separators = {
     r'\le':'<=',
     r'\neq':'≠'
 }
-
 # end of default values and dictionaries block --------------------------------
 
 # several functions and regexes for LaTeX-to-sympy conversions ----------------
@@ -201,6 +202,7 @@ def convertSet(set_latex):
     
 def convertComplexUnit(unit_latex):
     units_dict = dict(zip(units_list,[v[2] for v in UNITS.values()]*2))
+    #print(units_dict)
     def convertUnits(unit):
         output=''
         g = unit.groups()
@@ -218,6 +220,7 @@ def convertComplexUnit(unit_latex):
     output = '({})'.format(units_re.sub(convertUnits,unit_latex.group('up'))[1:])
     if unit_latex.group(2):
         output += r'/({})'.format(units_re.sub(convertUnits,unit_latex.group('down'))[2:])
+    #print(unit_latex)
     return output
 
 def convertEquation(eq_latex):
@@ -281,6 +284,8 @@ def preprocess_latex(input_latex,
     # \left,\right
     input_latex = input_latex.replace(r'\left', '').replace(r'\right', '')
     
+    input_latex = input_latex.replace(r'\$', r'\dol')
+    #print(input_latex)
     input_latex = latex_sign_re.sub(lambda x: latex_separators[x.group(0)],input_latex)
     #Euler Number handling
     if euler_number:
@@ -327,7 +332,7 @@ def sympify_latex(input_latex, evaluate=None):
     ''' Return sympy representation of a latex string if possible;
         None if conversion fails.
     '''
-    #print(process_sympy('x'),1)
+    #print(input_latex)
     try:
         # latex2sympy conversion may yield a strange result,
         # possibly because authors of latex2sympy didn't
@@ -338,7 +343,6 @@ def sympify_latex(input_latex, evaluate=None):
             input_latex = not_latex_re.sub('',input_latex)
             input_latex = format_latex_re.sub(lambda x: str(process_sympy(x.group(1))),input_latex)
         else:
-            #print(repr(input_latex),'k')
             input_latex = str(process_sympy(input_latex))
         input_symbolic = sympify(input_latex,evaluate=evaluate)
     except:
@@ -505,7 +509,7 @@ def equiv_symbolic(input_latex, expected_latex, options):
             if separator_pairs[a_sep] == s_sep:
                 flipped = True
             else:
-                return 'Signs Error'
+                return 'false'
         equiv = checkOptions(input_latex.split(a_sep, maxsplit=1)[0],options) or checkOptions(input_latex.split(a_sep, maxsplit=1)[1],options)
         input_latex = re.sub(fraction_plus_re,lambda x: '{}({}+{})'.format(x.group(1),x.group(2),x.group(3)),input_latex)
         #print(input_latex)
