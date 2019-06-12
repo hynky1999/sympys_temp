@@ -500,3 +500,17 @@
 492,reversing inequality,y>x,y<x,equivSymbolic,false
 493,support of le and ge,y \ge x,y \le x,equivSymbolic,false
 494,support of le and ge,y \le x,y \le x,equivSymbolic,true
+495,equivSymbolic isExpanded: simple polynomial,x^2+3x,x^2+3x,equivSymbolic:isExpanded,true
+496,isExpanded: simple polynomial,x^2+3x,,isExpanded,true
+497,equivLiteral ignoring order,1+x,1+x,equivLiteral:ignoreOrder,true
+498,equivSymbolic ignoring order,1+x,1+x,equivSymbolic,true
+499,equivLiteral ignoring coefficient of 1,1x+2,x+2,equivLiteral:ignoreCoefficientOfOne,true
+500,equivSymbolic ignoring coefficient of 1,1x+2,x+2,equivSymbolic,true
+501,equivSymbolic ignoring coefficient of 1,1x+2,1x+2,equivSymbolic,true
+502,equivLiteral:allowInterval,"[1, 2)","[1, 2)",equivLiteral,true
+503,equivSymbolic:allowInterval,"[1, 2)","[1, 2)",equivSymbolic,true
+504,"stringMatch:ignoreLeadingAndTrailingSpaces: asterisk",*,*,stringMatch:ignoreLeadingAndTrailingSpaces,true
+505,"equivSymbolic:ignoreLeadingAndTrailingSpaces: asterisk",*,*,equivSymbolic,Sympy_Parsing_Error
+506,"stringMatch:treatMultipleSpacesAsOne",*,*,stringMatch:treatMultipleSpacesAsOne,true
+507,"equivSymbolic:treatMultipleSpacesAsOne",*,*,equivSymbolic,Sympy_Parsing_Error
+508,equivValue ignoreAlphabeticCharacters,"1abcdE","1",equivSymbolic:ignoreAlphabeticCharacters,true
