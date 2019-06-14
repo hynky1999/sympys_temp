@@ -106,7 +106,8 @@ latex_separators = {
 # end of default values and dictionaries block --------------------------------
 
 # several functions and regexes for LaTeX-to-sympy conversions ----------------
-# and LaTeX-to-LaTeX preprocessing 
+# and LaTeX-to-LaTeX preprocessing
+curl_br = '(?:[^{}]*?(?:\{[^{}]+?\})?)*?'
 percent_re = re.compile(r'([0-9.]+)\s*\\%')
 log_re = re.compile(r'\\log_([^{])')
 multiple_spaces_re = re.compile(' {2,}')
@@ -127,6 +128,10 @@ not_latex_re = re.compile(r'NotLatex:')
 format_latex_re = re.compile(r'Format\((.*?)\)Format')
 latex_sign_re = re.compile('|'.join(map(re.escape,latex_separators.keys()))) 
 scientific_re = re.compile(r'e(-?\d+)',re.IGNORECASE)
+diffentiation_re = re.compile(r'\\frac\{d\}\{d([a-z]+)\}(.*)')
+integral_re = re.compile(r'\\int(_(?P<down>{0})\^\{{(?P<up>{0})\}})?\s*(?P<expr>.*?)d(?P<symbol>[a-z])'.format(curl_br))
+sums_re = re.compile(r'\\sum_\{{([a-z])\=({0})\}}\^\{{({0})\}}(.*)'.format(curl_br))
+limits_re = re.compile(r'\\lim_\{{({0})\\to({0})\}}(.*)'.format(curl_br))
 fraction_plus_re = r'(-?)\s*(\d+\.?\d*)(\s*(\\frac{.+}{.+})|\s+(\(?\d+\)?/\(?\d+\)?))'
 preceding_zeroes_re = re.compile(r'(?<![\d\.])(0+)(\d+?)')
 times = r'(\*|\\cdot ?|\\times ?)?'
@@ -164,6 +169,36 @@ def convertInterval(interval_latex):
     
     return r'NotLatex:Interval(Format({1})Format,Format({2})Format,{0},{3})'.format(
     opening,*interval_latex.groups()[1:3],closing)
+    
+def convertDif(dif_latex):
+    derivation_symbols = list(dif_latex.group(1))
+    derivated = r'NotLatex:diff(Format({})Format,{})'.format(dif_latex.group(2),','.join(derivation_symbols))
+    return derivated
+    
+def convertSum(sum_latex):
+    sym,start,end,expr = sum_latex.groups()
+    return r'NotLatex:Sum(Format({})Format,(Format({})Format,Format({})Format,Format({})Format)).doit()'.format(
+    expr,sym,start,end)
+    
+def convertIntegral(int_latex):
+    up = int_latex.group('up')
+    down = int_latex.group('down')
+    optional = int_latex.group('symbol')
+    if up and down:
+        optional = '({},Format({})Format,Format({})Format)'.format(optional,down,up)
+    interval_syntax = r'NotLatex:integrate(Format({})Format,{})'.format(int_latex.group('expr'),optional)
+    return interval_syntax
+    
+def convertLimit(limit_latex):
+    #print(limit_latex)
+    variable,limit,expr = limit_latex.groups()
+    limit = re.sub(r'\\infty','oo',limit)
+    if re.search(r'\^',limit):
+        limit = r"Format({p[0]})Format,'{p[1]}'".format(p=limit.split(r'^'))
+    limit_syntax = r'NotLatex:limit(Format({})Format,Format({})Format,{})'.format(expr,variable,limit)
+    #print(limit_syntax)
+    return limit_syntax
+    
 def convertSet(set_latex):
     input_latex = 'NotLatex:'
     variable = set_latex.group('var')
@@ -202,7 +237,6 @@ def convertSet(set_latex):
     
 def convertComplexUnit(unit_latex):
     units_dict = dict(zip(units_list,[v[2] for v in UNITS.values()]*2))
-    #print(units_dict)
     def convertUnits(unit):
         output=''
         g = unit.groups()
@@ -220,7 +254,6 @@ def convertComplexUnit(unit_latex):
     output = '({})'.format(units_re.sub(convertUnits,unit_latex.group('up'))[1:])
     if unit_latex.group(2):
         output += r'/({})'.format(units_re.sub(convertUnits,unit_latex.group('down'))[2:])
-    #print(unit_latex)
     return output
 
 def convertEquation(eq_latex):
@@ -279,13 +312,10 @@ def preprocess_latex(input_latex,
                                          decimal=decimal_sep)
         if SEP_ERROR_PLACEHOLDER in input_latex:
             return None
-            
-    input_latex = preceding_zeroes_re.sub(r'\2',input_latex)
     # \left,\right
     input_latex = input_latex.replace(r'\left', '').replace(r'\right', '')
-    
+    input_latex = input_latex.replace(r'\cfrac', r'\frac')
     input_latex = input_latex.replace(r'\$', r'\dol')
-    #print(input_latex)
     input_latex = latex_sign_re.sub(lambda x: latex_separators[x.group(0)],input_latex)
     #Euler Number handling
     if euler_number:
@@ -309,17 +339,26 @@ def preprocess_latex(input_latex,
     # trailing zeros
     if ignore_trailing_zeros:
         input_latex = trailing_zeros_re.sub(lambda x: '' if (x.group(1) == '.') else x.group(1), input_latex)
-    
+    #fix neq
     input_latex = re.sub(r'\\neq','≠',input_latex)
-    # fix fractions so that -\frac{1}{2} is not converted into -1/2
     #Interval preparation
     if interval_form_re.search(input_latex) and decimal_sep != ',':
         input_latex = interval_form_re.sub(convertInterval,input_latex)
-        
+    #Diferentiation preparation
+    if diffentiation_re.search(input_latex):
+        input_latex = diffentiation_re.sub(convertDif,input_latex)
+    #Integral preparation
+    if integral_re.search(input_latex):
+        input_latex = integral_re.sub(convertIntegral,input_latex)
+    #Limit preparation
+    if limits_re.search(input_latex):
+        input_latex = limits_re.sub(convertLimit,input_latex)
+    if sums_re.search(input_latex):
+        input_latex = sums_re.sub(convertSum,input_latex)
+    #fix fractions so that -\frac{1}{2} is not converted into -1/2    
     if keep_neg_fraction_form:
         input_latex = neg_fraction_re.sub(convert_frac, input_latex)
-        
-    # Matrices preparation
+    #Matrices preparation
     if matrix_form_re.search(input_latex):
         input_latex = re.sub(r'\\end\{bmatrix\}*\\begin\{bmatrix\}',r'\\end{bmatrix}*\\begin{bmatrix}',input_latex)
         input_latex = matrix_form_re.sub(convertMatrix,input_latex)
@@ -332,7 +371,6 @@ def sympify_latex(input_latex, evaluate=None):
     ''' Return sympy representation of a latex string if possible;
         None if conversion fails.
     '''
-    #print(input_latex)
     try:
         # latex2sympy conversion may yield a strange result,
         # possibly because authors of latex2sympy didn't
@@ -342,6 +380,7 @@ def sympify_latex(input_latex, evaluate=None):
         if not_latex_re.search(input_latex):
             input_latex = not_latex_re.sub('',input_latex)
             input_latex = format_latex_re.sub(lambda x: str(process_sympy(x.group(1))),input_latex)
+            #print(input_latex)
         else:
             input_latex = str(process_sympy(input_latex))
         input_symbolic = sympify(input_latex,evaluate=evaluate)
@@ -444,7 +483,12 @@ def number_type(input,options):
         return not (re.search(r'(?<![a-z])i(?![a-z])',input,re.IGNORECASE)
         or re.search(r'\\infty',input))
     return True
-    
+
+def derivateExpected(inp,exp):
+    parts = re.search(r'\\int(?!_)(.*?)(d[a-z])',inp)
+    inp = r'\frac{{d}}{{{}}}{}'.format(parts.group(2),exp)
+    exp = parts.group(1)
+    return inp,exp
 def checkOptions(input,options):
     equiv = True
     options = options.copy()
@@ -480,6 +524,9 @@ def checkOptions(input,options):
 def equiv_symbolic(input_latex, expected_latex, options):
     ''' check equivSymbolic
     '''
+    if re.search(r'\\int(?!_).*d[a-z]',input_latex):
+        input_latex,expected_latex = derivateExpected(input_latex,expected_latex)
+        
     input_latex = preprocess_latex(input_latex.strip(),
                                    thousand_sep=getThousandsSeparator(options),
                                    decimal_sep=getDecimalSeparator(options),
@@ -512,7 +559,6 @@ def equiv_symbolic(input_latex, expected_latex, options):
                 return 'false'
         equiv = checkOptions(input_latex.split(a_sep, maxsplit=1)[0],options) or checkOptions(input_latex.split(a_sep, maxsplit=1)[1],options)
         input_latex = re.sub(fraction_plus_re,lambda x: '{}({}+{})'.format(x.group(1),x.group(2),x.group(3)),input_latex)
-        #print(input_latex)
         expected_latex = re.sub(fraction_plus_re,lambda x: '{}({}+{})'.format(x.group(1),x.group(2),x.group(3)),expected_latex)
         input_latex, input_result_latex = input_latex.split(a_sep, maxsplit=1)
         input_symbolic = sympify_latex(input_latex)
@@ -607,7 +653,7 @@ def equiv_symbolic(input_latex, expected_latex, options):
         except AttributeError:
             equiv = (simplify(input_symbolic) == simplify(expected_symbolic)) and equiv
         except:
-            return ERROR
+            return 'Compare_Error'
     return result(xor(equiv, 'inverseResult' in options))
 
 coefficient_of_one_re = re.compile(r'(?<![0-9].)1' + times + r'(?=[a-z(\\])', flags=re.IGNORECASE)
@@ -618,6 +664,9 @@ trailing_zeros_re = re.compile(r'(\.[0-9]*?)0+\b')
 def equiv_literal(input_latex, expected_latex, options):
     ''' check equivLiteral
     '''
+    if re.search(r'\\int(?!_).*d[a-z]',input_latex):
+        input_latex,expected_latex = derivateExpected(input_latex,expected_latex)
+        
     ignore_trailing_zeros = 'ignoreTrailingZeros' in options
     input_symbolic = convert(input_latex.strip(), evaluate=False,
                              ignore_trailing_zeros=ignore_trailing_zeros,
@@ -628,7 +677,7 @@ def equiv_literal(input_latex, expected_latex, options):
                              ignore_text=options.get('ignoreText',False),
                              ignore_alpha=options.get('ignoreAlphabeticCharacters'))
     if input_symbolic is None:
-        return ERROR
+        return 'Sympy_Parsing_Error'
     expected_symbolic = convert(expected_latex.strip(), evaluate=False,
                                 ignore_trailing_zeros=ignore_trailing_zeros,
                                 keep_neg_fraction_form=True,
@@ -669,6 +718,9 @@ def equiv_literal(input_latex, expected_latex, options):
 def equiv_value(input_latex, expected_latex, options):
     ''' check equivValue
     '''
+    if re.search(r'\\int(?!_).*d[a-z]',input_latex):
+        input_latex,expected_latex = derivateExpected(input_latex,expected_latex)
+        
     input_latex = preprocess_latex(input_latex,
                                    thousand_sep=getThousandsSeparator(options),
                                    decimal_sep=getDecimalSeparator(options),
@@ -676,7 +728,7 @@ def equiv_value(input_latex, expected_latex, options):
                                    ignore_text=options.get('ignoreText',False),
                                    ignore_alpha=options.get('ignoreAlphabeticCharacters'))
     if input_latex is None:
-        return ERROR
+        return 'Parsing_Error'
     expected_latex = preprocess_latex(expected_latex,
                                       thousand_sep=getThousandsSeparator(options),
                                       decimal_sep=getDecimalSeparator(options),
@@ -701,7 +753,7 @@ def equiv_value(input_latex, expected_latex, options):
                              ignore_text=options.get('ignoreText', False),
                              euler_number=options.get('allowEulersNumber',False))
         if input_symbolic is None or input_result_symblic is None:
-            return ERROR
+            return 'Sympy_Parsing_Error'
 
         expected_latex, expected_result_latex = expected_latex.split('=', maxsplit=1)
         expected_symbolic = convert(expected_latex,
@@ -746,12 +798,13 @@ def equiv_value(input_latex, expected_latex, options):
                              ignore_text=options.get('ignoreText', False),
                              euler_number=options.get('allowEulersNumber',False))
     if input_symbolic is None:
-        return ERROR
+        return 'Sympy_Parsing_Error'
     expected_symbolic = convert(expected_latex,
                                 thousand_sep=getThousandsSeparator(options),
                                 decimal_sep=getDecimalSeparator(options),
                                 preprocess_sep=False,
                                 euler_number=options.get('allowEulersNumber',False))
+        
     decimal_places = options.get('significantDecimalPlaces', None)
     if decimal_places is not None:
         try:
@@ -763,7 +816,10 @@ def equiv_value(input_latex, expected_latex, options):
     else:
         input_numeric = simplify(input_symbolic)
         expected_numeric = simplify(expected_symbolic)
-    equiv = equiv and abs(simplify(input_numeric - expected_numeric)) <= options.get('tolerance', 0.0)
+    try:
+        equiv = equiv and abs(simplify(input_numeric - expected_numeric)) <= options.get('tolerance', 0.0)
+    except TypeError:
+        return 'Compare_Error'
     return result(xor(equiv, 'inverseResult' in options))
 
 def string_match(input_latex, expected_latex, options):
@@ -788,7 +844,7 @@ def is_simplified(input_latex, expected_latex=None, options={}):
                              decimal_sep=getDecimalSeparator(options),
                              euler_number=options.get('allowEulersNumber',False))
     if input_symbolic is None:
-        return ERROR
+        return 'Sympy_Parsing_Error'
     
     input_symbolic = parentheses_minus_re.sub(r'\1',str(input_symbolic))
     simplified = equiv and str(input_symbolic) ==\
@@ -807,7 +863,7 @@ def is_expanded(input_latex, expected_latex=None, options={}):
                              decimal_sep=getDecimalSeparator(options),
                              euler_number=options.get('allowEulersNumber',False))
     if input_symbolic is None:
-        return ERROR
+        return 'Sympy_Parsing_Error'
     expanded = equiv and input_symbolic - expand(simplify(input_symbolic)) == 0
     return result(xor(expanded, 'inverseResult' in options))
 
@@ -820,7 +876,7 @@ def is_factorised(input_latex, expected_latex=None, options={}):
                              decimal_sep=getDecimalSeparator(options),
                              euler_number=options.get('allowEulersNumber',False))
     if input_symbolic is None:
-        return ERROR
+        return 'Sympy_Parsing_Error'
     
     if re.search('^\(.*[\)\)].*\)$', str(input_symbolic)):
         factorised =equiv and bool( re.search('^\(.*[\)\)].*\)$', str(input_symbolic)) )
@@ -839,7 +895,7 @@ def is_rationalized(input_latex, expected_latex=None, options={}):
                              euler_number=options.get('allowEulersNumber',False))
     
     if input_symbolic is None:
-        return ERROR
+        return 'Sympy_Parsing_Error'
     rationalized = fraction(input_symbolic)[1] == fraction((nsimplify(input_symbolic)))[1]
     
     return result(xor(rationalized, 'inverseResult' in options))
@@ -851,7 +907,7 @@ def set_evaluation(input_latex, expected_latex=None, options={}):
     expected_latex = list(map(int, expected_latex.split(',')))
 
     if input_symbolic is None:
-        return ERROR
+        return 'Sympy_Parsing_Error'
 
     input_symbolic.sort()
     expected_latex.sort()
@@ -870,7 +926,7 @@ def is_true(input_latex, expected_latex=None, options={}):
         input_latex = eq_form_re.sub(convertEquation,input_latex)
     input_symbolic = sympify_latex(input_latex)
     if input_symbolic is None:
-        return ERROR
+        return 'Sympy_Parsing_Error'
     try:
         true = bool(simplify(input_symbolic))
     except TypeError:
@@ -886,7 +942,7 @@ def is_unit(input_latex, expected_latex=None, options={}):
                                    decimal_sep=getDecimalSeparator(options),
                                    euler_number=options.get('allowEulersNumber',False))
     if input_latex is None or input_latex.count('.') > 1:
-        return ERROR
+        return 'Sympy_Parsing_Error'
     is_unit_re = re.compile(r'^(.*?) *(?:\\text\{)?(' +
                             '|'.join(options['allowedUnits']) + ')\}?$')
     unit = is_unit_re.match(input_latex)
