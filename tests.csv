@@ -552,3 +552,17 @@
 544,"limits",\lim_{x\to -3^-}\cfrac{-2+5x}{(x+3)^3},+\infty,equivSymbolic,true
 545,"limits",\lim_{x\to 2^+}\cfrac{-3x+4x^2}{(-2+x)^7},+\infty,equivSymbolic,true
 546,"limits",\lim_{x\to 0^+}\cfrac{-3x+4x^2}{x^2},-\infty,equivSymbolic,true
+547,star matrix multiplication,\begin{bmatrix}4&0\\1&-9\end{bmatrix} * 2 =\begin{bmatrix}8&0\\2&-18\end{bmatrix},\begin{bmatrix}4&0\\1&-9\end{bmatrix} * 2 = \begin{bmatrix}8&0\\2&-18\end{bmatrix},equivSymbolic,true
+548,times in matrices,\begin{bmatrix}4&0\\1&-9\end{bmatrix} \times2 =\begin{bmatrix}8&0\\2&-18\end{bmatrix},\begin{bmatrix}4&0\\1&-9\end{bmatrix} \times2 = \begin{bmatrix}8&0\\2&-18\end{bmatrix},equivSymbolic,true
+549,times in matrices,\begin{bmatrix}4&0\\1&-9\end{bmatrix} \times 2 =\begin{bmatrix}8&0\\2&-18\end{bmatrix},\begin{bmatrix}4&0\\1&-9\end{bmatrix} \times 2 = \begin{bmatrix}8&0\\2&-18\end{bmatrix},equivSymbolic,true
+550,cdot in matrices,\begin{bmatrix}4&0\\1&-9\end{bmatrix} \cdot 2 =\begin{bmatrix}8&0\\2&-18\end{bmatrix},\begin{bmatrix}4&0\\1&-9\end{bmatrix} \cdot 2 = \begin{bmatrix}8&0\\2&-18\end{bmatrix},equivSymbolic,true
+551,times,2 \times 2,4,equivSymbolic,true
+552,equivValue with units,"5281ft","1mi",equivValue:tolerance=2,true
+553,equivValue with units,"5280ft","1mi",equivValue:tolerance=2,true
+554,equivValue with units,"5800ft","1mi",equivValue:tolerance=10%,true
+555,equivValue with units,"5805ft","1mi",equivValue:tolerance=10%,true
+556,equivValue with units,"5810ft","1mi",equivValue:tolerance=10%,false
+557,equivValue with units,"5284ft","1mi",equivValue:tolerance=0.00001,false
+558,equivValue with units,"5277ft","1mi",equivValue:tolerance=0.00001,false
+559,equivValue with units,"1mi","5277ft",equivValue:tolerance=2,false
+560,equivValue with units,"1mi","5285ft",equivValue:tolerance=2,false

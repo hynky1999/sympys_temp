@@ -134,8 +134,9 @@ sums_re = re.compile(r'\\sum_\{{([a-z])\=({0})\}}\^\{{({0})\}}(.*)'.format(curl_
 limits_re = re.compile(r'\\lim_\{{({0})\\to({0})\}}(.*)'.format(curl_br))
 fraction_plus_re = r'(-?)\s*(\d+\.?\d*)(\s*(\\frac{.+}{.+})|\s+(\(?\d+\)?/\(?\d+\)?))'
 preceding_zeroes_re = re.compile(r'(?<![\d\.])(0+)(\d+?)')
-times = r'(\*|\\cdot ?|\\times ?)?'
-units = [r'{}(?:\^{{?-?\d*}}?)?(?:{})?'.format(u,times) for u in sorted(units_list,key=len,reverse=True)]
+times = r'(\* ?|\\cdot ?|\\times ?)?'
+times_re = re.compile(r'(\*|\\cdot ?|\\times)')
+units = [r'({})(?:\^{{?(-?\d*)}}?)?(\*)?'.format(u) for u in sorted(units_list,key=len,reverse=True)]
 unit_text_re = re.compile(r'(?:\\text{{)?(?P<up>(?:{0})+)(?P<down>\/(?:{0})+)?(?:}})?(?:(?=\=)|$)'.format('|'.join(units)))
 def load_units(units_csv_path):
     ''' Load conversion tables for SI/US units
@@ -190,13 +191,11 @@ def convertIntegral(int_latex):
     return interval_syntax
     
 def convertLimit(limit_latex):
-    #print(limit_latex)
     variable,limit,expr = limit_latex.groups()
     limit = re.sub(r'\\infty','oo',limit)
     if re.search(r'\^',limit):
         limit = r"Format({p[0]})Format,'{p[1]}'".format(p=limit.split(r'^'))
     limit_syntax = r'NotLatex:limit(Format({})Format,Format({})Format,{})'.format(expr,variable,limit)
-    #print(limit_syntax)
     return limit_syntax
     
 def convertSet(set_latex):
@@ -249,12 +248,13 @@ def convertComplexUnit(unit_latex):
             output = r'*' + output
             break
         return output
-    units = [r'({})(?:\^{{?(-?\d*)}}?)?(\*)?'.format(u) for u in sorted(units_list,key=len,reverse=True)]
+    
     units_re = re.compile('|'.join(units))
     output = '({})'.format(units_re.sub(convertUnits,unit_latex.group('up'))[1:])
     if unit_latex.group(2):
         output += r'/({})'.format(units_re.sub(convertUnits,unit_latex.group('down'))[2:])
-    return output
+    
+    return output    
 
 def convertEquation(eq_latex):
     eq = 'NotLatex:{}'.format(separator_functions[eq_latex.group('sign')])
@@ -314,6 +314,7 @@ def preprocess_latex(input_latex,
             return None
     # \left,\right
     input_latex = input_latex.replace(r'\left', '').replace(r'\right', '')
+    input_latex = times_re.sub(r'*',input_latex)
     input_latex = input_latex.replace(r'\cfrac', r'\frac')
     input_latex = input_latex.replace(r'\$', r'\dol')
     input_latex = latex_sign_re.sub(lambda x: latex_separators[x.group(0)],input_latex)
@@ -380,7 +381,6 @@ def sympify_latex(input_latex, evaluate=None):
         if not_latex_re.search(input_latex):
             input_latex = not_latex_re.sub('',input_latex)
             input_latex = format_latex_re.sub(lambda x: str(process_sympy(x.group(1))),input_latex)
-            #print(input_latex)
         else:
             input_latex = str(process_sympy(input_latex))
         input_symbolic = sympify(input_latex,evaluate=evaluate)
@@ -539,9 +539,9 @@ def equiv_symbolic(input_latex, expected_latex, options):
                                       thousand_sep=getThousandsSeparator(options),
                                       decimal_sep=getDecimalSeparator(options),
                                       euler_number=options.get('allowEulersNumber',False))
-
-    input_latex = unit_text_re.sub(convertComplexUnit,input_latex)
-    expected_latex = unit_text_re.sub(convertComplexUnit,expected_latex)
+                                      
+    input_latex = unit_text_re.sub(lambda x:'*' + convertComplexUnit(x),input_latex)
+    expected_latex = unit_text_re.sub(lambda x:'*' + convertComplexUnit(x),expected_latex)
     
     separator_re = re.compile('|'.join(separator_pairs.keys()))
     if separator_re.search(input_latex) or separator_re.search(expected_latex) or 'compareSides' in options:
@@ -727,14 +727,19 @@ def equiv_value(input_latex, expected_latex, options):
                                    euler_number=options.get('allowEulersNumber',False),
                                    ignore_text=options.get('ignoreText',False),
                                    ignore_alpha=options.get('ignoreAlphabeticCharacters'))
-    if input_latex is None:
-        return 'Parsing_Error'
     expected_latex = preprocess_latex(expected_latex,
                                       thousand_sep=getThousandsSeparator(options),
                                       decimal_sep=getDecimalSeparator(options),
                                       euler_number=options.get('allowEulersNumber',False))
-    input_latex = unit_text_re.sub(convertComplexUnit,input_latex)
-    expected_latex = unit_text_re.sub(convertComplexUnit,expected_latex)
+    expected_unit_search = unit_text_re.search(expected_latex)
+    if expected_unit_search:
+        expected_unit = convertComplexUnit(expected_unit_search)
+        expected_latex = unit_text_re.sub(lambda x: '*' + convertComplexUnit(x) + '/' + expected_unit,expected_latex)
+        input_latex = unit_text_re.sub(lambda x: '*' + convertComplexUnit(x) + '/' + expected_unit,input_latex)
+    #print(input_latex,expected_latex)
+    if input_latex is None:
+        return 'Parsing_Error'
+        
     if 'compareSides' in options:
         equiv = checkOptions(input_latex.split('=', maxsplit=1)[0],options) or checkOptions(input_latex.split('=', maxsplit=1)[1],options)
         input_latex = re.sub(fraction_plus_re,lambda x: '{}({}+{})'.format(x.group(1),x.group(2),x.group(3)),input_latex)
@@ -784,9 +789,23 @@ def equiv_value(input_latex, expected_latex, options):
             input_result_numeric = simplify(input_result_symblic)
             expected_numeric = expand(simplify(expected_symbolic))
             expected_result_numeric = simplify(expected_result_symbolic)
-        equiv = equiv and input_numeric == expected_numeric and\
-                abs(input_result_numeric - expected_result_numeric) <= options.get('tolerance', 0.0)
+        tolerance = str(options.get('tolerance', 0.0))
+        if 'tolerance' not in options:
+            tolerance_check = input_result_numeric == expected_result_numeric
+        elif '%' in tolerance:
+            try:
+                tolerance = float(tolerance.replace('%',''))
+            except ValueError:
+                return 'Unparsable_Tolerance_Error'
+            tolerance_check = abs(input_result_numeric - expected_result_numeric) <= float(tolerance)* expected_result_numeric/100
+        else:
+            tolerance_check = abs(input_result_numeric - expected_result_numeric) <= float(tolerance)
+        try:
+            equiv = equiv and input_numeric == expected_numeric and bool(tolerance_check)
+        except TypeError:
+            return 'Compare_Error'
         return result(xor(equiv, 'inverseResult' in options))
+        
     equiv = checkOptions(input_latex,options)
     input_latex = re.sub(fraction_plus_re,lambda x: '{}({}+{})'.format(x.group(1),x.group(2),x.group(3)),input_latex)
     expected_latex = re.sub(fraction_plus_re,lambda x: '{}({}+{})'.format(x.group(1),x.group(2),x.group(3)),expected_latex)
@@ -804,7 +823,6 @@ def equiv_value(input_latex, expected_latex, options):
                                 decimal_sep=getDecimalSeparator(options),
                                 preprocess_sep=False,
                                 euler_number=options.get('allowEulersNumber',False))
-        
     decimal_places = options.get('significantDecimalPlaces', None)
     if decimal_places is not None:
         try:
@@ -816,8 +834,23 @@ def equiv_value(input_latex, expected_latex, options):
     else:
         input_numeric = simplify(input_symbolic)
         expected_numeric = simplify(expected_symbolic)
+    #print(input_symbolic,expected_symbolic)
+        
+    tolerance = str(options.get('tolerance', 0.0))
+    #print(input_numeric,expected_numeric)
+    if 'tolerance' not in options:
+        tolerance_check = input_numeric == expected_numeric
+    elif '%' in tolerance:
+        try:
+            tolerance = float(tolerance.replace('%',''))
+        except ValueError:
+            return 'Unparsable_Tolerance_Error'
+        tolerance_check = abs(input_numeric - expected_numeric) <= float(tolerance)* expected_numeric/100
+    else:
+        tolerance_check = abs(input_numeric - expected_numeric) <= float(tolerance)
     try:
-        equiv = equiv and abs(simplify(input_numeric - expected_numeric)) <= options.get('tolerance', 0.0)
+        equiv = equiv and bool(tolerance_check)
+        #print(equiv)
     except TypeError:
         return 'Compare_Error'
     return result(xor(equiv, 'inverseResult' in options))
@@ -1232,10 +1265,11 @@ def parse_checks(options_str):
                                 raise Exception('{} is not a valid SI or US Customary unit'.format(unit))
                         sep = sep_tmp
                     elif add == 'tolerance':
-                        try:
-                            sep = float(sep)
-                        except ValueError:
-                            raise Exception('{} is not a valid float value for tolerance'.format(sep))
+                        if '%' not in sep:   
+                            try:
+                                sep = float(sep)
+                            except ValueError:
+                                raise Exception('{} is not a valid float value for tolerance'.format(sep))
                     elif add == 'significantDecimalPlaces':
                         try:
                             sep = int(sep)
