@@ -49,6 +49,7 @@
 49,equivSymbolic: sin/cos with missing x,\frac{\sin}{\cos},\tan x,equivSymbolic,Sympy_Parsing_Error
 50,equivSymbolic: squares expansion,(x+y)^2,x^2 + 2xy + y^2,equivSymbolic,true
 51,"equivSymbolic:setDecimalSeparator=',': percent conversion","10,1\%","0,101","equivSymbolic:setDecimalSeparator=','",true
+51b,"equivSymbolic percent conversion",10.1\%,0.101,equivSymbolic,true
 52,"equivSymbolic:setDecimalSeparator=',': simple fraction vs. decimal","\frac{1,0}{10}",0.1,"equivSymbolic:setDecimalSeparator=','",true
 53,"equivSymbolic:setDecimalSeparator=',': floats","1,01",1.01,"equivSymbolic:setDecimalSeparator=','",true
 54,"equivSymbolic:setDecimalSeparator=',': enumeration","1, 2, 3","1, 2, 3","equivSymbolic:setDecimalSeparator=','",Sympy_Parsing_Error
@@ -303,12 +304,14 @@
 300,setEvaluation: any order,"-3,3","3,-3",setEvaluation,true
 301,setEvaluation: any order,"-6,-3,3","3,-3",setEvaluation,false
 302,setEvaluation: any order,"-6,-3,3","3,6,-3",setEvaluation,false
-303,isFactorised: complex factorised,(x+I)(x-I),,isFactorised:complexType,true
-304,isFactorised: real factorised,(x+1.5)(x-1.5),,isFactorised:realType,true
-305,isFactorised: integer factorised,(x+1)(x-1),,isFactorised:integerType,true
-306,isFactorised: integer factorised,x^2-4x+4,,isFactorised:integerType,false
-307,isFactorised: complex factorised,x^2+9,,isFactorised:complexType,false
-308,isFactorised: real factorised,x^2+1.5x+4.4,,isFactorised:realType,false
+303,complex,3i,3i,equivSymbolic:complexType,true
+303b,complex,1-3i,1-3i,equivSymbolic:complexType,true
+304,complex,3,3,equivSymbolic:complexType,true
+305,real,3,3,equivSymbolic:realType,true
+306,real,3.0,3.0,equivSymbolic:realType,true
+307,integer,8,8,equivSymbolic:integerType,true
+307b,integer,8i,8i,equivSymbolic:integerType,false
+308,integer,8.10,8.10,equivSymbolic:integerType,false
 309,isUnit,"\frac{1}{2}\text{Km}",,"isUnit:allowedUnits=[km]",false
 310,"calculate method","input:x=3,y=5,formula:x+y",8,calculate,true
 311,"calculate method","input:x=3,y=5,formula:x+y",9,calculate,false
@@ -360,8 +363,6 @@
 356,ineq:compareSides,1 + x > 2, 2 - x < 1,"equivSymbolic:compareSides",false
 357,ineq,1 + x > 2, 2 - x < 1,"equivSymbolic",true
 358,"big matrix EV-1963",\begin{bmatrix}1&2&4\\3&4&5\\2&3&4\end{bmatrix},\begin{bmatrix}1&2&4\\3&4&5\\2&3&4\end{bmatrix},equivSymbolic,true
-359,complex factorised,(x+i)(x-i),,isFactorised:complexType,true
-360,complex expanded,x^2 -1,,isExpanded:complexType,true
 361,isUnit,"\frac{1}{2}\text{g/s}",,"isUnit:allowedUnits=[g/s]",true
 362,isUnit,"\frac{1}{2}\text{cm/s}",,"isUnit:allowedUnits=[cm/s]",true
 363,isUnit,"\frac{1}{2}\text{pounds}",,"isUnit:allowedUnits=[ounce],inverseResult",true
@@ -566,3 +567,35 @@
 558,equivValue with units,"5277ft","1mi",equivValue:tolerance=0.00001,false
 559,equivValue with units,"1mi","5277ft",equivValue:tolerance=2,false
 560,equivValue with units,"1mi","5285ft",equivValue:tolerance=2,false
+561,"EV-5518",\frac{10}{2} \%,\frac{10}{2} \%,equivSymbolic,true
+562,"EV-5518",\frac{10}{1} \%,\frac{10}{1} \%,equivSymbolic,true
+563,"EV-5518",100\%,100\%,equivSymbolic,true
+564,"EV-5518",100\%,10\%,equivSymbolic,false
+577,"EV-5206",5,,equivSyntax:integerType,true
+578,"EV-5206",5.1,,equivSyntax:integerType,false
+579,"EV-5206",5,,equivSyntax:numberType,true
+580,"EV-5206",0.5,,equivSyntax:numberType,true
+581,"EV-5206",\frac{1}{2},,equivSyntax:numberType,false
+582,"EV-5206",x,,equivSyntax:variableType,true
+583,"EV-5206",6,,equivSyntax:variableType,false
+584,"EV-5206",4 \times 10^3,,equivSyntax:scientificType,true
+585,"EV-5206",1.3 \times 10^{-2},,equivSyntax:scientificType,true
+586,"EV-5206",10 \times 10^2,,equivSyntax:scientificType,false
+576,"EV-5018",4m,4,equivValue:ignoreAlphabeticCharacters,true
+587,setEvaluation equivSymbolic: any order,"-3,3","3,-3",equivSymbolic:setEvaluation,true
+588,setEvaluation equivSymbolic: any order,"-6,-3,3","3,-3",equivSymbolic:setEvaluation,false
+589,setEvaluation equivSymbolic: any order,"-6,-3,3","3,6,-3",equivSymbolic:setEvaluation,false
+590,setEvaluation equivValue: any order,"-3,3","3,-3",equivValue:setEvaluation,true
+591,setEvaluation equivValue: any order,"-6,-3,3","3,-3",equivValue:setEvaluation,false
+592,setEvaluation equivValue: any order,"-6,-3,3","3,6,-3",equivValue:setEvaluation,false
+593,EV-5582 latex inequalities,x\ge 12,x \ge 12,equivSymbolic,true
+594,EV-5582 latex inequalities,x\geq 12,x \ge 12,equivSymbolic,true
+595,EV-5582 latex inequalities,x\leq 12,x \leq 12,equivSymbolic,true
+596,EV-5582 latex inequalities,x\leq 12,x \le 12,equivSymbolic,true
+597,EV-5582 latex inequalities,1\leq 12,,isTrue,true
+598,EV-5582 latex inequalities,12\leq 12,,isTrue,true
+599,EV-5582 latex inequalities,12\le 12,,isTrue,true
+600,EV-5582 latex inequalities,11.9\le 12,,isTrue,true
+601,EV-5582 latex equalities,11.9 \eq 12,,isTrue,false
+602,EV-5582 latex equalities,11.9 \eq 11.9,,isTrue,true
+603,EV-5574 symbol conversion to latex,90°,90°,equivSymbolic,true

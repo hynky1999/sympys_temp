@@ -99,8 +99,11 @@ separator_functions = {
     '≠':'Unequality(Format({})Format,Format({})Format)'
 }
 latex_separators = {
-    r'\ge':'>=',
+    r'\geq':'>=',
+	r'\ge':'>=',
+	r'\leq':'<=',
     r'\le':'<=',
+	r'\eq':'=',
     r'\neq':'≠'
 }
 # end of default values and dictionaries block --------------------------------
@@ -108,7 +111,7 @@ latex_separators = {
 # several functions and regexes for LaTeX-to-sympy conversions ----------------
 # and LaTeX-to-LaTeX preprocessing
 curl_br = '(?:[^{}]*?(?:\{[^{}]+?\})?)*?'
-percent_re = re.compile(r'([0-9.]+)\s*\\%')
+percent_re = re.compile(r'(^|[+-/* ])(.+)\\%')
 log_re = re.compile(r'\\log_([^{])')
 multiple_spaces_re = re.compile(' {2,}')
 variable_before_parentheses_re = re.compile(r'\b([abcdxyz])\(')
@@ -126,6 +129,7 @@ set_form_re = re.compile(r'\{{\s*(?P<var>[a-zA-Z])\s*\|\s*(?:(?P<num1>\d*)\s*(?P
 eq_form_re = re.compile(r'^(?P<l>.*?)(?P<sign>{})(?P<r>.*)$'.format('|'.join(separator_functions.keys())))
 not_latex_re = re.compile(r'NotLatex:')
 format_latex_re = re.compile(r'Format\((.*?)\)Format')
+format_func_re = re.compile(r'Format:(?P<func>.+?)\((.*?)\)Format:(?P=func)')
 latex_sign_re = re.compile('|'.join(map(re.escape,latex_separators.keys()))) 
 scientific_re = re.compile(r'e(-?\d+)',re.IGNORECASE)
 diffentiation_re = re.compile(r'\\frac\{d\}\{d([a-z]+)\}(.*)')
@@ -146,11 +150,11 @@ def load_units(units_csv_path):
         csv_file.readline()
 
 def convert_percent(matchobj):
-    found_str = matchobj.group(1)
-    precision = len((found_str + '.').split('.')[1]) + 2
+    return 'NotLatex:Format:convert_percent_final({})Format:convert_percent_final'.format(matchobj.group(2))
 
-    return str(round(float(found_str) * 0.01, precision))
-
+def convert_percent_final(found_str):
+    precision = len((str(found_str) + '.').split('.')[1]) + 2
+    return str(round(found_str * 0.01, precision))
 def convert_frac(matchobj):
     if matchobj.group(1) == '1':
         return ''.join((r'\frac{\one}{',
@@ -327,6 +331,8 @@ def preprocess_latex(input_latex,
     input_latex = re.sub(r'(?<![a-zA-Z])(i)(?![a-zA-Z])','I',input_latex)
     # Percent sign (\%)
     input_latex = percent_re.sub(convert_percent, input_latex)
+	# Degree fix
+    input_latex = re.sub('°',r'*2*\\pi',input_latex)
     # \log_a -> \log_{a}
     input_latex = log_re.sub(r'\\log_{\1}', input_latex)
     # a(x+1) -> x*(x+1)
@@ -340,8 +346,6 @@ def preprocess_latex(input_latex,
     # trailing zeros
     if ignore_trailing_zeros:
         input_latex = trailing_zeros_re.sub(lambda x: '' if (x.group(1) == '.') else x.group(1), input_latex)
-    #fix neq
-    input_latex = re.sub(r'\\neq','≠',input_latex)
     #Interval preparation
     if interval_form_re.search(input_latex) and decimal_sep != ',':
         input_latex = interval_form_re.sub(convertInterval,input_latex)
@@ -366,6 +370,8 @@ def preprocess_latex(input_latex,
     #Form perparation
     if set_form_re.search(input_latex):
         input_latex = set_form_re.sub(convertSet,input_latex)
+	
+    #print(input_latex)
     return input_latex
 
 def sympify_latex(input_latex, evaluate=None):
@@ -381,6 +387,8 @@ def sympify_latex(input_latex, evaluate=None):
         if not_latex_re.search(input_latex):
             input_latex = not_latex_re.sub('',input_latex)
             input_latex = format_latex_re.sub(lambda x: str(process_sympy(x.group(1))),input_latex)
+            a = format_func_re.search(input_latex)
+            input_latex = format_func_re.sub(lambda x: globals()[x.group('func')](sympify(str(process_sympy(x.group(2))))),input_latex)
         else:
             input_latex = str(process_sympy(input_latex))
         input_symbolic = sympify(input_latex,evaluate=evaluate)
@@ -475,14 +483,27 @@ def getDecimalSeparator(options):
     return decimal_sep
     
 def number_type(input,options):
-    if 'integerType' in options:
-        return not(re.search(r'\\frac',input) or re.search(r'\.\d',input) or re.search(r'\d\/\d',input))
+    integer = r'\s*-?\s*\d+\s*'
+    number = r'\s*-?\s*\d+(\.\d+)?\s*'
+    equiv = True
     if 'complexType' in options:
-        return not re.search(r'\\infty',input)
+        equiv = re.search(r'(?<![a-z])I(?![a-z])',input) or re.match(number + r'$',input) or re.match(integer + r'$',input)
     if 'realType' in options:
-        return not (re.search(r'(?<![a-z])i(?![a-z])',input,re.IGNORECASE)
+        equiv = (not re.search(r'(?<![a-z])i(?![a-z])',input,re.IGNORECASE)
         or re.search(r'\\infty',input))
-    return True
+    if 'numberType' in options:
+        equiv = re.match(number + r'$',input) 
+    if 'integerType' in options:
+        equiv = re.match(integer + r'$',input)
+    if 'variableType' in options:
+        equiv = re.match(r'\s*[a-zA-Z]\s*$',input)
+    if 'scientificType' in options:
+        matching = re.match(r'\s*-?\s*(?P<number>\d+(\.\d+)?)\s*'+ times +r'\s*10\s*\^\s*('+ number + r'|\{' + number + r'})\s*$',input)
+        if matching and float(matching.group('number')) != 10:
+            equiv = True
+        else:
+            equiv = False
+    return equiv
 
 def derivateExpected(inp,exp):
     parts = re.search(r'\\int(?!_)(.*?)(d[a-z])',inp)
@@ -524,6 +545,9 @@ def checkOptions(input,options):
 def equiv_symbolic(input_latex, expected_latex, options):
     ''' check equivSymbolic
     '''
+    if 'setEvaluation' in options:
+        return set_evaluation(input_latex,expected_latex,options)
+        
     if re.search(r'\\int(?!_).*d[a-z]',input_latex):
         input_latex,expected_latex = derivateExpected(input_latex,expected_latex)
         
@@ -718,6 +742,9 @@ def equiv_literal(input_latex, expected_latex, options):
 def equiv_value(input_latex, expected_latex, options):
     ''' check equivValue
     '''
+    if 'setEvaluation' in options:
+        return set_evaluation(input_latex,expected_latex,options)
+        
     if re.search(r'\\int(?!_).*d[a-z]',input_latex):
         input_latex,expected_latex = derivateExpected(input_latex,expected_latex)
         
@@ -736,7 +763,6 @@ def equiv_value(input_latex, expected_latex, options):
         expected_unit = convertComplexUnit(expected_unit_search)
         expected_latex = unit_text_re.sub(lambda x: '*' + convertComplexUnit(x) + '/' + expected_unit,expected_latex)
         input_latex = unit_text_re.sub(lambda x: '*' + convertComplexUnit(x) + '/' + expected_unit,input_latex)
-    #print(input_latex,expected_latex)
     if input_latex is None:
         return 'Parsing_Error'
         
@@ -834,10 +860,8 @@ def equiv_value(input_latex, expected_latex, options):
     else:
         input_numeric = simplify(input_symbolic)
         expected_numeric = simplify(expected_symbolic)
-    #print(input_symbolic,expected_symbolic)
         
     tolerance = str(options.get('tolerance', 0.0))
-    #print(input_numeric,expected_numeric)
     if 'tolerance' not in options:
         tolerance_check = input_numeric == expected_numeric
     elif '%' in tolerance:
@@ -850,7 +874,6 @@ def equiv_value(input_latex, expected_latex, options):
         tolerance_check = abs(input_numeric - expected_numeric) <= float(tolerance)
     try:
         equiv = equiv and bool(tolerance_check)
-        #print(equiv)
     except TypeError:
         return 'Compare_Error'
     return result(xor(equiv, 'inverseResult' in options))
@@ -1018,6 +1041,7 @@ def equiv_syntax(input_latex, expected_latex=None, options={}):
     '''
     equiv = number_type(input_latex,options)
     precision = options.get('isDecimal', None)
+    pattern_re = None
     if precision is not None:
         # compile regex here to account for precision
         pattern_re = re.compile(decimal_re_pattern.format(precision))
@@ -1029,8 +1053,9 @@ def equiv_syntax(input_latex, expected_latex=None, options={}):
             for option in pattern_dict:
                 if options.get(option, False):
                     pattern_re = pattern_dict[option]
-    input_latex = input_latex.replace('\\left', '').replace('\\right', '')
-    equiv = equiv and bool(pattern_re.match(input_latex.strip()))
+    if pattern_re:
+        input_latex = input_latex.replace('\\left', '').replace('\\right', '')
+        equiv = equiv and bool(pattern_re.match(input_latex.strip()))
     return result(xor(equiv, 'inverseResult' in options))
 
 def calculate(input_latex, expected_latex, options):
@@ -1097,6 +1122,7 @@ allowed_options = {
         'isExponent',
         'isStandardForm',
         'isSlopeInterceptForm',
+        'setEvaluation',
         'isPointSlopeForm'},
     'equivLiteral': {
         'setThousandsSeparator',
@@ -1121,6 +1147,7 @@ allowed_options = {
         'isExponent',
         'isStandardForm',
         'isSlopeInterceptForm',
+        'setEvaluation',
         'isPointSlopeForm'},
     'equivValue': {
         'tolerance',
@@ -1145,6 +1172,7 @@ allowed_options = {
         'isExponent',
         'isStandardForm',
         'isSlopeInterceptForm',
+        'setEvaluation',
         'isPointSlopeForm'},
     'isSimplified': {
         'setThousandsSeparator',
@@ -1203,6 +1231,9 @@ allowed_options = {
         'isPointSlopeForm',
         'realType',
         'integerType',
+        'numberType',
+        'scientificType',
+        'variableType',
         'complexType'},
     'setEvaluation': {
         'inverseResult'},
