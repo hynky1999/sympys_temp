@@ -599,3 +599,15 @@
 601,EV-5582 latex equalities,11.9 \eq 12,,isTrue,false
 602,EV-5582 latex equalities,11.9 \eq 11.9,,isTrue,true
 603,EV-5574 symbol conversion to latex,90°,90°,equivSymbolic,true
+604,textitsupport EV-5722,20 centimeters,20 \textit{centimeters},equivSymbolic,true
+605,textitsupport EV-5722,24 square centimeters,24  \textit{square} \textit{centimeters},equivSymbolic,true
+606,circ,-270\circ ,-270°,equivSymbolic,false
+607,circ,-60\circ ,-60°,equivSymbolic,false
+608,circ,45\circ ,45°,equivSymbolic,false
+609,circ,-375\circ ,-375°,equivSymbolic,false
+610,"equivSymbolic:setThousandSeparator=['.'],setDecimalSeparator=[',']","1.001,0","1.000,0","equivSymbolic:setThousandsSeparator=['.'],setDecimalSeparator=[',']",false
+611,"equivSymbolic:setThousandSeparator=[','],setDecimalSeparator=['.']","1,000.50","1000.50","equivSymbolic:setThousandsSeparator=[','],setDecimalSeparator=['.']",true
+612,"equivSymbolic:setThousandSeparator=[','],setDecimalSeparator=['.']","1,000.60","1000.50","equivSymbolic:setThousandsSeparator=['.'],setDecimalSeparator=[',']",false
+613,"equivSymbolic:setThousandSeparator=[','],setDecimalSeparator=['.']","1,000","1000","equivSymbolic:setThousandsSeparator=['.'],setDecimalSeparator=[',']",false
+614,"equivSymbolic:setThousandSeparator=[','],setDecimalSeparator=['.']","1.000",1,"equivSymbolic:setThousandsSeparator=['.'],setDecimalSeparator=[',']",false
+615,"equivSymbolic:setThousandSeparator=['.'],setDecimalSeparator=[',']","1.000",1,"equivSymbolic:setThousandsSeparator=[','],setDecimalSeparator=['.']",true

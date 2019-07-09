@@ -117,8 +117,9 @@ multiple_spaces_re = re.compile(' {2,}')
 variable_before_parentheses_re = re.compile(r'\b([abcdxyz])\(')
 trailing_zeros_re = re.compile(r'(\.[0-9]*?)0+\b')
 neg_fraction_re = re.compile(r'-\\frac\{(.*?)\}\{(.*?)\}')
-closing_text_decorated_re = re.compile(r'(?:\\text\{.*?\})([a-zA-Z ]*)$')
-closing_text_re = re.compile(r'(?:[a-zA-Z ]*)(\\text\{.*?\})?$')
+closing_text_re = re.compile(r'(?:\\text\{.*?\})*([a-zA-Z ]*)+(?:\\text\{.*?\})*$')
+closing_text_decorated_re = re.compile(r'(?:[a-zA-Z ]*)*(\\text\{.*?\})+(?:[a-zA-Z ]*)*$')
+closed_to_normal_text_re = re.compile(r'\\text?\{(.*?)\}')
 mixed_frac_re = re.compile(r'-?\s*[0-9]+(\s*\\frac{[^-]+?}{[^-]+?}|\s+\(?\d+\)?/\(?\d+\)?)')
 mixed_fraction_error_re = re.compile(r'[0-9] *\( *[0-9]+ */ *[0-9]+ *\)')
 matrix_form_re = re.compile(r'\\begin\{bmatrix\}(.*?)\\end{bmatrix}')
@@ -322,6 +323,7 @@ def preprocess_latex(input_latex,
     input_latex = input_latex.replace(r'\cfrac', r'\frac')
     input_latex = input_latex.replace(r'\$', r'\dol')
     input_latex = latex_sign_re.sub(lambda x: latex_separators[x.group(0)],input_latex)
+    input_latex = input_latex.replace(r'\textit',r'\text')
     #Euler Number handling
     if euler_number:
         input_latex = re.sub(r'(\\exp|e)','E',input_latex)
@@ -339,10 +341,11 @@ def preprocess_latex(input_latex,
     input_latex = variable_before_parentheses_re.sub(r'\1*(', input_latex)
     # ignore trailing \text{}
     if ignore_text:
-        input_latex = closing_text_decorated_re.sub(r'\1', input_latex)
+        input_latex = closing_text_decorated_re.sub(r'', input_latex)
     # ignore all trailing text
     if ignore_alpha:
-        input_latex = closing_text_re.sub(r'\1', input_latex)
+        input_latex = closing_text_re.sub(r'', input_latex)
+    input_latex = closed_to_normal_text_re.sub(r'\1',input_latex)
     # trailing zeros
     if ignore_trailing_zeros:
         input_latex = trailing_zeros_re.sub(lambda x: '' if (x.group(1) == '.') else x.group(1), input_latex)
