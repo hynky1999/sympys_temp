@@ -1,5 +1,6 @@
 import sympy
 import antlr4
+import re
 from antlr4.error.ErrorListener import ErrorListener
 
 from .gen.PSParser import PSParser
@@ -8,9 +9,12 @@ from .gen.PSListener import PSListener
 
 from sympy.printing.str import StrPrinter
 
+fraction_plus_re = r'(-?)\s*(\d+\.?\d*)(\s*(\\frac{.+}{.+})|\s+(\(?\d+\)?/\(?\d+\)?))'
 
 def process_sympy(sympy):
-
+    sympy = re.sub(fraction_plus_re,lambda x: '{}({}+{})'.format(x.group(1),x.group(2),x.group(3)),sympy)
+    if re.search(r'\d\s+\d',sympy):
+        raise ValueError()
     matherror = MathErrorListener(sympy)
 
     stream = antlr4.InputStream(sympy)

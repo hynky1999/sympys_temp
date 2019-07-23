@@ -117,13 +117,14 @@ multiple_spaces_re = re.compile(' {2,}')
 variable_before_parentheses_re = re.compile(r'\b([abcdxyz])\(')
 trailing_zeros_re = re.compile(r'(\.[0-9]*?)0+\b')
 neg_fraction_re = re.compile(r'-\\frac\{(.*?)\}\{(.*?)\}')
-closing_text_re = re.compile(r'(?:\\text\{.*?\})*([a-zA-Z ]*)+(?:\\text\{.*?\})*$')
+closing_text_re = re.compile(r'(^|[^\\a-zA-Z])[a-zA-Z]+')
 closing_text_decorated_re = re.compile(r'(?:[a-zA-Z ]*)*(\\text\{.*?\})+(?:[a-zA-Z ]*)*$')
 closed_to_normal_text_re = re.compile(r'\\text?\{(.*?)\}')
 mixed_frac_re = re.compile(r'-?\s*[0-9]+(\s*\\frac{[^-]+?}{[^-]+?}|\s+\(?\d+\)?/\(?\d+\)?)')
 mixed_fraction_error_re = re.compile(r'[0-9] *\( *[0-9]+ */ *[0-9]+ *\)')
+parenthesis_re = re.compile(r'\((-?[a-z]|\d+(?:.\d+)?)\)')
 matrix_form_re = re.compile(r'\\begin\{bmatrix\}(.*?)\\end{bmatrix}')
-interval_form_re = re.compile(r'\s*([{}])(.*?),(.*?)([{}])\s*'.format(
+interval_form_re = re.compile(r'\s*([{}])([^,]*?),([^,]*?)([{}])\s*'.format(
 re.escape(''.join(interval_opening.keys())),re.escape(''.join(interval_closing.keys()))))
 set_form_re = re.compile(r'\{{\s*(?P<var>[a-zA-Z])\s*\|\s*(?:(?P<num1>\d*)\s*(?P<sign1>{0}))?\s*\1\s*(?:(?P<sign2>{0})\s*(?P<num2>\d*))?\s*\}}'.format(
 '|'.join(separator_functions.keys())))
@@ -137,7 +138,6 @@ diffentiation_re = re.compile(r'\\frac\{d\}\{d([a-z]+)\}(.*)')
 integral_re = re.compile(r'\\int(_(?P<down>{0})\^\{{(?P<up>{0})\}})?\s*(?P<expr>.*?)d(?P<symbol>[a-z])'.format(curl_br))
 sums_re = re.compile(r'\\sum_\{{([a-z])\=({0})\}}\^\{{({0})\}}(.*)'.format(curl_br))
 limits_re = re.compile(r'\\lim_\{{({0})\\to({0})\}}(.*)'.format(curl_br))
-fraction_plus_re = r'(-?)\s*(\d+\.?\d*)(\s*(\\frac{.+}{.+})|\s+(\(?\d+\)?/\(?\d+\)?))'
 preceding_zeroes_re = re.compile(r'(?<![\d\.])(0+)(\d+?)')
 times = r'(\* ?|\\cdot ?|\\times ?)?'
 times_re = re.compile(r'(\*|\\cdot ?|\\times)')
@@ -156,6 +156,7 @@ def convert_percent(matchobj):
 def convert_percent_final(found_str):
     precision = len((str(found_str) + '.').split('.')[1]) + 2
     return str(round(found_str * 0.01, precision))
+    
 def convert_frac(matchobj):
     if matchobj.group(1) == '1':
         return ''.join((r'\frac{\one}{',
@@ -292,7 +293,18 @@ def replace_separators(input_latex,
     # replace placeholders with actual separators
     input_latex = input_latex.replace(DECIMAL_SEP_PLACEHOLDER, '.')
     return input_latex
-
+    
+def balance_check(str,par_open=['(','[','{'],par_close=[')',']','}']):
+    opening = 0
+    for char in str:
+            if char in par_open:
+                opening += 1
+            elif char in par_close:
+                opening -= 1
+                if opening < 0:
+                    return False
+    return not opening
+    
 def preprocess_latex(input_latex,
                      ignore_trailing_zeros=False,
                      keep_neg_fraction_form=False,
@@ -301,7 +313,8 @@ def preprocess_latex(input_latex,
                      preprocess_sep=True,
                      ignore_text=False,
                      ignore_alpha=False,
-                     euler_number=False):
+                     euler_number=False,
+                     fix_parenthesis=False):
     ''' Convert anything that latex2sympy can't handle,
         e.g., percentages and logarithms
     '''
@@ -339,12 +352,15 @@ def preprocess_latex(input_latex,
     input_latex = log_re.sub(r'\\log_{\1}', input_latex)
     # a(x+1) -> x*(x+1)
     input_latex = variable_before_parentheses_re.sub(r'\1*(', input_latex)
+    #ignore parenthesis
+    if fix_parenthesis:
+        input_latex = parenthesis_re.sub(r'\1',input_latex)
     # ignore trailing \text{}
     if ignore_text:
         input_latex = closing_text_decorated_re.sub(r'', input_latex)
     # ignore all trailing text
     if ignore_alpha:
-        input_latex = closing_text_re.sub(r'', input_latex)
+        input_latex = closing_text_re.sub(r'\1', input_latex)
     input_latex = closed_to_normal_text_re.sub(r'\1',input_latex)
     # trailing zeros
     if ignore_trailing_zeros:
@@ -373,8 +389,7 @@ def preprocess_latex(input_latex,
     #Form perparation
     if set_form_re.search(input_latex):
         input_latex = set_form_re.sub(convertSet,input_latex)
-	
-    #print(input_latex)
+    #Convert mixed fraction
     return input_latex
 
 def sympify_latex(input_latex, evaluate=None):
@@ -395,6 +410,8 @@ def sympify_latex(input_latex, evaluate=None):
         else:
             input_latex = str(process_sympy(input_latex))
         input_symbolic = sympify(input_latex,evaluate=evaluate)
+        if input_symbolic == S.EmptySet:
+            return None
     except:
         return None
     return input_symbolic
@@ -407,7 +424,8 @@ def convert(input_latex, evaluate=None,
             preprocess_sep=True,
             ignore_text=False,
             ignore_alpha=False,
-            euler_number=False):
+            euler_number=False,
+            fix_parenthesis=False):
     ''' All preprocessing in one function
     '''
     input_latex = preprocess_latex(input_latex,
@@ -418,7 +436,8 @@ def convert(input_latex, evaluate=None,
                                    preprocess_sep=preprocess_sep,
                                    ignore_text=ignore_text,
                                    ignore_alpha=ignore_alpha,
-                                   euler_number=euler_number)
+                                   euler_number=euler_number,
+                                   fix_parenthesis=fix_parenthesis)
     if input_latex is None:
         return None
     input_symbolic = sympify_latex(input_latex, evaluate=evaluate)
@@ -518,7 +537,7 @@ def checkOptions(input,options):
     options = options.copy()
     options['inverseResult'] = False
     syntax_func = allowed_options['equivSyntax']
-    integer_func = ['complexType','integerType','realType']
+    integer_func = ['complexType','integerType','realType','numberType']
     simple_func = ['isFactorised','isExpanded','isSimplified','isRationalized']
     collisions = [0] * 3
     for option in options:
@@ -541,15 +560,43 @@ def checkOptions(input,options):
             collisions[2] = 1
     return equiv
             
-            
 # end of helper functions -----------------------------------------------------
 
+set_re_brackets = re.compile(r'(\[)([^|]*?)(\])$')
+set_re_par = re.compile(r'(\()([^|]*?)(\))$')
+set_re_par2 = re.compile(r'(\{)([^|]*?)(\})$')
+set_res = [set_re_brackets,set_re_par,set_re_par2]
+set_re_error = re.compile(r'^\s*[({].*?\d{1,3},\d{1,2}[^\d].*?[})]\s*$')
 # check functions -------------------------------------------------------------
 def equiv_symbolic(input_latex, expected_latex, options):
     ''' check equivSymbolic
     '''
-    if 'setEvaluation' in options:
+    
+    if 'setEvaluation' in options or 'orderedElements' in options or 'orderedPair' in options:
         return set_evaluation(input_latex,expected_latex,options)
+    
+    if 'interpretAsList' in options:
+        options['orderedPair'] = True
+        return set_evaluation(input_latex,expected_latex,options)
+        
+    if 'interpretAsSet' in options:
+        return set_evaluation(input_latex,expected_latex,options)
+    for set_re in set_res:
+        search = set_re.match(expected_latex)
+        if search and balance_check(search.group(2)):
+            break
+        else:
+            search = ''
+            
+    if search:
+        if (search.group(1) == '(' and search.group(3) == ')' and
+            not len(re.findall(r',',search.group(2))) == 1):
+            options['orderedPair'] = True
+            return set_evaluation(input_latex,expected_latex,options)
+        elif search.group(1) == '{' and search.group(3) == '}':
+            return set_evaluation(input_latex,expected_latex,options)
+    if set_re_error.search(input_latex):
+        return 'Undefined_Expected_Error'
         
     if re.search(r'\\int(?!_).*d[a-z]',input_latex):
         input_latex,expected_latex = derivateExpected(input_latex,expected_latex)
@@ -569,7 +616,6 @@ def equiv_symbolic(input_latex, expected_latex, options):
                                       
     input_latex = unit_text_re.sub(lambda x:'*' + convertComplexUnit(x),input_latex)
     expected_latex = unit_text_re.sub(lambda x:'*' + convertComplexUnit(x),expected_latex)
-    
     separator_re = re.compile('|'.join(separator_pairs.keys()))
     if separator_re.search(input_latex) or separator_re.search(expected_latex) or 'compareSides' in options:
         separator_re = re.compile('|'.join(separator_pairs.keys()))
@@ -585,8 +631,6 @@ def equiv_symbolic(input_latex, expected_latex, options):
             else:
                 return 'false'
         equiv = checkOptions(input_latex.split(a_sep, maxsplit=1)[0],options) or checkOptions(input_latex.split(a_sep, maxsplit=1)[1],options)
-        input_latex = re.sub(fraction_plus_re,lambda x: '{}({}+{})'.format(x.group(1),x.group(2),x.group(3)),input_latex)
-        expected_latex = re.sub(fraction_plus_re,lambda x: '{}({}+{})'.format(x.group(1),x.group(2),x.group(3)),expected_latex)
         input_latex, input_result_latex = input_latex.split(a_sep, maxsplit=1)
         input_symbolic = sympify_latex(input_latex)
         input_result_symbolic = sympify_latex(input_result_latex)
@@ -648,8 +692,6 @@ def equiv_symbolic(input_latex, expected_latex, options):
         return result(xor(equiv, 'inverseResult' in options))
         
     equiv = checkOptions(input_latex,options)
-    input_latex = re.sub(fraction_plus_re,lambda x: '{}({}+{})'.format(x.group(1),x.group(2),x.group(3)),input_latex)
-    expected_latex = re.sub(fraction_plus_re,lambda x: '{}({}+{})'.format(x.group(1),x.group(2),x.group(3)),expected_latex)
     input_symbolic = sympify_latex(input_latex)
     if input_symbolic is None:
         return 'Sympy_Parsing_Error'
@@ -657,7 +699,6 @@ def equiv_symbolic(input_latex, expected_latex, options):
     if 'allowEulersNumber' in options:
         input_symbolic = logcombine(expand_log(input_symbolic,force=True))
         expected_symbolic = logcombine(expand_log(expected_symbolic,force=True))
-        
     # if expected answer evaluates to boolean
     # (most prominent case is when it's an equality),
     # evaluate if input evaluates to the same value
@@ -745,9 +786,31 @@ def equiv_literal(input_latex, expected_latex, options):
 def equiv_value(input_latex, expected_latex, options):
     ''' check equivValue
     '''
-    if 'setEvaluation' in options:
+    if 'setEvaluation' in options or 'orderedElements' in options or 'orderedPair' in options:
+        return set_evaluation(input_latex,expected_latex,options)
+    
+    if 'interpretAsList' in options:
+        options['orderedPair'] = True
         return set_evaluation(input_latex,expected_latex,options)
         
+    if 'interpretAsSet' in options:
+        return set_evaluation(input_latex,expected_latex,options)
+    for set_re in set_res:
+        search = set_re.match(expected_latex)
+        if search and balance_check(search.group(2)):
+            break
+        else:
+            search = ''
+            
+    if search:
+        if (search.group(1) == '(' and search.group(3) == ')' and
+            not len(re.findall(r',',search.group(2))) == 1):
+            options['orderedPair'] = True
+            return set_evaluation(input_latex,expected_latex,options)
+        elif search.group(1) == '{' and search.group(3) == '}':
+            return set_evaluation(input_latex,expected_latex,options)
+    if set_re_error.search(input_latex):
+        return 'Undefined_Expected_Error'    
     if re.search(r'\\int(?!_).*d[a-z]',input_latex):
         input_latex,expected_latex = derivateExpected(input_latex,expected_latex)
         
@@ -771,35 +834,15 @@ def equiv_value(input_latex, expected_latex, options):
         
     if 'compareSides' in options:
         equiv = checkOptions(input_latex.split('=', maxsplit=1)[0],options) or checkOptions(input_latex.split('=', maxsplit=1)[1],options)
-        input_latex = re.sub(fraction_plus_re,lambda x: '{}({}+{})'.format(x.group(1),x.group(2),x.group(3)),input_latex)
-        expected_latex = re.sub(fraction_plus_re,lambda x: '{}({}+{})'.format(x.group(1),x.group(2),x.group(3)),expected_latex)
         input_latex, input_result_latex = input_latex.split('=', maxsplit=1)
-        input_symbolic = convert(input_latex,
-                             thousand_sep=getThousandsSeparator(options),
-                             decimal_sep=getDecimalSeparator(options),
-                             preprocess_sep=False,
-                             ignore_text=options.get('ignoreText', False),
-                             euler_number=options.get('allowEulersNumber',False))
-        input_result_symblic = convert(input_result_latex,
-                             thousand_sep=getThousandsSeparator(options),
-                             decimal_sep=getDecimalSeparator(options),
-                             preprocess_sep=False,
-                             ignore_text=options.get('ignoreText', False),
-                             euler_number=options.get('allowEulersNumber',False))
+        input_symbolic = sympify_latex(input_latex)
+        input_result_symblic = sympify_latex(input_result_latex)
         if input_symbolic is None or input_result_symblic is None:
             return 'Sympy_Parsing_Error'
 
         expected_latex, expected_result_latex = expected_latex.split('=', maxsplit=1)
-        expected_symbolic = convert(expected_latex,
-                                    thousand_sep=getThousandsSeparator(options),
-                                    decimal_sep=getDecimalSeparator(options),
-                                    preprocess_sep=False,
-                                    euler_number=options.get('allowEulersNumber',False))
-        expected_result_symbolic = convert(expected_result_latex,
-                                    thousand_sep=getThousandsSeparator(options),
-                                    decimal_sep=getDecimalSeparator(options),
-                                    preprocess_sep=False,
-                                    euler_number=options.get('allowEulersNumber',False))      
+        expected_symbolic = sympify_latex(expected_latex)
+        expected_result_symbolic = sympify_latex(expected_result_latex)     
 
         decimal_places = options.get('significantDecimalPlaces', None)
         if decimal_places is not None:
@@ -836,22 +879,10 @@ def equiv_value(input_latex, expected_latex, options):
         return result(xor(equiv, 'inverseResult' in options))
         
     equiv = checkOptions(input_latex,options)
-    input_latex = re.sub(fraction_plus_re,lambda x: '{}({}+{})'.format(x.group(1),x.group(2),x.group(3)),input_latex)
-    expected_latex = re.sub(fraction_plus_re,lambda x: '{}({}+{})'.format(x.group(1),x.group(2),x.group(3)),expected_latex)
-    
-    input_symbolic = convert(input_latex,
-                             thousand_sep=getThousandsSeparator(options),
-                             decimal_sep=getDecimalSeparator(options),
-                             preprocess_sep=False,
-                             ignore_text=options.get('ignoreText', False),
-                             euler_number=options.get('allowEulersNumber',False))
+    input_symbolic = sympify_latex(input_latex)
     if input_symbolic is None:
         return 'Sympy_Parsing_Error'
-    expected_symbolic = convert(expected_latex,
-                                thousand_sep=getThousandsSeparator(options),
-                                decimal_sep=getDecimalSeparator(options),
-                                preprocess_sep=False,
-                                euler_number=options.get('allowEulersNumber',False))
+    expected_symbolic = sympify_latex(expected_latex)
     decimal_places = options.get('significantDecimalPlaces', None)
     if decimal_places is not None:
         try:
@@ -904,7 +935,6 @@ def is_simplified(input_latex, expected_latex=None, options={}):
                              euler_number=options.get('allowEulersNumber',False))
     if input_symbolic is None:
         return 'Sympy_Parsing_Error'
-    
     input_symbolic = parentheses_minus_re.sub(r'\1',str(input_symbolic))
     simplified = equiv and str(input_symbolic) ==\
                  str(expand(simplify(convert(input_latex,
@@ -917,13 +947,16 @@ def is_expanded(input_latex, expected_latex=None, options={}):
     ''' check isExpanded
     '''
     equiv = number_type(input_latex,options)
+    
     input_symbolic = convert(input_latex,
                              thousand_sep=getThousandsSeparator(options),
                              decimal_sep=getDecimalSeparator(options),
-                             euler_number=options.get('allowEulersNumber',False))
+                             euler_number=options.get('allowEulersNumber',False),
+                             evaluate=False,
+                             fix_parenthesis=True)
     if input_symbolic is None:
         return 'Sympy_Parsing_Error'
-    expanded = equiv and input_symbolic - expand(simplify(input_symbolic)) == 0
+    expanded = equiv and str(input_symbolic) == str(expand(simplify(input_symbolic)))
     return result(xor(expanded, 'inverseResult' in options))
 
 def is_factorised(input_latex, expected_latex=None, options={}):
@@ -959,19 +992,97 @@ def is_rationalized(input_latex, expected_latex=None, options={}):
     
     return result(xor(rationalized, 'inverseResult' in options))
 
+
+def transform_set(set_latex,par_open=['(','[','{'],par_close=[')',']','}']):
+    type = 'any'
+    search_set = set_latex
+    for set_re in set_res:
+        search = set_re.match(set_latex)
+        if search and balance_check(search.group(2)):
+            if set_re == set_re_par:
+                type = 'list'
+            elif set_re == set_re_par2:
+                type = 'set'
+            search_set = search.group(2)
+            break
+    opening = []
+    set_symbolic = []
+    last_char = 0
+    quoted = False
+    closed = False
+    for i,char in enumerate(search_set):
+        if char in par_open and len(opening) == 0 and not quoted:
+            if closed:
+                raise ValueError
+            opening.append(char)
+            set_symbolic.append([char])
+            last_char = i+1
+        elif char in par_close and len(opening) == 1 and not quoted:
+            element = str(convert(search_set[last_char:i]))
+            if element == 'None':
+                raise ValueError
+            set_symbolic[-1].append(element)
+            set_symbolic[-1].append(char)
+            char2 = opening.pop()
+            if char2 == '{' and char == '}':
+                [set_symbolic[-1][0]] + sorted(set_symbolic[-1][1:-1]) + [set_symbolic[-1][-1]]
+            last_char = i+1
+            if closed:
+                raise ValueError
+            closed = True
+        elif char == '"':
+            if not quoted:
+                quoted = True
+                last_char = i+1
+            else:
+                quoted = False
+        elif char == ',' and not quoted:
+            if opening:
+                element = str(convert(search_set[last_char:i]))
+                if element == 'None':
+                    raise ValueError
+                set_symbolic[-1].append(element)
+                last_char = i+1
+            else:
+                if not closed:
+                    element = str(convert(search_set[last_char:i]))
+                    if element == 'None':
+                        raise ValueError
+                    set_symbolic.append([element])
+                    last_char = i+1
+                if closed:
+                    last_char = i+1
+                    closed = False
+    if last_char != len(search_set) and not closed:
+        element = str(convert(search_set[last_char:]))
+        if element == 'None':
+            raise ValueError
+        set_symbolic.append([element])
+    return set_symbolic,type
+    
 def set_evaluation(input_latex, expected_latex=None, options={}):
     ''' check setEvaluation
     '''
-    input_symbolic = list(map(int, input_latex.split(',')))
-    expected_latex = list(map(int, expected_latex.split(',')))
-
-    if input_symbolic is None:
-        return 'Sympy_Parsing_Error'
-
-    input_symbolic.sort()
-    expected_latex.sort()
-
-    evaluation = input_symbolic == expected_latex
+    try:
+        input_symbolic,type1 = transform_set(input_latex)
+    except ValueError:
+        return 'false'
+    try:
+        expected_symbolic,type2 = transform_set(expected_latex)  
+    except ValueError:
+        return 'Unreadable_List_Error'
+    if 'interpretAsList' in options or 'interpretAsSet' in options:
+        type1 = 'any'
+    if not 'orderedElements' in options:
+        input_symbolic = [sorted(x) for x in input_symbolic]
+        expected_symbolic = [sorted(x) for x in expected_symbolic]
+    if not 'orderedPair' in options:
+        input_symbolic.sort()
+        expected_symbolic.sort()
+    if type1 == 'any' or type2 == 'any' or type2 == type1:
+        evaluation = input_symbolic == expected_symbolic
+    else:
+        evaluation = False
     return result(xor(evaluation, 'inverseResult' in options))
 
 def is_true(input_latex, expected_latex=None, options={}):
@@ -1032,7 +1143,6 @@ standard_form_dict = {
 
 def equiv_syntax(input_latex, expected_latex=None, options={}):
     ''' check equivSyntax depending on the pattern specified
-
         Checks implemented:
          - isDecimal
          - isSimpleFraction
@@ -1126,6 +1236,10 @@ allowed_options = {
         'isStandardForm',
         'isSlopeInterceptForm',
         'setEvaluation',
+        'orderedElements',
+        'orderedPair',
+        'interpretAsList',
+        'interpretAsSet',
         'isPointSlopeForm'},
     'equivLiteral': {
         'setThousandsSeparator',
@@ -1150,7 +1264,6 @@ allowed_options = {
         'isExponent',
         'isStandardForm',
         'isSlopeInterceptForm',
-        'setEvaluation',
         'isPointSlopeForm'},
     'equivValue': {
         'tolerance',
@@ -1176,6 +1289,10 @@ allowed_options = {
         'isStandardForm',
         'isSlopeInterceptForm',
         'setEvaluation',
+        'orderedElements',
+        'orderedPair',
+        'interpretAsList',
+        'interpretAsSet',
         'isPointSlopeForm'},
     'isSimplified': {
         'setThousandsSeparator',
@@ -1239,7 +1356,9 @@ allowed_options = {
         'variableType',
         'complexType'},
     'setEvaluation': {
-        'inverseResult'},
+        'inverseResult',
+        'orderedElements',
+        'orderedPair'},
     'calculate': {},
 }
 

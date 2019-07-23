@@ -317,7 +317,7 @@
 311,"calculate method","input:x=3,y=5,formula:x+y",9,calculate,false
 312,"calculate method","input:x=3,formula:x+y",3+y,calculate,true
 313,"calculate method","input:x=3,formula:x+y",3+x,calculate,false
-314,"mixed fraction, EV-1322","1\frac{3}{4}","","isSimplified",true
+314,"mixed fraction, EV-1322","1\frac{3}{4}","","isSimplified",false
 315,"mixed fraction, EV-1322","1\frac{6}{8}","","isSimplified",false
 316,"mixed fraction, EV-1322","1\frac{6}{8}","1\frac{3}{4}","equivSymbolic",true
 317,"mixed fraction, EV-1322","1\frac{3}{4}","1.75","equivSymbolic",true
@@ -611,3 +611,150 @@
 613,"equivSymbolic:setThousandSeparator=[','],setDecimalSeparator=['.']","1,000","1000","equivSymbolic:setThousandsSeparator=['.'],setDecimalSeparator=[',']",false
 614,"equivSymbolic:setThousandSeparator=[','],setDecimalSeparator=['.']","1.000",1,"equivSymbolic:setThousandsSeparator=['.'],setDecimalSeparator=[',']",false
 615,"equivSymbolic:setThousandSeparator=['.'],setDecimalSeparator=[',']","1.000",1,"equivSymbolic:setThousandsSeparator=[','],setDecimalSeparator=['.']",true
+0.0,space handling,3 2,6,equivSymbolic,Sympy_Parsing_Error
+0.1,space handling,3 x,3x,equivSymbolic,true
+0.2,space handling,1 1 1,1,equivSymbolic,Sympy_Parsing_Error
+0.3,space handling,"1,1 1",1,equivSymbolic,Sympy_Parsing_Error
+0.4,space handling,"2*3",6,equivSymbolic,true
+1.0,basic list,"1,2,3","(1,2,3)",equivSymbolic,true
+1.1,basic list wrong element,"1,2,4","(1,2,3)",equivSymbolic,false
+1.2,basic list order violation,"2,1,3","(1,2,3)",equivSymbolic,false
+1.3,basic list extra element,"1,2,3,4","(1,2,3)",equivSymbolic,false
+1.4,basic list missing element,"1","(1,2,3)",equivSymbolic,false
+1.5,basic list extra white space on expected,"1,2,3","(1 ,2,3)",equivSymbolic,true
+1.6,basic list extra white space on expected,"1,2,3","(1 ,2,3 )",equivSymbolic,true
+1.7,basic list extra white space on expected,"1,2,3","( 1 ,2,3 )",equivSymbolic,true
+1.8,basic list extra white space on expected,"1,2,3","( 1 ,2,3 )",equivSymbolic,true
+1.9,basic list extra white space on expected,"1,2,3","( 1 , 2,3 )",equivSymbolic,true
+1.10,basic list extra white space on input,"1 ,2,3","(1,2,3)",equivSymbolic,true
+1.11,basic list extra white space on input,"1 , 2,3","(1,2,3)",equivSymbolic,true
+1.12,basic list extra white space on input,"1 ,  2,3","(1,2,3)",equivSymbolic,true
+1.13,basic list missing comma on expected,"1,2","(1 2)",equivSymbolic,Unreadable_List_Error
+1.14,basic list missing comma on input,"1 2 3","(1,2,3)",equivSymbolic,false
+1.15,basic list missing parenthesis on expected,"1,2","(1,2",equivSymbolic,Sympy_Parsing_Error
+1.16,basic list missing parenthesis on expected,"1,2","1,2)",equivSymbolic,Sympy_Parsing_Error
+1.17,basic list missing parenthesis on expected,"1,2","0,1,2)",equivSymbolic,Sympy_Parsing_Error
+1.18,basic list missing parenthesis on expected,"0,1,2","0,1,2)",equivSymbolic,Sympy_Parsing_Error
+2.0,basic list with interpretAsList,"1,2","1,2",equivSymbolic:interpretAsList,true
+2.1,basic list with interpretAsList over-ride parenthesis,"1,2","{1,2}",equivSymbolic:interpretAsList,true
+2.2,basic list with interpretAsList over-ride parenthesis,"2,1","{1,2}",equivSymbolic:interpretAsList,false
+3.0,thousands handling,"1,234","1,234",equivSymbolic,true
+3.1,thousands handling,"1,23","1,234",equivSymbolic,Sympy_Parsing_Error
+3.3,thousands handling as an interval,"(1,234)","(1,234)",equivSymbolic,true
+3.4,thousands handling as an interval,"1,234","(1,234)",equivSymbolic:interpretAsList,true
+3.5,thousands handling as an interval,"234,1","(1,234)",equivSymbolic:interpretAsList,false
+3.6,thousands handling as an interval,"1,234","(1,234)",equivSymbolic:interpretAsSet,true
+3.7,thousands handling as an interval,"234,1","(1,234)",equivSymbolic:interpretAsSet,true
+3.8,thousands handling,"234,1","{1,234}",equivSymbolic,true
+3.9,thousands handling,"234,1,567","{1,234,567}",equivSymbolic,true
+3.10,thousands handling,"234,1,567","1,234,567",equivSymbolic:interpretAsList,false
+3.11,thousands handling,"234,567,1","1,234,567",equivSymbolic:interpretAsList,false
+3.12,thousands handling,"234,567,0","0,234,567",equivSymbolic:interpretAsList,false
+3.13,thousands handling,"0,234,567","0,234,567",equivSymbolic:interpretAsList,true
+4.0,basic set,"0,1","{0,1}",equivSymbolic,true
+4.1,basic set,"0,1,2","{0,1,2}",equivSymbolic,true
+4.2,basic set,"0,1,2","{0,1 2}",equivSymbolic,Unreadable_List_Error
+4.3,basic set,"0 1,2","{0,1,2}",equivSymbolic,false
+4.4,basic set,"2,1","{0,1,2}",equivSymbolic,false
+4.5,basic set,"0,2,1","{0,1,2}",equivSymbolic,true
+4.6,basic set,"0,2,1","0,1,2}",equivSymbolic,Sympy_Parsing_Error
+4.7,basic set,"0,2,1","{0,1,2",equivSymbolic,Sympy_Parsing_Error
+4.8,basic set,"0,2,1}","{0,1,2}",equivSymbolic,false
+4.9,basic set,"{0,2,1","{0,1,2}",equivSymbolic,false
+4.10,basic set,"{0,2,1","{0,1,2}",equivSymbolic,false
+4.11,basic set,"0 2 1","{0,1,2}",equivSymbolic,false
+4.12,basic set,"-1 0 2 1","{0,1,2}",equivSymbolic,false
+4.13,basic set,"-1","{-1}",equivSymbolic,true
+4.14,basic set,"-1,1","{-1,1}",equivSymbolic,true
+4.15,basic set,"-1,2","{-1,1}",equivSymbolic,false
+5.0,basic set with interpretAsSet ,"-1,2","(-1,1)",equivSymbolic:interpretAsSet,false
+5.1,basic set with interpretAsSet ,"-1,2","(-1,2)",equivSymbolic:interpretAsSet,true
+5.2,basic set with interpretAsSet ,"-1,2,1","(-1,2)",equivSymbolic:interpretAsSet,false
+5.3,basic set with interpretAsSet ,"1,2,1","(1,2,1)",equivSymbolic:interpretAsSet,true
+5.4,basic set with interpretAsSet ,"1,1,2,1","(1,2,1)",equivSymbolic:interpretAsSet,false
+5.5,basic set with interpretAsList ,"1,1,2,1","(1,2,1)",equivSymbolic:interpretAsList,false
+5.6,basic set with interpretAsList ,"1,1,2,1","(1,1,2,1)",equivSymbolic:interpretAsList,true
+6.0,set with variables interpretAsSet ,"x,2","(-1,1)",equivSymbolic:interpretAsSet,false
+6.1,set with variables interpretAsSet ,"x,2","(x,2)",equivSymbolic:interpretAsSet,true
+6.2,set with variables interpretAsSet ,"x+1,2","(x+1,2)",equivSymbolic:interpretAsSet,true
+6.3,set with variables interpretAsSet ,"2,x+1","(x+1,2)",equivSymbolic:interpretAsSet,true
+6.4,set with variables interpretAsSet ,"2,x + 1","(x+1,2)",equivSymbolic:interpretAsSet,true
+6.5,set with variables interpretAsSet ,"2 x + 1","(x+1,2)",equivSymbolic:interpretAsSet,false
+6.6,set with variables interpretAsSet ,"x + 1,2,3","(x + 1,2,3)",equivSymbolic:interpretAsSet,true
+6.7,set with variables interpretAsSet ,"2,x + 1,3","(x + 1,2,3)",equivSymbolic:interpretAsSet,true
+6.8,list with variables interpretAsList ,"x + 1,2,3","(x + 1,2,3)",equivSymbolic:interpretAsList,true
+6.9,list with variables interpretAsList ,"x + 1,2,3","(x + 1,3,2)",equivSymbolic:interpretAsList,false
+6.10,list with variables interpretAsList ,"x + 1,2,3","{x + 1,3,2}",equivSymbolic:interpretAsList,false
+6.11,list with variables interpretAsList ,"x + 1,2 3","{x + 1,3,2}",equivSymbolic:interpretAsList,false
+7.0,set with hierarchy ,"(x,y),(w,z)","{(x,y),(w,z)}",equivSymbolic,true
+7.1,list with hierarchy ,"(x,y),(w,z)","{(x,y),(w,z)}",equivSymbolic,true
+7.2,list with hierarchy with space,"(x,y),(w,z)","{(x,y), (w ,z)}",equivSymbolic,true
+7.3,list with hierarchy with space,"(x,y), (w,z)","{(x,y), (w ,z)}",equivSymbolic,true
+7.4,list with hierarchy with space,"(x,y) (w,z)","{(x,y), (w ,z)}",equivSymbolic,false
+7.5,list with hierarchy ,"(w,z),(x,y)","((x,y),(w,z))",equivSymbolic,false
+7.6,list with hierarchy with space ,"(w,z),(x,y)","((x,y), (w,z))",equivSymbolic,false
+7.7,set with variables interpretAsSet ,"+-(x,y),(w,z)","{(x,y),(w,z)}",equivSymbolic:interpretAsSet,true
+7.8,set with variables interpretAsSet ,"(p,q),(x,y),(w,z)","{(x,y),(w,z)}",equivSymbolic:interpretAsSet,false
+7.9,set with variables interpretAsSet ,"(p,q),(x,y),(w,z)","{(p,q),(x,y),(w,z)}",equivSymbolic:interpretAsSet,true
+8.1,"[] default to intervals","[4,5]","[4,5]",equivSymbolic,true
+8.2,"[] default to intervals","(4,5]","(4,5]",equivSymbolic,true
+8.3,"[] default to intervals","[4,5)","[4,5)",equivSymbolic,true
+8.4,"[] default to intervals","(4,5)","(4,5)",equivSymbolic,true
+8.5,"[] default to intervals","(5,4]","[5,4]",equivSymbolic,Sympy_Parsing_Error
+8.6,"[] default to intervals","[5,4)","[5,4]",equivSymbolic,Sympy_Parsing_Error
+8.7,"[] default to intervals","(5,4)","[5,4]",equivSymbolic,Sympy_Parsing_Error
+8.8,"[] default to intervals","2,5","[5,4]",equivSymbolic:interpretAsSet,false
+8.9,"[] default to intervals","5,4","[5,4]",equivSymbolic:interpretAsSet,true
+8.10,"[] default to intervals","4,5","[5,4]",equivSymbolic:interpretAsSet,true
+9.1,"() and two elements -> default to intervals","(4,5)","(4,5)",equivSymbolic,true
+9.2,"() and two elements -> default to intervals","{2,3}","(2, 3)",equivSymbolic,Sympy_Parsing_Error
+9.3,"() and two elements -> default to intervals","(2,3)","(2, 5)",equivSymbolic,false
+10.1,"() and more than two elements -> default to list","(5,4,3)","(5,4,3)",equivSymbolic,true
+10.2,"() and more than two elements -> default to list","5,4,3","(5,4,3)",equivSymbolic:interpretAsList,true
+10.3,"() and more than two elements -> default to list","(5,4,3)","(5,4,3)",equivSymbolic,true
+11.1,"{} -> default to sets","1 3 4","{2, 3, 4}",equivSymbolic,false
+11.2,"{} -> default to sets","2 3 4","{2, 3, 4}",equivSymbolic,false
+11.3,"{} -> default to sets","(2, 3, 4)","{2, 3, 4}",equivSymbolic:interpretAsSet,true
+11.4,"{} -> default to sets","(3, 2, 4)","{2, 3, 4}",equivSymbolic:interpretAsSet,true
+12.1,"(): list with two entries","(23,441,3)","(23,441,3)",equivSymbolic,true
+12.2,"(): list with two entries","23,441,3","(23,441,3)",equivSymbolic,true
+12.3,"{}: set with two entries","{23,441,3}","{23,441,3}",equivSymbolic,true
+12.4,"{}: set with two entries","[23,441,3]","{23,441,3}",equivSymbolic,true
+12.5,"{}: set with two entries","23,441,3","{23,441,3}",equivSymbolic,true
+13.1,"thousands handling","4,654","4,654",equivSymbolic,true
+13.2,"thousands handling","4,65","4,654",equivSymbolic,Sympy_Parsing_Error
+13.3,"thousands handling","(4,654)","(4,654)",equivSymbolic,true
+13.4,"thousands handling","4,654","(4,654)",equivSymbolic:interpretAsList,true
+14.1,"not to automatically multiple a pair of numbers separated by space","3 2","6",equivSymbolic,Sympy_Parsing_Error
+14.2,"not to automatically multiple a pair of numbers separated by space","3 x","3x",equivSymbolic,true
+14.3,"not to automatically multiple a pair of numbers separated by space","3 2 1","6",equivSymbolic,Sympy_Parsing_Error
+14.4,"not to automatically multiple a pair of numbers separated by space","3 x y","3xy",equivSymbolic,true
+15.1,"extra white space","1,2,3","(1 ,2,3)",equivSymbolic,true
+15.2,"extra white space","1,2,3","(1 ,2,3 )",equivSymbolic,true
+15.3,"extra white space","1,2,3","( 1 ,2,3 )",equivSymbolic,true
+15.4,"extra white space","1,2,3","( 1 , 2,3 )",equivSymbolic,true
+15.5,"extra white space","1,2,3","( 1 ,  2,3 )",equivSymbolic,true
+15.6,"extra white space on input","1 ,2,3","(1,2,3)",equivSymbolic,true
+15.7,"extra white space on input","1 , 2,3","(1,2,3)",equivSymbolic,true
+15.8,"extra white space on input","1 ,  2,3","(1,2,3)",equivSymbolic,true
+15.9,"extra white space on input","1 ,  2,3","(1,2,3)",equivSymbolic,true
+15.10,"extra white space on input"," 1 ,  2,3","(1,2,3)",equivSymbolic,true
+15.11,"extra white space on input"," 1 ,  2,3 ","(1,2,3)",equivSymbolic,true
+15.12,"extra white space on input","1 , 2, 3","(1,2,3)",equivSymbolic,true
+15.13,"extra white space on input","1, 2, 3","(1,2,3)",equivSymbolic,true
+15.14,"extra white space on input","1 , 2,3","(1,2,3)",equivSymbolic,true
+16.1,"basic list missing comma on expected","1,2,3","(1 2 3)",equivSymbolic,Unreadable_List_Error
+16.2,"basic list missing comma on input","1 2,3","(1,2,3)",equivSymbolic,false
+16.3,"basic list missing parenthesis on expected","1,2,3","(1,2,3",equivSymbolic,Sympy_Parsing_Error
+16.4,"basic list missing parenthesis on expected","1,2,3","1,2,3)",equivSymbolic,Sympy_Parsing_Error
+17.1,"() conflict with interpretAsSet","(1,2)","(2,1)",equivSymbolic:interpretAsSet,true
+17.2,"() conflict with interpretAsSet","(1,2)","(1,2)",equivSymbolic:interpretAsSet,true
+17.3,"() conflict with interpretAsList","(1,2)","(2,1)",equivSymbolic:interpretAsList,false
+18.1,"{} -> default to sets","1,1+x,3","{1, 1+x, 3}",equivSymbolic,true
+18.2,"{} -> default to sets","1,3,1+x","{1, 1+x, 3}",equivSymbolic,true
+18.3,"() and more than two elements -> default to list","(1,1+x,3)","(1,1+x,3)",equivSymbolic,true
+18.4,"() and more than two elements -> default to list","(1,3,1+x)","(1,1+x,3)",equivSymbolic,false
+18.5,"() and more than two elements -> default to list","(1,1+x,3,2-x)","(1,1+x,3)",equivSymbolic,false
+19.1,"{} -> default to sets","{{1,2}, {3,4}}","{{1,2}, {3,4}}",equivSymbolic,true
+19.2,"{} -> default to sets","{{3,4}, {1,2}}","{{1,2}, {3,4}}",equivSymbolic,true
+19.3,"{} -> default to sets","{1,2, 3, 4}","{{1,2}, {3,4}}",equivSymbolic,false
