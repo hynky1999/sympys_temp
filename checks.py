@@ -612,10 +612,9 @@ def equiv_symbolic(input_latex, expected_latex, options):
     expected_latex = preprocess_latex(expected_latex.strip(),
                                       thousand_sep=getThousandsSeparator(options),
                                       decimal_sep=getDecimalSeparator(options),
-                                      euler_number=options.get('allowEulersNumber',False))
-                                      
-    input_latex = unit_text_re.sub(lambda x:'*' + convertComplexUnit(x),input_latex)
-    expected_latex = unit_text_re.sub(lambda x:'*' + convertComplexUnit(x),expected_latex)
+                                      euler_number=options.get('allowEulersNumber',False))                              
+    input_latex = unit_text_re.sub(lambda x:convertComplexUnit(x),input_latex)
+    expected_latex = unit_text_re.sub(lambda x:convertComplexUnit(x),expected_latex)
     separator_re = re.compile('|'.join(separator_pairs.keys()))
     if separator_re.search(input_latex) or separator_re.search(expected_latex) or 'compareSides' in options:
         separator_re = re.compile('|'.join(separator_pairs.keys()))
@@ -827,8 +826,8 @@ def equiv_value(input_latex, expected_latex, options):
     expected_unit_search = unit_text_re.search(expected_latex)
     if expected_unit_search:
         expected_unit = convertComplexUnit(expected_unit_search)
-        expected_latex = unit_text_re.sub(lambda x: '*' + convertComplexUnit(x) + '/' + expected_unit,expected_latex)
-        input_latex = unit_text_re.sub(lambda x: '*' + convertComplexUnit(x) + '/' + expected_unit,input_latex)
+        expected_latex = unit_text_re.sub(lambda x:'('+convertComplexUnit(x) + '/' + expected_unit+')',expected_latex)
+        input_latex = unit_text_re.sub(lambda x:'('+convertComplexUnit(x) + '/' + expected_unit+')',input_latex)
     if input_latex is None:
         return 'Parsing_Error'
         

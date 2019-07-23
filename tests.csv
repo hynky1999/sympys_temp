@@ -758,3 +758,11 @@
 19.1,"{} -> default to sets","{{1,2}, {3,4}}","{{1,2}, {3,4}}",equivSymbolic,true
 19.2,"{} -> default to sets","{{3,4}, {1,2}}","{{1,2}, {3,4}}",equivSymbolic,true
 19.3,"{} -> default to sets","{1,2, 3, 4}","{{1,2}, {3,4}}",equivSymbolic,false
+6251.0,s,s,s,equivSymbolic,true
+6251.1,s1,s1,s1,equivSymbolic,true
+6251.3,x,s,x,equivSymbolic,false
+6251.4,x,x,x,equivSymbolic,true
+6251.5,x double quotes,"x","x",equivSymbolic,true
+6251.6,b,b,b,equivSymbolic,true
+6251.7,x1,x1,x1,equivSymbolic,true
+6251.8,s1-x1,s1,x1,equivSymbolic,false
