@@ -11,7 +11,7 @@
 11,equivLiteral: different order,x+1,1+x,equivLiteral,false
 12,equivLiteral: decimal fractions,0.50,0.5,equivLiteral,false
 13,equivLiteral: decimal fractions,.5,0.5,equivLiteral,true
-14,equivLiteral: decimal fractions,"0,5",0.5,equivLiteral,Sympy_Parsing_Error
+14,equivLiteral: decimal fractions,"0,5",0.5,equivLiteral,false
 15,equivLiteral: fraction instead of number,4/2,2,equivLiteral,false
 16,equivLiteral: simple case,2,2,equivLiteral,true
 17,equivLiteral: simple case with brackets,(2),2,equivLiteral,true
@@ -34,19 +34,19 @@
 34,"equivLiteral:setThousandsSeparator=[',', ' ']","1,000,000",1000000,"equivLiteral:setThousandsSeparator=[',', ' ']",true
 35,"equivLiteral:setThousandsSeparator=[',']","1,000,000",1000000,"equivLiteral:setThousandsSeparator=[',']",true
 36,"equivLiteral:setThousandsSeparator=[' ']",1 000 000,1000000,"equivLiteral:setThousandsSeparator=[' ']",true
-37,"equivLiteral:setThousandsSeparator=[',']",1 000 + x,1000 + x,"equivLiteral:setThousandsSeparator=[',']",Sympy_Parsing_Error
-38,"equivLiteral:setThousandsSeparator=[',', ' ']","1,0",1,"equivLiteral:setThousandsSeparator=[',', ' ']",Sympy_Parsing_Error
+37,"equivLiteral:setThousandsSeparator=[',']",1 000 + x,1000 + x,"equivLiteral:setThousandsSeparator=[',']",false
+38,"equivLiteral:setThousandsSeparator=[',', ' ']","1,0",1,"equivLiteral:setThousandsSeparator=[',', ' ']",false
 39,equivSymbolic: \log_2 x,\log_2 x,\log_{2} x,equivSymbolic,true
 40,equivSymbolic: addition and multiplication non-associativity,x+y*z,(x+y) \times z,equivSymbolic,false
 41,equivSymbolic: addition associativity,x+(y+z),(x+y)+z,equivSymbolic,true
 42,equivSymbolic: addition commutativity,x+y,y+x,equivSymbolic,true
-43,equivSymbolic: division without divisor,a / b /,a / b / c,equivSymbolic,Sympy_Parsing_Error
-44,equivSymbolic: fraction with missing closing '}',\frac{1}{10,0.1,equivSymbolic,Sympy_Parsing_Error
+43,equivSymbolic: division without divisor,a / b /,a / b / c,equivSymbolic,false
+44,equivSymbolic: fraction with missing closing '}',\frac{1}{10,0.1,equivSymbolic,false
 45,equivSymbolic: percent conversion,10\%,0.1,equivSymbolic,true
 46,equivSymbolic: simple fraction vs. decimal,\frac{1}{10},0.1,equivSymbolic,true
 47,equivSymbolic: sin without backslash,sin x,\sin x,equivSymbolic,false
 48,equivSymbolic: sin/cos equivalency to tangent,\frac{\sin x}{\cos x},\tan x,equivSymbolic,true
-49,equivSymbolic: sin/cos with missing x,\frac{\sin}{\cos},\tan x,equivSymbolic,Sympy_Parsing_Error
+49,equivSymbolic: sin/cos with missing x,\frac{\sin}{\cos},\tan x,equivSymbolic,false
 50,equivSymbolic: squares expansion,(x+y)^2,x^2 + 2xy + y^2,equivSymbolic,true
 51,"equivSymbolic:setDecimalSeparator=',': percent conversion","10,1\%","0,101","equivSymbolic:setDecimalSeparator=','",true
 51b,"equivSymbolic percent conversion",10.1\%,0.101,equivSymbolic,true
@@ -58,7 +58,7 @@
 57,"equivSymbolic:setThousandsSeparator=[' ']': simple fraction vs. decimal","\frac{1}{1 000}",0.001,"equivSymbolic:setThousandsSeparator=[' ']",true
 58,"equivSymbolic:setThousandsSeparator=[',']: percent conversion","1,000\%",10,"equivSymbolic:setThousandsSeparator=[',']",true
 59,"equivSymbolic:setThousandsSeparator=[',']': simple fraction vs. decimal","\frac{1}{1,000}",0.001,"equivSymbolic:setThousandsSeparator=[',']",true
-60,"equivSymbolic:setThousandsSeparator=[',', ' ']': polynomial","x+1,2",x+1.2,"equivSymbolic:setThousandsSeparator=[',', ' ']",Sympy_Parsing_Error
+60,"equivSymbolic:setThousandsSeparator=[',', ' ']': polynomial","x+1,2",x+1.2,"equivSymbolic:setThousandsSeparator=[',', ' ']",false
 61,equivSymbolic:compareSides: addition commutativity,3+4=7,4 + 3 = 7,equivSymbolic:compareSides,true
 62,equivSymbolic:compareSides: percent conversion,30\%+4.2=4.5,0.3 + 4.2 = 4.5,equivSymbolic:compareSides,true
 63,equivSymbolic:compareSides: wrong answer,3+4=9,4 + 3 = 7,equivSymbolic:compareSides,false
@@ -96,7 +96,7 @@
 95,"isFactorised:setDecimalSeparator=',': factorised","(x+3)(x+y)",,"isFactorised:setDecimalSeparator=','",true
 96,isFactorised: 2x,2x,,"isFactorised:setThousandsSeparator=[',']",true
 97,isFactorised:simple polynomial,x^2+3x,,"isFactorised:setThousandsSeparator=[',']",false
-98,isFactorised: factorised + constant,"x(x-3)+2,000",,isFactorised:setThousandsSeparator=[' '],Sympy_Parsing_Error
+98,isFactorised: factorised + constant,"x(x-3)+2,000",,isFactorised:setThousandsSeparator=[' '],false
 99,isFactorised: factorised,(x+y)(x+3 000),,isFactorised:setThousandsSeparator=[' '],true
 100,isFactorised: factorised,(x+3 000)(x+y),,"isFactorised:setThousandsSeparator=[',', ' ']",true
 101,isFactorised:inverseResult: 2x,2x,,isFactorised:inverseResult,false
@@ -370,8 +370,6 @@
 365,isUnit,"\frac{1}{2}\text{in}",,"isUnit:allowedUnits=[inches]",false
 366,equivSymbolic:ignoreText,"3 \text{cm}",3,equivSymbolic:ignoreText,true
 367,equivSymbolic:ignoreText,"3 cm",3,equivSymbolic:ignoreText,false
-368,equivSymbolic ignoreText only works for Latext text,"3 cm long",3,equivSymbolic:ignoreText,Sympy_Parsing_Error
-369,equivSymbolic ignoreText only works for Latext text,"4 cm long",3,equivSymbolic:ignoreText,Sympy_Parsing_Error
 370,isUnit,"7 ft",,"isUnit:allowedUnits=[ft]",true
 371,isUnit,"7ft",,"isUnit:allowedUnits=[ft,mi]",true
 372,isUnit,"10in",,"isUnit:allowedUnits=['ft', 'mi']",false
@@ -401,10 +399,9 @@
 396,isUnit,"\frac{1}{2} Km",,"isUnit:allowedUnits=[km]",false
 397,equivSymbolic,{x | x<2},"(-\infty,2)","equivSymbolic",true
 398,equivLiteral,{x | x<2},"(-\infty,2)","equivLiteral",false
-399,equivLiteral,{x | 1>x<2},"(-\infty,2)","equivSymbolic",false
-399,equivLiteral,{x | x \neq 2},"(\infty,8)","equivSymbolic",false
-399,equivLiteral,{x | 1<x<2},"(-\infty,2)","equivSymbolic",false
-399,equivLiteral,{x | 1<x<2},"(-\infty,1)","equivSymbolic",false
+399.1,equivLiteral,{x | 1>x<2},"(-\infty,2)","equivSymbolic",false
+399.3,equivLiteral,{x | 1<x<2},"(-\infty,2)","equivSymbolic",false
+399.4,equivLiteral,{x | 1<x<2},"(-\infty,1)","equivSymbolic",false
 400,equivSymbolic_eqn,{x | x<2} = {x | x > 2},"{x | x<2} = {x | x > 2}","equivSymbolic",true
 401,"EV-2261",1m=100cm,1m=100cm,equivSymbolic:significantDecimalPlaces=10,true
 402,"EV-2261",x+y,x+y,equivSymbolic:significantDecimalPlaces=10,true
@@ -517,8 +514,8 @@
 508,equivValue ignoreAlphabeticCharacters,"1abcdE","1",equivSymbolic:ignoreAlphabeticCharacters,true
 509,equivSymbolic,2\frac{1}{2},\frac{5}{2},equivSymbolic:isMixedFraction,true
 510,equivValue,2\frac{1}{2},\frac{5}{2},equivValue:isMixedFraction,true
-511,"EV-2712, we reversed our minds, now this should be false",0100,100,equivSymbolic,Sympy_Parsing_Error
-512,"EV-2712, we reversed our minds, now this should be false",0100,100,equivValue,Sympy_Parsing_Error
+511,"EV-2712, we reversed our minds, now this should be false",0100,100,equivSymbolic,false
+512,"EV-2712, we reversed our minds, now this should be false",0100,100,equivValue,false
 513,equivValue:isSimpleFraction with -1/2,-1/2,-1/2,equivValue:isSimpleFraction,true
 514,equivLiteral:ignoreTrailingZeros,0.50,0.5,equivLiteral:ignoreTrailingZeros,true
 515,equivValue:ignoreTrailingZeros,0.50,0.5,equivValue,true
@@ -611,10 +608,10 @@
 613,"equivSymbolic:setThousandSeparator=[','],setDecimalSeparator=['.']","1,000","1000","equivSymbolic:setThousandsSeparator=['.'],setDecimalSeparator=[',']",false
 614,"equivSymbolic:setThousandSeparator=[','],setDecimalSeparator=['.']","1.000",1,"equivSymbolic:setThousandsSeparator=['.'],setDecimalSeparator=[',']",false
 615,"equivSymbolic:setThousandSeparator=['.'],setDecimalSeparator=[',']","1.000",1,"equivSymbolic:setThousandsSeparator=[','],setDecimalSeparator=['.']",true
-0.0,space handling,3 2,6,equivSymbolic,Sympy_Parsing_Error
+0.0,space handling,3 2,6,equivSymbolic,false
 0.1,space handling,3 x,3x,equivSymbolic,true
-0.2,space handling,1 1 1,1,equivSymbolic,Sympy_Parsing_Error
-0.3,space handling,"1,1 1",1,equivSymbolic,Sympy_Parsing_Error
+0.2,space handling,1 1 1,1,equivSymbolic,false
+0.3,space handling,"1,1 1",1,equivSymbolic,false
 0.4,space handling,"2*3",6,equivSymbolic,true
 1.0,basic list,"1,2,3","(1,2,3)",equivSymbolic,true
 1.1,basic list wrong element,"1,2,4","(1,2,3)",equivSymbolic,false
@@ -639,7 +636,7 @@
 2.1,basic list with interpretAsList over-ride parenthesis,"1,2","{1,2}",equivSymbolic:interpretAsList,true
 2.2,basic list with interpretAsList over-ride parenthesis,"2,1","{1,2}",equivSymbolic:interpretAsList,false
 3.0,thousands handling,"1,234","1,234",equivSymbolic,true
-3.1,thousands handling,"1,23","1,234",equivSymbolic,Sympy_Parsing_Error
+3.1,thousands handling,"1,23","1,234",equivSymbolic,false
 3.3,thousands handling as an interval,"(1,234)","(1,234)",equivSymbolic,true
 3.4,thousands handling as an interval,"1,234","(1,234)",equivSymbolic:interpretAsList,true
 3.5,thousands handling as an interval,"234,1","(1,234)",equivSymbolic:interpretAsList,false
@@ -707,7 +704,7 @@
 8.9,"[] default to intervals","5,4","[5,4]",equivSymbolic:interpretAsSet,true
 8.10,"[] default to intervals","4,5","[5,4]",equivSymbolic:interpretAsSet,true
 9.1,"() and two elements -> default to intervals","(4,5)","(4,5)",equivSymbolic,true
-9.2,"() and two elements -> default to intervals","{2,3}","(2, 3)",equivSymbolic,Sympy_Parsing_Error
+9.2,"() and two elements -> default to intervals","{2,3}","(2, 3)",equivSymbolic,false
 9.3,"() and two elements -> default to intervals","(2,3)","(2, 5)",equivSymbolic,false
 10.1,"() and more than two elements -> default to list","(5,4,3)","(5,4,3)",equivSymbolic,true
 10.2,"() and more than two elements -> default to list","5,4,3","(5,4,3)",equivSymbolic:interpretAsList,true
@@ -722,12 +719,12 @@
 12.4,"{}: set with two entries","[23,441,3]","{23,441,3}",equivSymbolic,true
 12.5,"{}: set with two entries","23,441,3","{23,441,3}",equivSymbolic,true
 13.1,"thousands handling","4,654","4,654",equivSymbolic,true
-13.2,"thousands handling","4,65","4,654",equivSymbolic,Sympy_Parsing_Error
+13.2,"thousands handling","4,65","4,654",equivSymbolic,false
 13.3,"thousands handling","(4,654)","(4,654)",equivSymbolic,true
 13.4,"thousands handling","4,654","(4,654)",equivSymbolic:interpretAsList,true
-14.1,"not to automatically multiple a pair of numbers separated by space","3 2","6",equivSymbolic,Sympy_Parsing_Error
+14.1,"not to automatically multiple a pair of numbers separated by space","3 2","6",equivSymbolic,false
 14.2,"not to automatically multiple a pair of numbers separated by space","3 x","3x",equivSymbolic,true
-14.3,"not to automatically multiple a pair of numbers separated by space","3 2 1","6",equivSymbolic,Sympy_Parsing_Error
+14.3,"not to automatically multiple a pair of numbers separated by space","3 2 1","6",equivSymbolic,false
 14.4,"not to automatically multiple a pair of numbers separated by space","3 x y","3xy",equivSymbolic,true
 15.1,"extra white space","1,2,3","(1 ,2,3)",equivSymbolic,true
 15.2,"extra white space","1,2,3","(1 ,2,3 )",equivSymbolic,true
@@ -766,3 +763,24 @@
 6251.6,b,b,b,equivSymbolic,true
 6251.7,x1,x1,x1,equivSymbolic,true
 6251.8,s1-x1,s1,x1,equivSymbolic,false
+3.1.1,thousands handling,"1,23,000","1,234,000",equivSymbolic,false
+3.1.2,thousands handling,"1,234,000","1,234,000",equivSymbolic,true
+3.1.3,thousands handling,",234,000",",234,000",equivSymbolic,Sympy_Parsing_Error
+3.1.4,thousands handling,",234,000,",",234,000,",equivSymbolic,Sympy_Parsing_Error
+3.1.5,thousands handling,"110,234","234,110",equivSymbolic:interpretAsSet,true
+3.1.6,thousands handling,"234,00","234,00",equivSymbolic,Sympy_Parsing_Error
+3.1.8,thousands handling,"234,1","234,1",equivSymbolic:interpretAsList,true
+9.2.1,"() and two elements -> default to intervals","{2,3}","(2, 3 )",equivSymbolic,false
+9.2.2,"() and two elements -> default to intervals","{2,3}","(2 , 3 )",equivSymbolic,false
+9.2.3,"() and two elements -> default to intervals","{2,3}","( 2 , 3 )",equivSymbolic,false
+9.2.4,"() and two elements -> default to intervals","{2,3}","( 2 , 3  )",equivSymbolic,false
+9.2.5,"() and two elements -> default to intervals","{2,3}","( 2 ,  3  )",equivSymbolic,false
+9.2.6,"() and two elements -> default to intervals","{2,3}","( 2  ,  3  )",equivSymbolic,false
+9.2.7,"() and two elements -> default to intervals","{2,3}","(  2  ,  3  )",equivSymbolic,false
+9.2.8,"() and two elements -> default to intervals","(2,3)","(  2  ,  3  )",equivSymbolic,true
+9.2.9,"() and two elements -> default to intervals","(2 ,3)","(  2  ,  3  )",equivSymbolic,true
+9.2.10,"() and two elements -> default to intervals","(2 , 3)","(  2  ,  3  )",equivSymbolic,true
+9.2.11,"() and two elements -> default to intervals","(2 , 3 )","(  2  ,  3  )",equivSymbolic,true
+9.2.12,"() and two elements -> default to intervals","( 2 , 3 )","(  2  ,  3  )",equivSymbolic,true
+9.2.13,"() and two elements -> default to intervals","( 2  , 3 )","(  2  ,  3  )",equivSymbolic,true
+9.2.14,"() and two elements -> default to intervals","( 2  ,  3 )","(  2  ,  3  )",equivSymbolic,true
