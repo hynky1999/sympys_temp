@@ -7,7 +7,6 @@ from checks import parse_checks, check_func, is_simplified
 
 def test_case(input_latex, expected_latex, options):
     checks = parse_checks(options)
-
     # perform all checks
     for check in checks:
         result = check_func[check](input_latex.strip('$'),
@@ -29,7 +28,10 @@ if __name__ == '__main__':
     test_count, fail_count, fails = 0, 0, []
     with open(test_file_name, 'r', encoding='utf-8') as test_file:
         for row in csv.reader(test_file):
-            testno, desc, input_latex, expected_latex, options, expected_result = row
+            try:
+                testno, desc, input_latex, expected_latex, options, expected_result = row
+            except ValueError:
+                continue
             test_result = test_case(input_latex, expected_latex, options)
             if test_result != expected_result:
                 fails.append(row + [test_result])

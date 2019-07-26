@@ -211,7 +211,6 @@ def convert_exp(exp):
         exp_nested = exp.exp()
     else:
         exp_nested = exp.exp_nofunc()
-
     if exp_nested:
         base = convert_exp(exp_nested)
         if isinstance(base, list):
@@ -249,6 +248,8 @@ def convert_atom(atom):
             else:                               # subscript is atom
                 subscript = convert_atom(atom.subexpr().atom())
             subscriptName = '_{' + StrPrinter().doprint(subscript) + '}'
+        if atom.LETTER().getText() + subscriptName == 'E':
+            return sympy.E
         return sympy.Symbol(atom.LETTER().getText() + subscriptName)
     elif atom.SYMBOL():
         s = atom.SYMBOL().getText()[1:]
@@ -398,9 +399,9 @@ def convert_func(func):
         expr = convert_expr(func.base)
         if func.root:
             r = convert_expr(func.root)
-            return sympy.root(expr, r)
+            return sympy.root(expr, r,evaluate=False)
         else:
-            return sympy.sqrt(expr)
+            return sympy.root(expr,2,evaluate=False)
     elif func.FUNC_SUM():
         return handle_sum_or_prod(func, "summation")
     elif func.FUNC_PROD():

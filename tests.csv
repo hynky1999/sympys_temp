@@ -784,3 +784,49 @@
 9.2.12,"() and two elements -> default to intervals","( 2 , 3 )","(  2  ,  3  )",equivSymbolic,true
 9.2.13,"() and two elements -> default to intervals","( 2  , 3 )","(  2  ,  3  )",equivSymbolic,true
 9.2.14,"() and two elements -> default to intervals","( 2  ,  3 )","(  2  ,  3  )",equivSymbolic,true
+# Keep is isRationalized for Denominator checking only
+,'isRationalized 1',1.2,,isRationalized,false
+,'isRationalized 2',-1.999,,isRationalized,false
+,'isRationalized 3',1/2,,isRationalized,true
+,'isRationalized 4',-1/2,,isRationalized,true
+,'isRationalized 5',1/-2,,isRationalized,false
+,'isRationalized 6',-1/-2,,isRationalized,false
+,'isRationalized 7',2/4,,isRationalized,false
+,'isRationalized 8',5,,isRationalized,true
+,'isRationalized 9',2/1^{0.5},,isRationalized,false
+,'isRationalized 10',2/1^{0.25},,isRationalized,false
+,'isRationalized 11',2/2^{0.7},,isRationalized,false
+,'isRationalized 12',2^{0.7}/2,,isRationalized,true
+,'isRationalized 13',\sqrt{2}/2,,isRationalized,true
+,'isRationalized 14',2/\sqrt{2},,isRationalized,false
+,'isRationalized 15',2/\sqrt{9},2/3,equivSymbolic:isRationalized,false
+,'isRationalized 16',1/\sqrt{4},1/2,equivSymbolic:isRationalized,false
+,'isRationalized 17',2/\sqrt{4},1/\sqrt{4},equivSymbolic:isRationalized,false
+,'isRationalized 18',1/\sqrt{x^2+4x+4},1/{x+2},equivSymbolic:isRationalized,false
+,'isRationalized 19',2/{x+1},2/{x+1},equivSymbolic:isRationalized,true
+,'isRationalized 20',2/3,2/3,equivValue:isRationalized,true
+,'isRationalized 21',2/5,2/5,equivSymbolic:isRationalized,true
+,'isRationalized 21b',2/5,2/5,"equivSymbolic:isRationalized,inverseResult",false
+
+# Add new feature isRational for everything, numerator, denominator and non-fractions
+,'isRational function 22',\sqrt{x+1},,isRational,false
+,'isRational function 23',\sqrt{x+1}/2,,isRational,false
+,'isRational function 24',\frac{\sqrt{x+1}}{3},,isRational,false
+,'isRational function 25',{x^0.5+1},,isRational,false
+,'isRational function 26',2/\sqrt{x+1},,isRational,false
+,'isRational function 27',(2+1)/\sqrt{x+1},,isRational,false
+,'isRational function 28',\sqrt{x+1}/x,,isRational,false
+,'isRational function 29',\frac{\sqrt{x+1}}{x},,isRational,false
+,'isRational function 28',\frac{\sqrt{x+1}}{y},,isRational,false
+,'isRational function 29',\frac{x+1}{y},,isRational,true
+,'isRational in equivSymbolic 30',\frac{x+1}{y},\frac{x+1}{y},equivSymbolic:isRational,true
+,'isRational in equivSymbolic 31',\frac{1}{2},\frac{1}{2},equivSymbolic:isRational,true
+,'isRational in equivSymbolic 32',\frac{1}{\sqrt{4}},\frac{1}{2},equivSymbolic:isRational,false
+,'isRational in equivValue 33',\frac{x+1}{y},\frac{x+1}{y},equivValue:isRational,true
+,'isRational in equivValue 34',\frac{1}{2},\frac{1}{2},equivValue:isRational,true
+,'isRational in equivValue 35',\frac{1}{\sqrt{9}},\frac{1}{3},equivValue:isRational,false
+,'isRational in equivValue 36',\frac{1}{\sqrt{9}},\frac{1}{3},"equivValue:isRational,inverseResult",true
+,'isRational in equivValue 37',\frac{1}{\sqrt{x^2}},\frac{1}{x},equivValue:isRational,false
+,'isRational in equivValue 38',\frac{1}{\sqrt{x^2}},\frac{1}{x},"equivValue:isRational,inverseResult",true
+,'isRational function 39',\sqrt{x^2},,isRational,false
+,'isRational function 40',\sqrt{ x*x },,isRational,false

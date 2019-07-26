@@ -13,13 +13,14 @@ from sympy import sympify
 from sympy import simplify 
 from sympy import expand, factor, logcombine, expand_log
 from sympy import srepr
-from sympy import ask, Q
+from sympy.assumptions import register_handler, ask, Q
 from sympy import nsimplify,radsimp
 from sympy.core import Add, Basic, Mul
 from sympy.core.basic import preorder_traversal
 from sympy.core.singleton import S
 from latex2sympy.process_latex import process_sympy
 from sympy.simplify.radsimp import fraction
+from sympy.assumptions.handlers import CommonHandler, test_closed_group
 # default values and dictionaries ---------------------------------------------
 UNIT_FOLDER = 'units'
 SI_CSV = 'si.csv'
@@ -555,10 +556,11 @@ def sympify_latex(input_latex, evaluate=None):
                             lambda x: globals()[x.group('func')](
                             sympify(str(process_sympy(x.group(2)))))
                             ,input_latex)
+            input_symbolic = sympify(input_latex,evaluate=evaluate)
         else:
-            input_latex = str(process_sympy(input_latex))
-            
-        input_symbolic = sympify(input_latex,evaluate=evaluate)
+            input_symbolic = process_sympy(input_latex)
+            if evaluate == True:
+                input_symbolic = sympify(str(input_symbolic))
         if input_symbolic == S.EmptySet:
             return None
             
@@ -652,7 +654,6 @@ def getThousandsSeparator(options):
     elif thousand_sep is None and decimal_sep is not None:
         thousand_sep = '.' if decimal_sep == ',' else ','
         
-    #print(thousand_sep)
     return thousand_sep
 
 def getDecimalSeparator(options):
@@ -666,6 +667,69 @@ def getDecimalSeparator(options):
         decimal_sep = ',' if thousand_sep == '.' else '.'
         
     return decimal_sep
+    
+class AskRationalHandler2(CommonHandler):
+    """
+    Handler for Q.rational
+    Test that an expression belongs to the field of rational numbers
+    """
+
+
+    @staticmethod
+    def Expr(expr, assumptions):
+        return True
+
+    @staticmethod
+    def Add(expr, assumptions):
+        """
+        Rational + Rational     -> Rational
+        Rational + !Rational    -> !Rational
+        !Rational + !Rational   -> ?
+        """
+        if expr.is_number:
+            if expr.as_real_imag()[1]:
+                return False
+        return test_closed_group(expr, assumptions, Q.rational_2)
+
+
+    Mul = Add
+    
+    @staticmethod
+    def Pow(expr, assumptions):
+        if ask(Q.integer(expr.exp), assumptions):
+            return ask(Q.rational_2(expr.base), assumptions)
+        else:
+            return False
+    Rational = staticmethod(CommonHandler.AlwaysTrue)
+
+    Float = staticmethod(CommonHandler.AlwaysNone)
+
+    ImaginaryUnit, Infinity, NegativeInfinity, Pi, Exp1, GoldenRatio, TribonacciConstant = \
+        [staticmethod(CommonHandler.AlwaysFalse)]*7
+
+    @staticmethod
+    def exp(expr, assumptions):
+        x = expr.args[0]
+        if ask(Q.rational(x), assumptions):
+            return ask(~Q.nonzero(x), assumptions)
+
+    @staticmethod
+    def cot(expr, assumptions):
+        x = expr.args[0]
+        if ask(Q.rational(x), assumptions):
+            return False
+
+    @staticmethod
+    def log(expr, assumptions):
+        x = expr.args[0]
+        if ask(Q.rational(x), assumptions):
+            return ask(~Q.nonzero(x - 1), assumptions)
+
+    sin, cos, tan, asin, atan = [exp]*5
+    acos, acot = log, cot
+    
+    
+register_handler('rational_2', AskRationalHandler2)
     
 def number_type(input,options):
     integer = r'\s*-?\s*\d+\s*'
@@ -1341,6 +1405,7 @@ def is_simplified(input_latex, expected_latex=None, options={}):
     simplified = (equiv
                 and str(input_symbolic)
                 == str(expand(simplify(convert(input_latex
+                ,evaluate=False
                 ,thousand_sep=getThousandsSeparator(options)
                 ,decimal_sep=getDecimalSeparator(options)
                 ,euler_number=options.get('allowEulersNumber',False))))))
@@ -1361,8 +1426,7 @@ def is_expanded(input_latex, expected_latex=None, options={}):
         return 'false'
         
     expanded = (equiv
-                and str(input_symbolic)
-                == str(expand(simplify(input_symbolic))))
+                and input_symbolic - expand(simplify(input_symbolic))) == 0
     return result(xor(expanded, 'inverseResult' in options))
 
 def is_factorised(input_latex, expected_latex=None, options={}):
@@ -1370,6 +1434,7 @@ def is_factorised(input_latex, expected_latex=None, options={}):
     '''
     equiv = number_type(input_latex,options)
     input_symbolic = convert(input_latex,
+                        evaluate=False,
                         thousand_sep=getThousandsSeparator(options),
                         decimal_sep=getDecimalSeparator(options),
                         euler_number=options.get('allowEulersNumber',False))
@@ -1398,6 +1463,7 @@ def is_rationalized(input_latex, expected_latex=None, options={}):
     
     if input_symbolic is None:
         return 'Sympy_Parsing_Error'
+    #print(input_symbolic,input_latex)
     rationalized = fraction(input_symbolic)[1]\
                    == fraction((nsimplify(input_symbolic)))[1]
     
@@ -1407,15 +1473,15 @@ def is_rational(input_latex, expected_latex=None, options={}):
     ''' check isRational
     '''
     equiv = number_type(input_latex,options)
+    equiv = is_simplified(input_latex)
     input_symbolic = convert(input_latex, evaluate=False,
                              thousand_sep=getThousandsSeparator(options),
                              decimal_sep=getDecimalSeparator(options),
                              euler_number=options.get('allowEulersNumber',False))
-    
+    #print(srepr(input_symbolic))
     if input_symbolic is None:
         return 'Sympy_Parsing_Error'
-    #print(ask(Q.rational(input_symbolic),Q.integer(sympify('x')) & Q.integer(sympify('y'))))
-    rational = ask(Q.rational(input_symbolic),Q.integer(sympify('x')) & Q.integer(sympify('y')))
+    rational = (ask(Q.rational_2(input_symbolic)) and input_symbolic.is_rational_function()) and equiv
     #print(rational)
     return result(xor(rational, 'inverseResult' in options))
 
@@ -1445,10 +1511,10 @@ def transform_set(set_latex,par_open=['(','[','{'],par_close=[')',']','}']):
             set_symbolic.append([char])
             last_char = i+1
         elif char in par_close and len(opening) == 1 and not quoted:
-            element = str(convert(search_set[last_char:i]))
-            if element == 'None':
+            element = convert(search_set[last_char:i],evaluate=True)
+            if element == None:
                 raise ValueError
-            set_symbolic[-1].append(element)
+            set_symbolic[-1].append(str(element))
             set_symbolic[-1].append(char)
             char2 = opening.pop()
             if char2 == '{' and char == '}':
@@ -1465,26 +1531,26 @@ def transform_set(set_latex,par_open=['(','[','{'],par_close=[')',']','}']):
                 quoted = False
         elif char == ',' and not quoted:
             if opening:
-                element = str(convert(search_set[last_char:i]))
-                if element == 'None':
+                element = convert(search_set[last_char:i],evaluate=True)
+                if element is None:
                     raise ValueError
-                set_symbolic[-1].append(element)
+                set_symbolic[-1].append(str(element))
                 last_char = i+1
             else:
                 if not closed:
-                    element = str(convert(search_set[last_char:i]))
-                    if element == 'None':
+                    element = convert(search_set[last_char:i],evaluate=True)
+                    if element is None:
                         raise ValueError
-                    set_symbolic.append([element])
+                    set_symbolic.append([str(element)])
                     last_char = i+1
                 if closed:
                     last_char = i+1
                     closed = False
     if last_char != len(search_set) and not closed:
-        element = str(convert(search_set[last_char:]))
-        if element == 'None':
+        element = convert(search_set[last_char:],evaluate=True)
+        if element is None:
             raise ValueError
-        set_symbolic.append([element])
+        set_symbolic.append([str(element)])
     return set_symbolic,type
     
 def set_evaluation(input_latex, expected_latex=None, options={}):
