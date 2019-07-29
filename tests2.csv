@@ -1,0 +1,464 @@
+0.0,space handling,3 2,6,equivSymbolic,false
+0.1,space handling,3 x,3x,equivSymbolic,true
+0.2,space handling,1 1 1,1,equivSymbolic,false
+0.3,space handling,"1,1 1",1,equivSymbolic,false
+0.4,space handling,"2*3",6,equivSymbolic,true
+1.0,basic list,"1,2,3","(1,2,3)",equivSymbolic,true
+1.1,basic list wrong element,"1,2,4","(1,2,3)",equivSymbolic,false
+1.2,basic list order violation,"2,1,3","(1,2,3)",equivSymbolic,false
+1.3,basic list extra element,"1,2,3,4","(1,2,3)",equivSymbolic,false
+1.4,basic list missing element,"1","(1,2,3)",equivSymbolic,false
+1.5,basic list extra white space on expected,"1,2,3","(1 ,2,3)",equivSymbolic,true
+1.6,basic list extra white space on expected,"1,2,3","(1 ,2,3 )",equivSymbolic,true
+1.7,basic list extra white space on expected,"1,2,3","( 1 ,2,3 )",equivSymbolic,true
+1.8,basic list extra white space on expected,"1,2,3","( 1 ,2,3 )",equivSymbolic,true
+1.9,basic list extra white space on expected,"1,2,3","( 1 , 2,3 )",equivSymbolic,true
+1.10,basic list extra white space on input,"1 ,2,3","(1,2,3)",equivSymbolic,true
+1.11,basic list extra white space on input,"1 , 2,3","(1,2,3)",equivSymbolic,true
+1.12,basic list extra white space on input,"1 ,  2,3","(1,2,3)",equivSymbolic,true
+1.13,basic list missing comma on expected,"1,2","(1 2)",equivSymbolic,false
+1.14,basic list missing comma on input,"1 2 3","(1,2,3)",equivSymbolic,false
+1.15,basic list missing parenthesis on expected,"1,2","(1,2",equivSymbolic,Sympy_Parsing_Error
+1.16,basic list missing parenthesis on expected,"1,2","1,2)",equivSymbolic,Sympy_Parsing_Error
+1.17,basic list missing parenthesis on expected,"1,2","0,1,2)",equivSymbolic,Sympy_Parsing_Error
+1.18,basic list missing parenthesis on expected,"0,1,2","0,1,2)",equivSymbolic,Sympy_Parsing_Error
+2.0,basic list with interpretAsList,"1,2","1,2",equivSymbolic:interpretAsList,true
+2.1,basic list with interpretAsList over-ride parenthesis,"1,2","{1,2}",equivSymbolic:interpretAsList,true
+2.2,basic list with interpretAsList over-ride parenthesis,"2,1","{1,2}",equivSymbolic:interpretAsList,false
+3.0,thousands handling,"1,234","1,234",equivSymbolic,true
+3.1,thousands handling,"1,23","1,234",equivSymbolic,false
+3.3,thousands handling as an interval,"(1,234)","(1,234)",equivSymbolic,true
+3.4,thousands handling as an interval,"1,234","(1,234)",equivSymbolic:interpretAsList,true
+3.5,thousands handling as an interval,"234,1","(1,234)",equivSymbolic:interpretAsList,false
+3.6,thousands handling as an interval,"1,234","(1,234)",equivSymbolic:interpretAsSet,true
+3.7,thousands handling as an interval,"234,1","(1,234)",equivSymbolic:interpretAsSet,true
+3.8,thousands handling,"234,1","{1,234}",equivSymbolic,true
+3.9,thousands handling,"234,1,567","{1,234,567}",equivSymbolic,true
+3.10,thousands handling,"234,1,567","1,234,567",equivSymbolic:interpretAsList,false
+3.11,thousands handling,"234,567,1","1,234,567",equivSymbolic:interpretAsList,false
+3.12,thousands handling,"234,567,0","0,234,567",equivSymbolic:interpretAsList,false
+3.13,thousands handling,"0,234,567","0,234,567",equivSymbolic:interpretAsList,true
+4.0,basic set,"0,1","{0,1}",equivSymbolic,true
+4.1,basic set,"0,1,2","{0,1,2}",equivSymbolic,true
+4.2,basic set,"0,1,2","{0,1 2}",equivSymbolic,false
+4.3,basic set,"0 1,2","{0,1,2}",equivSymbolic,false
+4.4,basic set,"2,1","{0,1,2}",equivSymbolic,false
+4.5,basic set,"0,2,1","{0,1,2}",equivSymbolic,true
+4.6,basic set,"0,2,1","0,1,2}",equivSymbolic,Sympy_Parsing_Error
+4.7,basic set,"0,2,1","{0,1,2",equivSymbolic,Sympy_Parsing_Error
+4.8,basic set,"0,2,1}","{0,1,2}",equivSymbolic,false
+4.9,basic set,"{0,2,1","{0,1,2}",equivSymbolic,false
+4.10,basic set,"{0,2,1","{0,1,2}",equivSymbolic,false
+4.11,basic set,"0 2 1","{0,1,2}",equivSymbolic,false
+4.12,basic set,"-1 0 2 1","{0,1,2}",equivSymbolic,false
+4.13,basic set,"-1","{-1}",equivSymbolic,true
+4.14,basic set,"-1,1","{-1,1}",equivSymbolic,true
+4.15,basic set,"-1,2","{-1,1}",equivSymbolic,false
+5.0,basic set with interpretAsSet ,"-1,2","(-1,1)",equivSymbolic:interpretAsSet,false
+5.1,basic set with interpretAsSet ,"-1,2","(-1,2)",equivSymbolic:interpretAsSet,true
+5.2,basic set with interpretAsSet ,"-1,2,1","(-1,2)",equivSymbolic:interpretAsSet,false
+5.3,basic set with interpretAsSet ,"1,2,1","(1,2,1)",equivSymbolic:interpretAsSet,true
+5.4,basic set with interpretAsSet ,"1,1,2,1","(1,2,1)",equivSymbolic:interpretAsSet,false
+5.5,basic set with interpretAsList ,"1,1,2,1","(1,2,1)",equivSymbolic:interpretAsList,false
+5.6,basic set with interpretAsList ,"1,1,2,1","(1,1,2,1)",equivSymbolic:interpretAsList,true
+6.0,set with variables interpretAsSet ,"x,2","(-1,1)",equivSymbolic:interpretAsSet,false
+6.1,set with variables interpretAsSet ,"x,2","(x,2)",equivSymbolic:interpretAsSet,true
+6.2,set with variables interpretAsSet ,"x+1,2","(x+1,2)",equivSymbolic:interpretAsSet,true
+6.3,set with variables interpretAsSet ,"2,x+1","(x+1,2)",equivSymbolic:interpretAsSet,true
+6.4,set with variables interpretAsSet ,"2,x + 1","(x+1,2)",equivSymbolic:interpretAsSet,true
+6.5,set with variables interpretAsSet ,"2 x + 1","(x+1,2)",equivSymbolic:interpretAsSet,false
+6.6,set with variables interpretAsSet ,"x + 1,2,3","(x + 1,2,3)",equivSymbolic:interpretAsSet,true
+6.7,set with variables interpretAsSet ,"2,x + 1,3","(x + 1,2,3)",equivSymbolic:interpretAsSet,true
+6.8,list with variables interpretAsList ,"x + 1,2,3","(x + 1,2,3)",equivSymbolic:interpretAsList,true
+6.9,list with variables interpretAsList ,"x + 1,2,3","(x + 1,3,2)",equivSymbolic:interpretAsList,false
+6.10,list with variables interpretAsList ,"x + 1,2,3","{x + 1,3,2}",equivSymbolic:interpretAsList,false
+6.11,list with variables interpretAsList ,"x + 1,2 3","{x + 1,3,2}",equivSymbolic:interpretAsList,false
+7.0,set with hierarchy ,"(x,y),(w,z)","{(x,y),(w,z)}",equivSymbolic,true
+7.1,list with hierarchy ,"(x,y),(w,z)","{(x,y),(w,z)}",equivSymbolic,true
+7.2,list with hierarchy with space,"(x,y),(w,z)","{(x,y), (w ,z)}",equivSymbolic,true
+7.3,list with hierarchy with space,"(x,y), (w,z)","{(x,y), (w ,z)}",equivSymbolic,true
+7.4,list with hierarchy with space,"(x,y) (w,z)","{(x,y), (w ,z)}",equivSymbolic,false
+7.5,list with hierarchy ,"(w,z),(x,y)","((x,y),(w,z))",equivSymbolic,false
+7.6,list with hierarchy with space ,"(w,z),(x,y)","((x,y), (w,z))",equivSymbolic,false
+7.7,set with variables interpretAsSet ,"+-(x,y),(w,z)","{(x,y),(w,z)}",equivSymbolic:interpretAsSet,true
+7.8,set with variables interpretAsSet ,"(p,q),(x,y),(w,z)","{(x,y),(w,z)}",equivSymbolic:interpretAsSet,false
+7.9,set with variables interpretAsSet ,"(p,q),(x,y),(w,z)","{(p,q),(x,y),(w,z)}",equivSymbolic:interpretAsSet,true
+8.1,"[] default to intervals","[4,5]","[4,5]",equivSymbolic,true
+8.2,"[] default to intervals","(4,5]","(4,5]",equivSymbolic,true
+8.3,"[] default to intervals","[4,5)","[4,5)",equivSymbolic,true
+8.4,"[] default to intervals","(4,5)","(4,5)",equivSymbolic,true
+8.5,"[] default to intervals","(5,4]","[5,4]",equivSymbolic,Sympy_Parsing_Error
+8.6,"[] default to intervals","[5,4)","[5,4]",equivSymbolic,Sympy_Parsing_Error
+8.7,"[] default to intervals","(5,4)","[5,4]",equivSymbolic,Sympy_Parsing_Error
+8.8,"[] default to intervals","2,5","[5,4]",equivSymbolic:interpretAsSet,false
+8.9,"[] default to intervals","5,4","[5,4]",equivSymbolic:interpretAsSet,true
+8.10,"[] default to intervals","4,5","[5,4]",equivSymbolic:interpretAsSet,true
+9.1,"() and two elements -> default to intervals","(4,5)","(4,5)",equivSymbolic,true
+9.2,"() and two elements -> default to intervals","{2,3}","(2, 3)",equivSymbolic,false
+9.3,"() and two elements -> default to intervals","(2,3)","(2, 5)",equivSymbolic,false
+10.1,"() and more than two elements -> default to list","(5,4,3)","(5,4,3)",equivSymbolic,true
+10.2,"() and more than two elements -> default to list","5,4,3","(5,4,3)",equivSymbolic:interpretAsList,true
+10.3,"() and more than two elements -> default to list","(5,4,3)","(5,4,3)",equivSymbolic,true
+11.1,"{} -> default to sets","1 3 4","{2, 3, 4}",equivSymbolic,false
+11.2,"{} -> default to sets","2 3 4","{2, 3, 4}",equivSymbolic,false
+11.3,"{} -> default to sets","(2, 3, 4)","{2, 3, 4}",equivSymbolic:interpretAsSet,true
+11.4,"{} -> default to sets","(3, 2, 4)","{2, 3, 4}",equivSymbolic:interpretAsSet,true
+12.1,"(): list with two entries","(23,441,3)","(23,441,3)",equivSymbolic,true
+12.2,"(): list with two entries","23,441,3","(23,441,3)",equivSymbolic,true
+12.3,"{}: set with two entries","{23,441,3}","{23,441,3}",equivSymbolic,true
+12.4,"{}: set with two entries","[23,441,3]","{23,441,3}",equivSymbolic,true
+12.5,"{}: set with two entries","23,441,3","{23,441,3}",equivSymbolic,true
+13.1,"thousands handling","4,654","4,654",equivSymbolic,true
+13.2,"thousands handling","4,65","4,654",equivSymbolic,false
+13.3,"thousands handling","(4,654)","(4,654)",equivSymbolic,true
+13.4,"thousands handling","4,654","(4,654)",equivSymbolic:interpretAsList,true
+14.1,"not to automatically multiple a pair of numbers separated by space","3 2","6",equivSymbolic,false
+14.2,"not to automatically multiple a pair of numbers separated by space","3 x","3x",equivSymbolic,true
+14.3,"not to automatically multiple a pair of numbers separated by space","3 2 1","6",equivSymbolic,false
+14.4,"not to automatically multiple a pair of numbers separated by space","3 x y","3xy",equivSymbolic,true
+15.1,"extra white space","1,2,3","(1 ,2,3)",equivSymbolic,true
+15.2,"extra white space","1,2,3","(1 ,2,3 )",equivSymbolic,true
+15.3,"extra white space","1,2,3","( 1 ,2,3 )",equivSymbolic,true
+15.4,"extra white space","1,2,3","( 1 , 2,3 )",equivSymbolic,true
+15.5,"extra white space","1,2,3","( 1 ,  2,3 )",equivSymbolic,true
+15.6,"extra white space on input","1 ,2,3","(1,2,3)",equivSymbolic,true
+15.7,"extra white space on input","1 , 2,3","(1,2,3)",equivSymbolic,true
+15.8,"extra white space on input","1 ,  2,3","(1,2,3)",equivSymbolic,true
+15.9,"extra white space on input","1 ,  2,3","(1,2,3)",equivSymbolic,true
+15.10,"extra white space on input"," 1 ,  2,3","(1,2,3)",equivSymbolic,true
+15.11,"extra white space on input"," 1 ,  2,3 ","(1,2,3)",equivSymbolic,true
+15.12,"extra white space on input","1 , 2, 3","(1,2,3)",equivSymbolic,true
+15.13,"extra white space on input","1, 2, 3","(1,2,3)",equivSymbolic,true
+15.14,"extra white space on input","1 , 2,3","(1,2,3)",equivSymbolic,true
+16.1,"basic list missing comma on expected","1,2,3","(1 2 3)",equivSymbolic,false
+16.2,"basic list missing comma on input","1 2,3","(1,2,3)",equivSymbolic,false
+16.3,"basic list missing parenthesis on expected","1,2,3","(1,2,3",equivSymbolic,Sympy_Parsing_Error
+16.4,"basic list missing parenthesis on expected","1,2,3","1,2,3)",equivSymbolic,Sympy_Parsing_Error
+17.1,"() conflict with interpretAsSet","(1,2)","(2,1)",equivSymbolic:interpretAsSet,true
+17.2,"() conflict with interpretAsSet","(1,2)","(1,2)",equivSymbolic:interpretAsSet,true
+17.3,"() conflict with interpretAsList","(1,2)","(2,1)",equivSymbolic:interpretAsList,false
+18.1,"{} -> default to sets","1,1+x,3","{1, 1+x, 3}",equivSymbolic,true
+18.2,"{} -> default to sets","1,3,1+x","{1, 1+x, 3}",equivSymbolic,true
+18.3,"() and more than two elements -> default to list","(1,1+x,3)","(1,1+x,3)",equivSymbolic,true
+18.4,"() and more than two elements -> default to list","(1,3,1+x)","(1,1+x,3)",equivSymbolic,false
+18.5,"() and more than two elements -> default to list","(1,1+x,3,2-x)","(1,1+x,3)",equivSymbolic,false
+19.1,"{} -> default to sets","{{1,2}, {3,4}}","{{1,2}, {3,4}}",equivSymbolic,true
+19.2,"{} -> default to sets","{{3,4}, {1,2}}","{{1,2}, {3,4}}",equivSymbolic,true
+19.3,"{} -> default to sets","{1,2, 3, 4}","{{1,2}, {3,4}}",equivSymbolic,false
+6251.0,s,s,s,equivSymbolic,true
+6251.1,s1,s1,s1,equivSymbolic,true
+6251.3,x,s,x,equivSymbolic,false
+6251.4,x,x,x,equivSymbolic,true
+6251.5,x double quotes,"x","x",equivSymbolic,true
+6251.6,b,b,b,equivSymbolic,true
+6251.7,x1,x1,x1,equivSymbolic,true
+6251.8,s1-x1,s1,x1,equivSymbolic,false
+3.1.1,thousands handling,"1,23,000","1,234,000",equivSymbolic,false
+3.1.2,thousands handling,"1,234,000","1,234,000",equivSymbolic,true
+3.1.3,thousands handling,",234,000",",234,000",equivSymbolic,Sympy_Parsing_Error
+3.1.4,thousands handling,",234,000,",",234,000,",equivSymbolic,Sympy_Parsing_Error
+3.1.5,thousands handling,"110,234","234,110",equivSymbolic:interpretAsSet,true
+3.1.6,thousands handling,"234,00","234,00",equivSymbolic,Sympy_Parsing_Error
+3.1.8,thousands handling,"234,1","234,1",equivSymbolic:interpretAsList,true
+9.2.1,"() and two elements -> default to intervals","{2,3}","(2, 3 )",equivSymbolic,false
+9.2.2,"() and two elements -> default to intervals","{2,3}","(2 , 3 )",equivSymbolic,false
+9.2.3,"() and two elements -> default to intervals","{2,3}","( 2 , 3 )",equivSymbolic,false
+9.2.4,"() and two elements -> default to intervals","{2,3}","( 2 , 3  )",equivSymbolic,false
+9.2.5,"() and two elements -> default to intervals","{2,3}","( 2 ,  3  )",equivSymbolic,false
+9.2.6,"() and two elements -> default to intervals","{2,3}","( 2  ,  3  )",equivSymbolic,false
+9.2.7,"() and two elements -> default to intervals","{2,3}","(  2  ,  3  )",equivSymbolic,false
+9.2.8,"() and two elements -> default to intervals","(2,3)","(  2  ,  3  )",equivSymbolic,true
+9.2.9,"() and two elements -> default to intervals","(2 ,3)","(  2  ,  3  )",equivSymbolic,true
+9.2.10,"() and two elements -> default to intervals","(2 , 3)","(  2  ,  3  )",equivSymbolic,true
+9.2.11,"() and two elements -> default to intervals","(2 , 3 )","(  2  ,  3  )",equivSymbolic,true
+9.2.12,"() and two elements -> default to intervals","( 2 , 3 )","(  2  ,  3  )",equivSymbolic,true
+9.2.13,"() and two elements -> default to intervals","( 2  , 3 )","(  2  ,  3  )",equivSymbolic,true
+9.2.14,"() and two elements -> default to intervals","( 2  ,  3 )","(  2  ,  3  )",equivSymbolic,true
+# Keep is isRationalized for Denominator checking only
+,'isRationalized 1',1.2,,isRationalized,false
+,'isRationalized 2',-1.999,,isRationalized,false
+,'isRationalized 3',1/2,,isRationalized,true
+,'isRationalized 4',-1/2,,isRationalized,true
+,'isRationalized 5',1/-2,,isRationalized,false
+,'isRationalized 6',-1/-2,,isRationalized,false
+,'isRationalized 7',2/4,,isRationalized,false
+,'isRationalized 8',5,,isRationalized,true
+,'isRationalized 9',2/1^{0.5},,isRationalized,false
+,'isRationalized 10',2/1^{0.25},,isRationalized,false
+,'isRationalized 11',2/2^{0.7},,isRationalized,false
+,'isRationalized 12',2^{0.7}/2,,isRationalized,true
+,'isRationalized 13',\sqrt{2}/2,,isRationalized,true
+,'isRationalized 14',2/\sqrt{2},,isRationalized,false
+,'isRationalized 15',2/\sqrt{9},2/3,equivSymbolic:isRationalized,false
+,'isRationalized 16',1/\sqrt{4},1/2,equivSymbolic:isRationalized,false
+,'isRationalized 17',2/\sqrt{4},1/\sqrt{4},equivSymbolic:isRationalized,false
+,'isRationalized 18',1/\sqrt{x^2+4x+4},1/{x+2},equivSymbolic:isRationalized,false
+,'isRationalized 19',2/{x+1},2/{x+1},equivSymbolic:isRationalized,true
+,'isRationalized 20',2/3,2/3,equivValue:isRationalized,true
+,'isRationalized 21',2/5,2/5,equivSymbolic:isRationalized,true
+,'isRationalized 21b',2/5,2/5,"equivSymbolic:isRationalized,inverseResult",false
+
+# Add new feature isRational for everything, numerator, denominator and non-fractions
+,'isRational function 22',\sqrt{x+1},,isRational,false
+,'isRational function 23',\sqrt{x+1}/2,,isRational,false
+,'isRational function 24',\frac{\sqrt{x+1}}{3},,isRational,false
+,'isRational function 25',{x^0.5+1},,isRational,false
+,'isRational function 26',2/\sqrt{x+1},,isRational,false
+,'isRational function 27',(2+1)/\sqrt{x+1},,isRational,false
+,'isRational function 28',\sqrt{x+1}/x,,isRational,false
+,'isRational function 29',\frac{\sqrt{x+1}}{x},,isRational,false
+,'isRational function 28',\frac{\sqrt{x+1}}{y},,isRational,false
+,'isRational function 29',\frac{x+1}{y},,isRational,true
+,'isRational in equivSymbolic 30',\frac{x+1}{y},\frac{x+1}{y},equivSymbolic:isRational,true
+,'isRational in equivSymbolic 31',\frac{1}{2},\frac{1}{2},equivSymbolic:isRational,true
+,'isRational in equivSymbolic 32',\frac{1}{\sqrt{4}},\frac{1}{2},equivSymbolic:isRational,false
+,'isRational in equivValue 33',\frac{x+1}{y},\frac{x+1}{y},equivValue:isRational,true
+,'isRational in equivValue 34',\frac{1}{2},\frac{1}{2},equivValue:isRational,true
+,'isRational in equivValue 35',\frac{1}{\sqrt{9}},\frac{1}{3},equivValue:isRational,false
+,'isRational in equivValue 36',\frac{1}{\sqrt{9}},\frac{1}{3},"equivValue:isRational,inverseResult",true
+,'isRational in equivValue 37',\frac{1}{\sqrt{x^2}},\frac{1}{x},equivValue:isRational,false
+,'isRational in equivValue 38',\frac{1}{\sqrt{x^2}},\frac{1}{x},"equivValue:isRational,inverseResult",true
+,'isRational function 39',\sqrt{x^2},,isRational,false
+,'isRational function 40',\sqrt{ x*x },,isRational,false
+
+#  equivValue Support the same as equivValue
+603,EV-5574 symbol conversion to latex,90°,90°,equivValue,true
+604,textitsupport EV-5722,20 centimeters,20 \textit{centimeters},equivValue,true
+605,textitsupport EV-5722,24 square centimeters,24  \textit{square} \textit{centimeters},equivValue,true
+606,circ,-270\circ ,-270°,equivValue,false
+607,circ,-60\circ ,-60°,equivValue,false
+608,circ,45\circ ,45°,equivValue,false
+609,circ,-375\circ ,-375°,equivValue,false
+610,"equivValue:setThousandSeparator=['.'],setDecimalSeparator=[',']","1.001,0","1.000,0","equivValue:setThousandsSeparator=['.'],setDecimalSeparator=[',']",false
+611,"equivValue:setThousandSeparator=[','],setDecimalSeparator=['.']","1,000.50","1000.50","equivValue:setThousandsSeparator=[','],setDecimalSeparator=['.']",true
+612,"equivValue:setThousandSeparator=[','],setDecimalSeparator=['.']","1,000.60","1000.50","equivValue:setThousandsSeparator=['.'],setDecimalSeparator=[',']",false
+613,"equivValue:setThousandSeparator=[','],setDecimalSeparator=['.']","1,000","1000","equivValue:setThousandsSeparator=['.'],setDecimalSeparator=[',']",false
+614,"equivValue:setThousandSeparator=[','],setDecimalSeparator=['.']","1.000",1,"equivValue:setThousandsSeparator=['.'],setDecimalSeparator=[',']",false
+615,"equivValue:setThousandSeparator=['.'],setDecimalSeparator=[',']","1.000",1,"equivValue:setThousandsSeparator=[','],setDecimalSeparator=['.']",true
+0.0,space handling,3 2,6,equivValue,false
+0.1,space handling,3 x,3x,equivValue,true
+0.2,space handling,1 1 1,1,equivValue,false
+0.3,space handling,"1,1 1",1,equivValue,false
+0.4,space handling,"2*3",6,equivValue,true
+1.0,basic list,"1,2,3","(1,2,3)",equivValue,true
+1.1,basic list wrong element,"1,2,4","(1,2,3)",equivValue,false
+1.2,basic list order violation,"2,1,3","(1,2,3)",equivValue,false
+1.3,basic list extra element,"1,2,3,4","(1,2,3)",equivValue,false
+1.4,basic list missing element,"1","(1,2,3)",equivValue,false
+1.5,basic list extra white space on expected,"1,2,3","(1 ,2,3)",equivValue,true
+1.6,basic list extra white space on expected,"1,2,3","(1 ,2,3 )",equivValue,true
+1.7,basic list extra white space on expected,"1,2,3","( 1 ,2,3 )",equivValue,true
+1.8,basic list extra white space on expected,"1,2,3","( 1 ,2,3 )",equivValue,true
+1.9,basic list extra white space on expected,"1,2,3","( 1 , 2,3 )",equivValue,true
+1.10,basic list extra white space on input,"1 ,2,3","(1,2,3)",equivValue,true
+1.11,basic list extra white space on input,"1 , 2,3","(1,2,3)",equivValue,true
+1.12,basic list extra white space on input,"1 ,  2,3","(1,2,3)",equivValue,true
+1.13,basic list missing comma on expected,"1,2","(1 2)",equivValue,false
+1.14,basic list missing comma on input,"1 2 3","(1,2,3)",equivValue,false
+1.15,basic list missing parenthesis on expected,"1,2","(1,2",equivValue,Sympy_Parsing_Error
+1.16,basic list missing parenthesis on expected,"1,2","1,2)",equivValue,Sympy_Parsing_Error
+1.17,basic list missing parenthesis on expected,"1,2","0,1,2)",equivValue,Sympy_Parsing_Error
+1.18,basic list missing parenthesis on expected,"0,1,2","0,1,2)",equivValue,Sympy_Parsing_Error
+2.0,basic list with interpretAsList,"1,2","1,2",equivValue:interpretAsList,true
+2.1,basic list with interpretAsList over-ride parenthesis,"1,2","{1,2}",equivValue:interpretAsList,true
+2.2,basic list with interpretAsList over-ride parenthesis,"2,1","{1,2}",equivValue:interpretAsList,false
+3.0,thousands handling,"1,234","1,234",equivValue,true
+3.1,thousands handling,"1,23","1,234",equivValue,false
+3.3,thousands handling as an interval,"(1,234)","(1,234)",equivValue,true
+3.4,thousands handling as an interval,"1,234","(1,234)",equivValue:interpretAsList,true
+3.5,thousands handling as an interval,"234,1","(1,234)",equivValue:interpretAsList,false
+3.6,thousands handling as an interval,"1,234","(1,234)",equivValue:interpretAsSet,true
+3.7,thousands handling as an interval,"234,1","(1,234)",equivValue:interpretAsSet,true
+3.8,thousands handling,"234,1","{1,234}",equivValue,true
+3.9,thousands handling,"234,1,567","{1,234,567}",equivValue,true
+3.10,thousands handling,"234,1,567","1,234,567",equivValue:interpretAsList,false
+3.11,thousands handling,"234,567,1","1,234,567",equivValue:interpretAsList,false
+3.12,thousands handling,"234,567,0","0,234,567",equivValue:interpretAsList,false
+3.13,thousands handling,"0,234,567","0,234,567",equivValue:interpretAsList,true
+4.0,basic set,"0,1","{0,1}",equivValue,true
+4.1,basic set,"0,1,2","{0,1,2}",equivValue,true
+4.2,basic set,"0,1,2","{0,1 2}",equivValue,false
+4.3,basic set,"0 1,2","{0,1,2}",equivValue,false
+4.4,basic set,"2,1","{0,1,2}",equivValue,false
+4.5,basic set,"0,2,1","{0,1,2}",equivValue,true
+4.6,basic set,"0,2,1","0,1,2}",equivValue,Sympy_Parsing_Error
+4.7,basic set,"0,2,1","{0,1,2",equivValue,Sympy_Parsing_Error
+4.8,basic set,"0,2,1}","{0,1,2}",equivValue,false
+4.9,basic set,"{0,2,1","{0,1,2}",equivValue,false
+4.10,basic set,"{0,2,1","{0,1,2}",equivValue,false
+4.11,basic set,"0 2 1","{0,1,2}",equivValue,false
+4.12,basic set,"-1 0 2 1","{0,1,2}",equivValue,false
+4.13,basic set,"-1","{-1}",equivValue,true
+4.14,basic set,"-1,1","{-1,1}",equivValue,true
+4.15,basic set,"-1,2","{-1,1}",equivValue,false
+5.0,basic set with interpretAsSet ,"-1,2","(-1,1)",equivValue:interpretAsSet,false
+5.1,basic set with interpretAsSet ,"-1,2","(-1,2)",equivValue:interpretAsSet,true
+5.2,basic set with interpretAsSet ,"-1,2,1","(-1,2)",equivValue:interpretAsSet,false
+5.3,basic set with interpretAsSet ,"1,2,1","(1,2,1)",equivValue:interpretAsSet,true
+5.4,basic set with interpretAsSet ,"1,1,2,1","(1,2,1)",equivValue:interpretAsSet,false
+5.5,basic set with interpretAsList ,"1,1,2,1","(1,2,1)",equivValue:interpretAsList,false
+5.6,basic set with interpretAsList ,"1,1,2,1","(1,1,2,1)",equivValue:interpretAsList,true
+6.0,set with variables interpretAsSet ,"x,2","(-1,1)",equivValue:interpretAsSet,false
+6.1,set with variables interpretAsSet ,"x,2","(x,2)",equivValue:interpretAsSet,true
+6.2,set with variables interpretAsSet ,"x+1,2","(x+1,2)",equivValue:interpretAsSet,true
+6.3,set with variables interpretAsSet ,"2,x+1","(x+1,2)",equivValue:interpretAsSet,true
+6.4,set with variables interpretAsSet ,"2,x + 1","(x+1,2)",equivValue:interpretAsSet,true
+6.5,set with variables interpretAsSet ,"2 x + 1","(x+1,2)",equivValue:interpretAsSet,false
+6.6,set with variables interpretAsSet ,"x + 1,2,3","(x + 1,2,3)",equivValue:interpretAsSet,true
+6.7,set with variables interpretAsSet ,"2,x + 1,3","(x + 1,2,3)",equivValue:interpretAsSet,true
+6.8,list with variables interpretAsList ,"x + 1,2,3","(x + 1,2,3)",equivValue:interpretAsList,true
+6.9,list with variables interpretAsList ,"x + 1,2,3","(x + 1,3,2)",equivValue:interpretAsList,false
+6.10,list with variables interpretAsList ,"x + 1,2,3","{x + 1,3,2}",equivValue:interpretAsList,false
+6.11,list with variables interpretAsList ,"x + 1,2 3","{x + 1,3,2}",equivValue:interpretAsList,false
+7.0,set with hierarchy ,"(x,y),(w,z)","{(x,y),(w,z)}",equivValue,true
+7.1,list with hierarchy ,"(x,y),(w,z)","{(x,y),(w,z)}",equivValue,true
+7.2,list with hierarchy with space,"(x,y),(w,z)","{(x,y), (w ,z)}",equivValue,true
+7.3,list with hierarchy with space,"(x,y), (w,z)","{(x,y), (w ,z)}",equivValue,true
+7.4,list with hierarchy with space,"(x,y) (w,z)","{(x,y), (w ,z)}",equivValue,false
+7.5,list with hierarchy ,"(w,z),(x,y)","((x,y),(w,z))",equivValue,false
+7.6,list with hierarchy with space ,"(w,z),(x,y)","((x,y), (w,z))",equivValue,false
+7.7,set with variables interpretAsSet ,"+-(x,y),(w,z)","{(x,y),(w,z)}",equivValue:interpretAsSet,true
+7.8,set with variables interpretAsSet ,"(p,q),(x,y),(w,z)","{(x,y),(w,z)}",equivValue:interpretAsSet,false
+7.9,set with variables interpretAsSet ,"(p,q),(x,y),(w,z)","{(p,q),(x,y),(w,z)}",equivValue:interpretAsSet,true
+8.1,"[] default to intervals","[4,5]","[4,5]",equivValue,true
+8.2,"[] default to intervals","(4,5]","(4,5]",equivValue,true
+8.3,"[] default to intervals","[4,5)","[4,5)",equivValue,true
+8.4,"[] default to intervals","(4,5)","(4,5)",equivValue,true
+8.5,"[] default to intervals","(5,4]","[5,4]",equivValue,Sympy_Parsing_Error
+8.6,"[] default to intervals","[5,4)","[5,4]",equivValue,Sympy_Parsing_Error
+8.7,"[] default to intervals","(5,4)","[5,4]",equivValue,Sympy_Parsing_Error
+8.8,"[] default to intervals","2,5","[5,4]",equivValue:interpretAsSet,false
+8.9,"[] default to intervals","5,4","[5,4]",equivValue:interpretAsSet,true
+8.10,"[] default to intervals","4,5","[5,4]",equivValue:interpretAsSet,true
+9.1,"() and two elements -> default to intervals","(4,5)","(4,5)",equivValue,true
+9.2,"() and two elements -> default to intervals","{2,3}","(2, 3)",equivValue,false
+9.3,"() and two elements -> default to intervals","(2,3)","(2, 5)",equivValue,false
+10.1,"() and more than two elements -> default to list","(5,4,3)","(5,4,3)",equivValue,true
+10.2,"() and more than two elements -> default to list","5,4,3","(5,4,3)",equivValue:interpretAsList,true
+10.3,"() and more than two elements -> default to list","(5,4,3)","(5,4,3)",equivValue,true
+11.1,"{} -> default to sets","1 3 4","{2, 3, 4}",equivValue,false
+11.2,"{} -> default to sets","2 3 4","{2, 3, 4}",equivValue,false
+11.3,"{} -> default to sets","(2, 3, 4)","{2, 3, 4}",equivValue:interpretAsSet,true
+11.4,"{} -> default to sets","(3, 2, 4)","{2, 3, 4}",equivValue:interpretAsSet,true
+12.1,"(): list with two entries","(23,441,3)","(23,441,3)",equivValue,true
+12.2,"(): list with two entries","23,441,3","(23,441,3)",equivValue,true
+12.3,"{}: set with two entries","{23,441,3}","{23,441,3}",equivValue,true
+12.4,"{}: set with two entries","[23,441,3]","{23,441,3}",equivValue,true
+12.5,"{}: set with two entries","23,441,3","{23,441,3}",equivValue,true
+13.1,"thousands handling","4,654","4,654",equivValue,true
+13.2,"thousands handling","4,65","4,654",equivValue,false
+13.3,"thousands handling","(4,654)","(4,654)",equivValue,true
+13.4,"thousands handling","4,654","(4,654)",equivValue:interpretAsList,true
+14.1,"not to automatically multiple a pair of numbers separated by space","3 2","6",equivValue,false
+14.2,"not to automatically multiple a pair of numbers separated by space","3 x","3x",equivValue,true
+14.3,"not to automatically multiple a pair of numbers separated by space","3 2 1","6",equivValue,false
+14.4,"not to automatically multiple a pair of numbers separated by space","3 x y","3xy",equivValue,true
+15.1,"extra white space","1,2,3","(1 ,2,3)",equivValue,true
+15.2,"extra white space","1,2,3","(1 ,2,3 )",equivValue,true
+15.3,"extra white space","1,2,3","( 1 ,2,3 )",equivValue,true
+15.4,"extra white space","1,2,3","( 1 , 2,3 )",equivValue,true
+15.5,"extra white space","1,2,3","( 1 ,  2,3 )",equivValue,true
+15.6,"extra white space on input","1 ,2,3","(1,2,3)",equivValue,true
+15.7,"extra white space on input","1 , 2,3","(1,2,3)",equivValue,true
+15.8,"extra white space on input","1 ,  2,3","(1,2,3)",equivValue,true
+15.9,"extra white space on input","1 ,  2,3","(1,2,3)",equivValue,true
+15.10,"extra white space on input"," 1 ,  2,3","(1,2,3)",equivValue,true
+15.11,"extra white space on input"," 1 ,  2,3 ","(1,2,3)",equivValue,true
+15.12,"extra white space on input","1 , 2, 3","(1,2,3)",equivValue,true
+15.13,"extra white space on input","1, 2, 3","(1,2,3)",equivValue,true
+15.14,"extra white space on input","1 , 2,3","(1,2,3)",equivValue,true
+16.1,"basic list missing comma on expected","1,2,3","(1 2 3)",equivValue,false
+16.2,"basic list missing comma on input","1 2,3","(1,2,3)",equivValue,false
+16.3,"basic list missing parenthesis on expected","1,2,3","(1,2,3",equivValue,Sympy_Parsing_Error
+16.4,"basic list missing parenthesis on expected","1,2,3","1,2,3)",equivValue,Sympy_Parsing_Error
+17.1,"() conflict with interpretAsSet","(1,2)","(2,1)",equivValue:interpretAsSet,true
+17.2,"() conflict with interpretAsSet","(1,2)","(1,2)",equivValue:interpretAsSet,true
+17.3,"() conflict with interpretAsList","(1,2)","(2,1)",equivValue:interpretAsList,false
+18.1,"{} -> default to sets","1,1+x,3","{1, 1+x, 3}",equivValue,true
+18.2,"{} -> default to sets","1,3,1+x","{1, 1+x, 3}",equivValue,true
+18.3,"() and more than two elements -> default to list","(1,1+x,3)","(1,1+x,3)",equivValue,true
+18.4,"() and more than two elements -> default to list","(1,3,1+x)","(1,1+x,3)",equivValue,false
+18.5,"() and more than two elements -> default to list","(1,1+x,3,2-x)","(1,1+x,3)",equivValue,false
+19.1,"{} -> default to sets","{{1,2}, {3,4}}","{{1,2}, {3,4}}",equivValue,true
+19.2,"{} -> default to sets","{{3,4}, {1,2}}","{{1,2}, {3,4}}",equivValue,true
+19.3,"{} -> default to sets","{1,2, 3, 4}","{{1,2}, {3,4}}",equivValue,false
+6251.0,s,s,s,equivValue,true
+6251.1,s1,s1,s1,equivValue,true
+6251.3,x,s,x,equivValue,false
+6251.4,x,x,x,equivValue,true
+6251.5,x double quotes,"x","x",equivValue,true
+6251.6,b,b,b,equivValue,true
+6251.7,x1,x1,x1,equivValue,true
+6251.8,s1-x1,s1,x1,equivValue,false
+3.1.1,thousands handling,"1,23,000","1,234,000",equivValue,false
+3.1.2,thousands handling,"1,234,000","1,234,000",equivValue,true
+3.1.3,thousands handling,",234,000",",234,000",equivValue,Sympy_Parsing_Error
+3.1.4,thousands handling,",234,000,",",234,000,",equivValue,Sympy_Parsing_Error
+3.1.5,thousands handling,"110,234","234,110",equivValue:interpretAsSet,true
+3.1.6,thousands handling,"234,00","234,00",equivValue,Sympy_Parsing_Error
+3.1.8,thousands handling,"234,1","234,1",equivValue:interpretAsList,true
+9.2.1,"() and two elements -> default to intervals","{2,3}","(2, 3 )",equivValue,false
+9.2.2,"() and two elements -> default to intervals","{2,3}","(2 , 3 )",equivValue,false
+9.2.3,"() and two elements -> default to intervals","{2,3}","( 2 , 3 )",equivValue,false
+9.2.4,"() and two elements -> default to intervals","{2,3}","( 2 , 3  )",equivValue,false
+9.2.5,"() and two elements -> default to intervals","{2,3}","( 2 ,  3  )",equivValue,false
+9.2.6,"() and two elements -> default to intervals","{2,3}","( 2  ,  3  )",equivValue,false
+9.2.7,"() and two elements -> default to intervals","{2,3}","(  2  ,  3  )",equivValue,false
+9.2.8,"() and two elements -> default to intervals","(2,3)","(  2  ,  3  )",equivValue,true
+9.2.9,"() and two elements -> default to intervals","(2 ,3)","(  2  ,  3  )",equivValue,true
+9.2.10,"() and two elements -> default to intervals","(2 , 3)","(  2  ,  3  )",equivValue,true
+9.2.11,"() and two elements -> default to intervals","(2 , 3 )","(  2  ,  3  )",equivValue,true
+9.2.12,"() and two elements -> default to intervals","( 2 , 3 )","(  2  ,  3  )",equivValue,true
+9.2.13,"() and two elements -> default to intervals","( 2  , 3 )","(  2  ,  3  )",equivValue,true
+9.2.14,"() and two elements -> default to intervals","( 2  ,  3 )","(  2  ,  3  )",equivValue,true
+# Keep is isRationalized for Denominator checking only
+,'isRationalized 1',1.2,,isRationalized,false
+,'isRationalized 2',-1.999,,isRationalized,false
+,'isRationalized 3',1/2,,isRationalized,true
+,'isRationalized 4',-1/2,,isRationalized,true
+,'isRationalized 5',1/-2,,isRationalized,false
+,'isRationalized 6',-1/-2,,isRationalized,false
+,'isRationalized 7',2/4,,isRationalized,false
+,'isRationalized 8',5,,isRationalized,true
+,'isRationalized 9',2/1^{0.5},,isRationalized,false
+,'isRationalized 10',2/1^{0.25},,isRationalized,false
+,'isRationalized 11',2/2^{0.7},,isRationalized,false
+,'isRationalized 12',2^{0.7}/2,,isRationalized,true
+,'isRationalized 13',\sqrt{2}/2,,isRationalized,true
+,'isRationalized 14',2/\sqrt{2},,isRationalized,false
+,'isRationalized 15',2/\sqrt{9},2/3,equivValue:isRationalized,false
+,'isRationalized 16',1/\sqrt{4},1/2,equivValue:isRationalized,false
+,'isRationalized 17',2/\sqrt{4},1/\sqrt{4},equivValue:isRationalized,false
+,'isRationalized 18',1/\sqrt{x^2+4x+4},1/{x+2},equivValue:isRationalized,false
+,'isRationalized 19',2/{x+1},2/{x+1},equivValue:isRationalized,true
+,'isRationalized 20',2/3,2/3,equivValue:isRationalized,true
+,'isRationalized 21',2/5,2/5,equivValue:isRationalized,true
+,'isRationalized 21b',2/5,2/5,"equivValue:isRationalized,inverseResult",false
+
+# Add new feature isRational for everything, numerator, denominator and non-fractions
+,'isRational function 22',\sqrt{x+1},,isRational,false
+,'isRational function 23',\sqrt{x+1}/2,,isRational,false
+,'isRational function 24',\frac{\sqrt{x+1}}{3},,isRational,false
+,'isRational function 25',{x^0.5+1},,isRational,false
+,'isRational function 26',2/\sqrt{x+1},,isRational,false
+,'isRational function 27',(2+1)/\sqrt{x+1},,isRational,false
+,'isRational function 28',\sqrt{x+1}/x,,isRational,false
+,'isRational function 29',\frac{\sqrt{x+1}}{x},,isRational,false
+,'isRational function 28',\frac{\sqrt{x+1}}{y},,isRational,false
+,'isRational function 29',\frac{x+1}{y},,isRational,true
+,'isRational in equivValue 30',\frac{x+1}{y},\frac{x+1}{y},equivValue:isRational,true
+,'isRational in equivValue 31',\frac{1}{2},\frac{1}{2},equivValue:isRational,true
+,'isRational in equivValue 32',\frac{1}{\sqrt{4}},\frac{1}{2},equivValue:isRational,false
+,'isRational in equivValue 33',\frac{x+1}{y},\frac{x+1}{y},equivValue:isRational,true
+,'isRational in equivValue 34',\frac{1}{2},\frac{1}{2},equivValue:isRational,true
+,'isRational in equivValue 35',\frac{1}{\sqrt{9}},\frac{1}{3},equivValue:isRational,false
+,'isRational in equivValue 36',\frac{1}{\sqrt{9}},\frac{1}{3},"equivValue:isRational,inverseResult",true
+,'isRational in equivValue 37',\frac{1}{\sqrt{x^2}},\frac{1}{x},equivValue:isRational,false
+,'isRational in equivValue 38',\frac{1}{\sqrt{x^2}},\frac{1}{x},"equivValue:isRational,inverseResult",true
+,'isRational function 39',\sqrt{x^2},,isRational,false
+,'isRational function 40',\sqrt{ x*x },,isRational,false
+
+
+
+
+
