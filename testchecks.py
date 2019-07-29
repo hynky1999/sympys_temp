@@ -29,9 +29,11 @@ if __name__ == '__main__':
     with open(test_file_name, 'r', encoding='utf-8') as test_file:
         for row in csv.reader(test_file):
             try:
-                testno, desc, input_latex, expected_latex, options, expected_result = row
-            except ValueError:
-                continue
+                if row == [] or row[0][0] == '#':
+                    continue
+            except IndexError:
+                pass
+            testno, desc, input_latex, expected_latex, options, expected_result = row
             test_result = test_case(input_latex, expected_latex, options)
             if test_result != expected_result:
                 fails.append(row + [test_result])

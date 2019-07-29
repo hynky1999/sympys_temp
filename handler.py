@@ -149,6 +149,11 @@ def test(event, context):
         test_count, fail_count, fails = 0, 0, []
         with open(test_file_name, 'r', encoding='utf-8') as test_file:
             for row in csv.reader(test_file):
+                try:
+                    if row == [] or row[0][0] == '#':
+                        continue
+                except IndexError:
+                    pass
                 testno, desc, input_latex, expected_latex, options, expected_result = row
                 checks = parse_checks(options)
                 result = 'true'
@@ -190,7 +195,7 @@ def test(event, context):
             })
         }
         return response
-#x = json.dumps({"input":"1 6/8","expected" : "1 #3/4","checks":"equivSymbolic;isSimplified;equivSyntax:isMixedFraction"}
+#x = json.dumps({"input":"1 6/8","expected" : "1 3/4","checks":"equivSymbolic;isSimplified;equivSyntax:isMixedFraction"}
 #)
 #res = handle({"body":x},{})
 #print(res)
@@ -211,5 +216,5 @@ def test(event, context):
 # }, {})
 # print(res)
 
-# res = test({}, {})
-# print(res)
+res = test({}, {})
+print(res)
