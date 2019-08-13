@@ -226,6 +226,15 @@ r'[^\s()*+-]')
 leading_zero_re = re.compile(
 r'\b0(?=\.)')
 
+escaped_par_re = re.compile(
+r'\\([\{\[\(\}\]\)])'
+)
+left_par_re = re.compile(
+r'\\left([\{\(\[])'
+)
+right_par_re = re.compile(
+r'\\right([\}\)\]])'
+)
 trailing_zeros_re = re.compile(
 r'(\.[0-9]*?)0+\b')
 
@@ -240,7 +249,7 @@ units = [r'({})(?:\^{{?(-?\d*)}}?)?(\*)?'
 .format(u) for u in sorted(units_list,key=len,reverse=True)]
 
 unit_text_re = re.compile(
-r'(?:\\text{{)?(?P<up>(?:{0})+)(?P<down>\/(?:{0})+)?(?:}})?(?:(?=\=)|$)'
+r'(?<=[^a-zA-Z\\])(?:\\text{{)?(?P<up>(?:{0})+)(?P<down>\/(?:{0})+)?(?:}})?(?:(?=\=)|$)'
 .format('|'.join(units)))
 
 #Rexegex for sets
@@ -452,25 +461,50 @@ def replace_separators(input_latex,
     return input_latex
     
     
-def balance_check(str,par_open=['(','[','{'],par_close=[')',']','}']):
-    opening = 0
-    for char in str:
+def balance_check(str_input,par_open=['(','[','{'],par_close=[')',']','}']):
+    str_input = escaped_par_re.sub(r'\1',str_input)
+    opening = []
+    for i,char in enumerate(str_input):
             if char in par_open:
-                opening += 1
-                
-            elif char in par_close:
-                opening -= 1
-                
-                if opening < 0:
-                    return False
+                par_index = par_open.index(char)
+                if i >= 6 and str_input[i-6:i] == r'\\left':
+                    par_index = par_index*-1
+                if i >= 6 and str_input[i-6:i] == r'\\right':
+                    raise ValueError('Not_Supported_Error')
                     
+                opening.append(par_index)
+
+            elif char in par_close:
+                par_index = par_close.index(char)
+                if len(opening) <= 0:
+                    return False
+                last_par = opening.pop()
+                if i >= 6 and str_input[i-6:i] == r'\\right':
+                    par_index = par_index*-1
+                    
+                if i >= 6 and str_input[i-6:i] == r'\\left':
+                    raise ValueError('Not_Supported_Error')    
+                if par_index != last_par:
+                    return False
     return not opening
+
+def replaceNonEffective(input_latex):
+    input_latex = escaped_par_re.sub(r'\1',input_latex)
+    # \left,\right
+    input_latex = left_par_re.sub(r'\1',input_latex)
+    input_latex = right_par_re.sub(r'\1',input_latex)
+    # times for *
+    input_latex = times_re.sub(r'*',input_latex)
+    # \cfrac to frac
+    input_latex = input_latex.replace(r'\cfrac', r'\frac')
     
+    return input_latex    
     
 def identify_expected(input_latex,expected_latex,options):
     '''
     Identification of expected and calling set_evaluation properly
     '''
+    expected_tmp = replaceNonEffective(expected_latex)
     if ('setEvaluation' in options
         or 'orderedElements' in options
         or 'orderedPair' in options):
@@ -484,7 +518,7 @@ def identify_expected(input_latex,expected_latex,options):
         return set_evaluation(input_latex,expected_latex,options)
         
     for set_re in set_res:
-        search = set_re.match(expected_latex)
+        search = set_re.match(expected_tmp)
         if search and balance_check(search.group(2)):
             break
             
@@ -540,12 +574,11 @@ def preprocess_latex(input_latex,
                                          decimal=decimal_sep)
         if SEP_ERROR_PLACEHOLDER in input_latex:
             return None
-    # \left,\right
-    input_latex = input_latex.replace(r'\left', '').replace(r'\right', '')
-    # times for *
-    input_latex = times_re.sub(r'*',input_latex)
-    # \cfrac to frac
-    input_latex = input_latex.replace(r'\cfrac', r'\frac')
+            
+    if not balance_check(input_latex) and not interval_form_re.search(input_latex):
+        raise ValueError('Parenthesis_Error')
+        
+    input_latex = replaceNonEffective(input_latex)
     # $ to \dol
     input_latex = input_latex.replace(r'\$', r'\dol')
     # latex signs to normal
@@ -622,8 +655,7 @@ def preprocess_latex(input_latex,
         
     #Form perparation
     if set_form_re.search(input_latex):
-        input_latex = set_form_re.sub(convertSet,input_latex)
-        
+        input_latex = set_form_re.sub(convertSet,input_latex)   
     return input_latex
 
 
@@ -635,7 +667,6 @@ def sympify_latex(input_latex, evaluate=None):
         None if conversion fails.
     '''
     try:
-        #
         if not_latex_re.search(input_latex):
             input_latex = not_latex_re.sub('',input_latex)
             input_latex = format_latex_re.sub(
@@ -655,7 +686,6 @@ def sympify_latex(input_latex, evaluate=None):
             
     except:
         return None
-        
     return input_symbolic
 
 
@@ -870,6 +900,8 @@ def derivateExpected(inp,exp):
 def swap_units(input_latex,expected_latex):
     expected_unit_search = unit_text_re.search(expected_latex)
     if expected_unit_search:
+        if not unit_text_re.search(input_latex):
+            raise ValueError('No unit in input')
         expected_unit = convertComplexUnit(expected_unit_search)
         expected_latex = unit_text_re.sub(lambda x:'('
                                         + convertComplexUnit(x)
@@ -883,11 +915,10 @@ def swap_units(input_latex,expected_latex):
                                         + expected_unit
                                         + ')'
                                         ,input_latex)
+
     else:
-        expected_latex = unit_text_re.sub(lambda x:convertComplexUnit(x)
-                                        ,expected_latex)
-        input_latex = unit_text_re.sub(lambda x:convertComplexUnit(x)
-                                        ,input_latex)
+        if unit_text_re.search(input_latex):
+            raise ValueError('No unit in expected')
         
     return input_latex,expected_latex
     
@@ -1024,7 +1055,6 @@ def equiv_symbolic(input_latex, expected_latex, options):
     identified = identify_expected(input_latex,expected_latex,options)
     if identified is not None:
         return identified
-        
     #Swap of integral for derivation
     if re.search(r'\\int(?!_).*d[a-z]',input_latex):
         input_latex,expected_latex = derivateExpected(
@@ -1032,25 +1062,33 @@ def equiv_symbolic(input_latex, expected_latex, options):
                                         ,expected_latex)
     
     #Preprocessing of Latex
-    expected_latex = preprocess_latex(expected_latex.strip(),
-        thousand_sep=getThousandsSeparator(options),
-        decimal_sep=getDecimalSeparator(options),
-        ignore_text=options.get('ignoreText', False),
-        ignore_alpha=options.get('ignoreAlphabeticCharacters', False),
-        euler_number=options.get('allowEulersNumber',False))
-                                      
-    input_latex = preprocess_latex(input_latex.strip(),
-        thousand_sep=getThousandsSeparator(options),
-        decimal_sep=getDecimalSeparator(options),
-        ignore_text=options.get('ignoreText', False),
-        ignore_alpha=options.get('ignoreAlphabeticCharacters',False),
-        euler_number=options.get('allowEulersNumber',False))
+    try:
+        expected_latex = preprocess_latex(expected_latex.strip(),
+            thousand_sep=getThousandsSeparator(options),
+            decimal_sep=getDecimalSeparator(options),
+            ignore_text=options.get('ignoreText', False),
+            ignore_alpha=options.get('ignoreAlphabeticCharacters', False),
+            euler_number=options.get('allowEulersNumber',False))
+    except ValueError as e:
+        return e.args[0]
+    try:
+        input_latex = preprocess_latex(input_latex.strip(),
+            thousand_sep=getThousandsSeparator(options),
+            decimal_sep=getDecimalSeparator(options),
+            ignore_text=options.get('ignoreText', False),
+            ignore_alpha=options.get('ignoreAlphabeticCharacters',False),
+            euler_number=options.get('allowEulersNumber',False))
+    except ValueError:
+        return result(False)
         
     if input_latex is None:
         return 'Parsing_Error'
     
     #Swap of units to numbers
-    input_latex,expected_latex = swap_units(input_latex,expected_latex)
+    try:
+        input_latex,expected_latex = swap_units(input_latex,expected_latex)
+    except ValueError:
+        return result(False)
     
     #Detection of equation signs in expected_latex
     if (separator_re.search(expected_latex)
@@ -1141,7 +1179,6 @@ def equiv_symbolic(input_latex, expected_latex, options):
     if type(expected_symbolic) == bool:
         equiv = expected_symbolic == input_symbolic
         return result(xor(equiv, 'inverseResult' in options))
-        
     input_symbolic = format_sym_expression(input_symbolic,options)
     expected_symbolic = format_sym_expression(expected_symbolic,options)
     try:
@@ -1149,7 +1186,7 @@ def equiv_symbolic(input_latex, expected_latex, options):
                 and equiv)
     except:
         return 'Compare_Error'
-            
+   
     return result(xor(equiv, 'inverseResult' in options))
     
 
@@ -1183,7 +1220,8 @@ def equiv_literal(input_latex, expected_latex, options):
     
     #Conversion of latexes to sympy objects
     ignore_trailing_zeros = 'ignoreTrailingZeros' in options
-    expected_symbolic = convert(expected_latex.strip(), evaluate=False,
+    try:
+        expected_symbolic = convert(expected_latex.strip(), evaluate=False,
                     ignore_trailing_zeros=ignore_trailing_zeros,
                     keep_neg_fraction_form=True,
                     thousand_sep=getThousandsSeparator(options),
@@ -1191,10 +1229,14 @@ def equiv_literal(input_latex, expected_latex, options):
                     euler_number=options.get('allowEulersNumber',False),
                     ignore_text=options.get('ignoreText',False),
                     ignore_alpha=options.get('ignoreAlphabeticCharacters'))
+    except ValueError as e:
+        return e.args[0]
+        
     if expected_symbolic is None:
         return 'Sympy_Parsing_Error'
-        
-    input_symbolic = convert(input_latex.strip(), evaluate=False,
+    
+    try:
+        input_symbolic = convert(input_latex.strip(), evaluate=False,
                     ignore_trailing_zeros=ignore_trailing_zeros,
                     keep_neg_fraction_form=True,
                     thousand_sep=getThousandsSeparator(options),
@@ -1202,18 +1244,21 @@ def equiv_literal(input_latex, expected_latex, options):
                     euler_number=options.get('allowEulersNumber',False),
                     ignore_text=options.get('ignoreText',False),
                     ignore_alpha=options.get('ignoreAlphabeticCharacters'))
+    except ValueError as e:
+        return result(False)
+        
     if input_symbolic is None:
-        return 'false'
+        return result(False)
     
     #Preprocessing of latexes
-    preprocessed_input_latex = preprocess_latex(input_latex,
+    preprocessed_expected_latex = preprocess_latex(expected_latex,
                     thousand_sep=getThousandsSeparator(options),
                     decimal_sep=getDecimalSeparator(options),
                     ignore_trailing_zeros=ignore_trailing_zeros,
                     euler_number=options.get('allowEulersNumber',False),
                     ignore_text=options.get('ignoreText',False),
                     ignore_alpha=options.get('ignoreAlphabeticCharacters'))
-    preprocessed_expected_latex = preprocess_latex(expected_latex,
+    preprocessed_input_latex = preprocess_latex(input_latex,
                     thousand_sep=getThousandsSeparator(options),
                     decimal_sep=getDecimalSeparator(options),
                     ignore_trailing_zeros=ignore_trailing_zeros,
@@ -1279,22 +1324,32 @@ def equiv_value(input_latex, expected_latex, options):
         input_latex,expected_latex = derivateExpected(
                                         input_latex
                                         ,expected_latex)
-        
-    input_latex = preprocess_latex(input_latex,
+    
+    try:
+        expected_latex = preprocess_latex(expected_latex,
                     thousand_sep=getThousandsSeparator(options),
                     decimal_sep=getDecimalSeparator(options),
                     euler_number=options.get('allowEulersNumber',False),
                     ignore_text=options.get('ignoreText',False),
                     ignore_alpha=options.get('ignoreAlphabeticCharacters'))
-    expected_latex = preprocess_latex(expected_latex,
+    except ValueError as e:
+        return e.args[0]
+    try:
+        input_latex = preprocess_latex(input_latex,
                     thousand_sep=getThousandsSeparator(options),
                     decimal_sep=getDecimalSeparator(options),
                     ignore_text=options.get('ignoreText', False),
                     ignore_alpha=options.get('ignoreAlphabeticCharacters', False),
                     euler_number=options.get('allowEulersNumber',False))
+    except ValueError as e:
+        return result(False)
+        
     #Format units by unit in expected latex --> convert units to normal
     #and then to unit in expected
-    input_latex,expected_latex = swap_units(input_latex,expected_latex)
+    try:
+        input_latex,expected_latex = swap_units(input_latex,expected_latex)
+    except ValueError:
+        return result(False)
         
     if expected_latex is None:
         return 'Parsing_Error'
@@ -1391,12 +1446,16 @@ def is_simplified(input_latex, expected_latex=None, options={}):
     ''' check isSimplified
     '''
     equiv = number_type(input_latex,options)
-    input_symbolic = convert(input_latex, evaluate=False,
+    try:
+        input_symbolic = convert(input_latex, evaluate=False,
                         thousand_sep=getThousandsSeparator(options),
                         decimal_sep=getDecimalSeparator(options),
                         euler_number=options.get('allowEulersNumber',False))
+    except ValueError:
+        return result(False)
+        
     if input_symbolic is None:
-        return 'false'
+        return result(False)
         
     input_symbolic = parentheses_minus_re.sub(r'\1',str(input_symbolic))
     simplified = (equiv
@@ -1412,15 +1471,18 @@ def is_expanded(input_latex, expected_latex=None, options={}):
     ''' check isExpanded
     '''
     equiv = number_type(input_latex,options)
-    
-    input_symbolic = convert(input_latex,
+    try:
+        input_symbolic = convert(input_latex,
                         thousand_sep=getThousandsSeparator(options),
                         decimal_sep=getDecimalSeparator(options),
                         euler_number=options.get('allowEulersNumber',False),
                         evaluate=False,
                         fix_parenthesis=True)
+    except ValueError:
+        return result(False)
+        
     if input_symbolic is None:
-        return 'false'
+        return result(False)
         
     expanded = (equiv
                 and input_symbolic - expand(simplify(input_symbolic))) == 0
@@ -1430,11 +1492,15 @@ def is_factorised(input_latex, expected_latex=None, options={}):
     ''' check isFactorised
     '''
     equiv = number_type(input_latex,options)
-    input_symbolic = convert(input_latex,
+    try:
+        input_symbolic = convert(input_latex,
                         evaluate=False,
                         thousand_sep=getThousandsSeparator(options),
                         decimal_sep=getDecimalSeparator(options),
                         euler_number=options.get('allowEulersNumber',False))
+    except ValueError:
+        return result(False)
+        
     if input_symbolic is None:
         return 'false'
     
@@ -1453,10 +1519,14 @@ def is_rationalized(input_latex, expected_latex=None, options={}):
     ''' check isRationalized
     '''
     equiv = number_type(input_latex,options)
-    input_symbolic = convert(input_latex, evaluate=False,
+    
+    try:
+        input_symbolic = convert(input_latex, evaluate=False,
                              thousand_sep=getThousandsSeparator(options),
                              decimal_sep=getDecimalSeparator(options),
                              euler_number=options.get('allowEulersNumber',False))
+    except ValueError:
+        return result(False)
     
     if input_symbolic is None:
         return 'Sympy_Parsing_Error'
@@ -1470,11 +1540,14 @@ def is_rational(input_latex, expected_latex=None, options={}):
     '''
     equiv = number_type(input_latex,options)
     equiv = is_simplified(input_latex)
-    input_symbolic = convert(input_latex, evaluate=False,
+    try:
+        input_symbolic = convert(input_latex, evaluate=False,
                              thousand_sep=getThousandsSeparator(options),
                              decimal_sep=getDecimalSeparator(options),
                              euler_number=options.get(
                              'allowEulersNumber',False))
+    except ValueError:
+        return result(False)
     if input_symbolic is None:
         return 'Sympy_Parsing_Error'
     rational = (ask(Q.rational_2(input_symbolic))
@@ -1603,6 +1676,12 @@ def set_evaluation(input_latex, expected_latex=None, options={}):
     ''' check setEvaluation
         checking type and also if sets/list are the same
     '''
+    if not balance_check(expected_latex):
+        return 'Parenthesis_Error'
+    expected_latex = replaceNonEffective(expected_latex)
+    if not balance_check(input_latex):
+        return result(False)
+    input_latex = replaceNonEffective(input_latex)
     #Parse sets
     try:
         input_symbolic,type1 = transform_set(input_latex)
@@ -1655,12 +1734,15 @@ def is_true(input_latex, expected_latex=None, options={}):
 def is_unit(input_latex, expected_latex=None, options={}):
     ''' check isUnit
     '''
-    input_latex = preprocess_latex(input_latex,
+    try:
+        input_latex = preprocess_latex(input_latex,
                                    thousand_sep=getThousandsSeparator(options),
                                    decimal_sep=getDecimalSeparator(options),
                                    euler_number=options.get('allowEulersNumber',False),
                                    ignore_text=options.get('ignoreText', False),
                                    ignore_alpha=options.get('ignoreAlphabeticCharacters', False))
+    except ValueError:
+        return result(False)
     if input_latex is None or input_latex.count('.') > 1:
         return 'Sympy_Parsing_Error'
         

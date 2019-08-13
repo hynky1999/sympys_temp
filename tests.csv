@@ -628,10 +628,10 @@
 1.12,basic list extra white space on input,"1 ,  2,3","(1,2,3)",equivSymbolic,true
 1.13,basic list missing comma on expected,"1,2","(1 2)",equivSymbolic,false
 1.14,basic list missing comma on input,"1 2 3","(1,2,3)",equivSymbolic,false
-1.15,basic list missing parenthesis on expected,"1,2","(1,2",equivSymbolic,Sympy_Parsing_Error
-1.16,basic list missing parenthesis on expected,"1,2","1,2)",equivSymbolic,Sympy_Parsing_Error
-1.17,basic list missing parenthesis on expected,"1,2","0,1,2)",equivSymbolic,Sympy_Parsing_Error
-1.18,basic list missing parenthesis on expected,"0,1,2","0,1,2)",equivSymbolic,Sympy_Parsing_Error
+1.15,basic list missing parenthesis on expected,"1,2","(1,2",equivSymbolic,Parenthesis_Error
+1.16,basic list missing parenthesis on expected,"1,2","1,2)",equivSymbolic,Parenthesis_Error
+1.17,basic list missing parenthesis on expected,"1,2","0,1,2)",equivSymbolic,Parenthesis_Error
+1.18,basic list missing parenthesis on expected,"0,1,2","0,1,2)",equivSymbolic,Parenthesis_Error
 2.0,basic list with interpretAsList,"1,2","1,2",equivSymbolic:interpretAsList,true
 2.1,basic list with interpretAsList over-ride parenthesis,"1,2","{1,2}",equivSymbolic:interpretAsList,true
 2.2,basic list with interpretAsList over-ride parenthesis,"2,1","{1,2}",equivSymbolic:interpretAsList,false
@@ -654,8 +654,8 @@
 4.3,basic set,"0 1,2","{0,1,2}",equivSymbolic,false
 4.4,basic set,"2,1","{0,1,2}",equivSymbolic,false
 4.5,basic set,"0,2,1","{0,1,2}",equivSymbolic,true
-4.6,basic set,"0,2,1","0,1,2}",equivSymbolic,Sympy_Parsing_Error
-4.7,basic set,"0,2,1","{0,1,2",equivSymbolic,Sympy_Parsing_Error
+4.6,basic set,"0,2,1","0,1,2}",equivSymbolic,Parenthesis_Error
+4.7,basic set,"0,2,1","{0,1,2",equivSymbolic,Parenthesis_Error
 4.8,basic set,"0,2,1}","{0,1,2}",equivSymbolic,false
 4.9,basic set,"{0,2,1","{0,1,2}",equivSymbolic,false
 4.10,basic set,"{0,2,1","{0,1,2}",equivSymbolic,false
@@ -742,8 +742,8 @@
 15.14,"extra white space on input","1 , 2,3","(1,2,3)",equivSymbolic,true
 16.1,"basic list missing comma on expected","1,2,3","(1 2 3)",equivSymbolic,false
 16.2,"basic list missing comma on input","1 2,3","(1,2,3)",equivSymbolic,false
-16.3,"basic list missing parenthesis on expected","1,2,3","(1,2,3",equivSymbolic,Sympy_Parsing_Error
-16.4,"basic list missing parenthesis on expected","1,2,3","1,2,3)",equivSymbolic,Sympy_Parsing_Error
+16.3,"basic list missing parenthesis on expected","1,2,3","(1,2,3",equivSymbolic,Parenthesis_Error
+16.4,"basic list missing parenthesis on expected","1,2,3","1,2,3)",equivSymbolic,Parenthesis_Error
 17.1,"() conflict with interpretAsSet","(1,2)","(2,1)",equivSymbolic:interpretAsSet,true
 17.2,"() conflict with interpretAsSet","(1,2)","(1,2)",equivSymbolic:interpretAsSet,true
 17.3,"() conflict with interpretAsList","(1,2)","(2,1)",equivSymbolic:interpretAsList,false
@@ -865,10 +865,10 @@
 1.12,basic list extra white space on input,"1 ,  2,3","(1,2,3)",equivValue,true
 1.13,basic list missing comma on expected,"1,2","(1 2)",equivValue,false
 1.14,basic list missing comma on input,"1 2 3","(1,2,3)",equivValue,false
-1.15,basic list missing parenthesis on expected,"1,2","(1,2",equivValue,Sympy_Parsing_Error
-1.16,basic list missing parenthesis on expected,"1,2","1,2)",equivValue,Sympy_Parsing_Error
-1.17,basic list missing parenthesis on expected,"1,2","0,1,2)",equivValue,Sympy_Parsing_Error
-1.18,basic list missing parenthesis on expected,"0,1,2","0,1,2)",equivValue,Sympy_Parsing_Error
+1.15,basic list missing parenthesis on expected,"1,2","(1,2",equivValue,Parenthesis_Error
+1.16,basic list missing parenthesis on expected,"1,2","1,2)",equivValue,Parenthesis_Error
+1.17,basic list missing parenthesis on expected,"1,2","0,1,2)",equivValue,Parenthesis_Error
+1.18,basic list missing parenthesis on expected,"0,1,2","0,1,2)",equivValue,Parenthesis_Error
 2.0,basic list with interpretAsList,"1,2","1,2",equivValue:interpretAsList,true
 2.1,basic list with interpretAsList over-ride parenthesis,"1,2","{1,2}",equivValue:interpretAsList,true
 2.2,basic list with interpretAsList over-ride parenthesis,"2,1","{1,2}",equivValue:interpretAsList,false
@@ -891,8 +891,8 @@
 4.3,basic set,"0 1,2","{0,1,2}",equivValue,false
 4.4,basic set,"2,1","{0,1,2}",equivValue,false
 4.5,basic set,"0,2,1","{0,1,2}",equivValue,true
-4.6,basic set,"0,2,1","0,1,2}",equivValue,Sympy_Parsing_Error
-4.7,basic set,"0,2,1","{0,1,2",equivValue,Sympy_Parsing_Error
+4.6,basic set,"0,2,1","0,1,2}",equivValue,Parenthesis_Error
+4.7,basic set,"0,2,1","{0,1,2",equivValue,Parenthesis_Error
 4.8,basic set,"0,2,1}","{0,1,2}",equivValue,false
 4.9,basic set,"{0,2,1","{0,1,2}",equivValue,false
 4.10,basic set,"{0,2,1","{0,1,2}",equivValue,false
@@ -979,8 +979,8 @@
 15.14,"extra white space on input","1 , 2,3","(1,2,3)",equivValue,true
 16.1,"basic list missing comma on expected","1,2,3","(1 2 3)",equivValue,false
 16.2,"basic list missing comma on input","1 2,3","(1,2,3)",equivValue,false
-16.3,"basic list missing parenthesis on expected","1,2,3","(1,2,3",equivValue,Sympy_Parsing_Error
-16.4,"basic list missing parenthesis on expected","1,2,3","1,2,3)",equivValue,Sympy_Parsing_Error
+16.3,"basic list missing parenthesis on expected","1,2,3","(1,2,3",equivValue,Parenthesis_Error
+16.4,"basic list missing parenthesis on expected","1,2,3","1,2,3)",equivValue,Parenthesis_Error
 17.1,"() conflict with interpretAsSet","(1,2)","(2,1)",equivValue:interpretAsSet,true
 17.2,"() conflict with interpretAsSet","(1,2)","(1,2)",equivValue:interpretAsSet,true
 17.3,"() conflict with interpretAsList","(1,2)","(2,1)",equivValue:interpretAsList,false
@@ -1067,7 +1067,32 @@
 ,'isRational in equivValue 38',\frac{1}{\sqrt{x^2}},\frac{1}{x},"equivValue:isRational,inverseResult",true
 ,'isRational function 39',\sqrt{x^2},,isRational,false
 ,'isRational function 40',\sqrt{ x*x },,isRational,false
-
+6917.1,,10,10oz,equivSymbolic,false
+6917.2,,11,10oz,equivSymbolic,false
+6917.3,,10,10,equivSymbolic,true
+6917.4,,10,10x,equivSymbolic,false
+6917.5,,10,10in,equivSymbolic,false
+6917.6,,10,10cm,equivSymbolic,false
+6917.7,,10,10m,equivSymbolic,false
+6917.8,,10,10kg,equivSymbolic,false
+6917.9,,10,10g,equivSymbolic,false
+6917.10,,10 s,10s,equivSymbolic,true
+6917.11,,10 s x,10s,equivSymbolic,false
+6917.12,,10 sec,10s,equivSymbolic,false
+6917.13,,10 sec,10,equivSymbolic,false
+6917.14,,10,10s,equivSymbolic,false
+6917.15,,"3 cm",3,equivSymbolic:ignoreAlphabeticCharacters,true
+6917.15,,"3cm",3,equivSymbolic:ignoreAlphabeticCharacters,true
+6917.16,,"5\text{cm}",4,equivSymbolic:ignoreAlphabeticCharacters,false
+6917.17,,"5\text{cm}",5,equivSymbolic:ignoreAlphabeticCharacters,true
+6761.1,EV-6761,"1,2","\left\{1,2\right\}",equivSymbolic:interpretAsSet,true
+6761.2,EV-6761,"1,2","\left\{1,2\right\}",equivSymbolic:interpretAsList,true
+6761.3,EV-6761,"1,2","\{1,2\}",equivSymbolic:interpretAsList,true
+6761.4,EV-6761,"1,2","\{1,2\}",equivSymbolic:interpretAsSet,true
+6761.5,EV-6761,"1,2,3","{1,2,3}",equivSymbolic:interpretAsSet,true
+6761.6,EV-6761,"1,2,3","{1,2,3}",equivSymbolic:interpretAsList,true
+6761.7,EV-6761,"(1,2)","\(1,2\)",equivSymbolic,true
+8,EV-6761,"[1,2]","\[1,2\]",equivSymbolic,true
 
 
 
