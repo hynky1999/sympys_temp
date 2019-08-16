@@ -1093,7 +1093,42 @@
 6761.6,EV-6761,"1,2,3","{1,2,3}",equivSymbolic:interpretAsList,true
 6761.7,EV-6761,"(1,2)","\(1,2\)",equivSymbolic,true
 8,EV-6761,"[1,2]","\[1,2\]",equivSymbolic,true
-
-
-
-
+# special new tests
+special_1,equivLiteral,2,2,equivLiteral,true
+special_2,equivLiteral,2\theta,2\theta,equivLiteral,true
+special_3,equivLiteral,2\pi\theta,2\pi\theta,equivLiteral,true
+special_4,equivSymbolic,2\pi\theta,2\pi\theta,equivSymbolic,true
+special_5,equivSymbolic,2,2\pi\theta,equivSymbolic,false
+special_6,equivSymbolic,\pi\theta,2\pi\theta,equivSymbolic,false
+special_7,equivSymbolic,(2\pi\theta),(2\pi\theta),equivSymbolic,true
+special_8,equivSymbolic,\sin(2\pi\theta),\sin(2\pi\theta),equivSymbolic,true
+special_9,equivSymbolic,\sin(2\pi\lambda),\sin(2\pi\theta),equivSymbolic,false
+special1,,"no solution","no  solution",equivSymbolic,true
+special2,,"no  solution","no  solution",equivSymbolic,true
+special3,,"not a   solution","no  solution",equivSymbolic,false
+special4,,"none","none",equivSymbolic,true
+special5,,"none ","none",equivSymbolic,true
+special6,," none ","none",equivSymbolic,true
+special7,," na ","none",equivSymbolic,false
+special9,," n/a ","none",equivSymbolic,false
+special10,," n /a ","none",equivSymbolic,false
+special10b,," n /a ","empty set",equivSymbolic,false
+special10c,,"{}","{}",equivSymbolic,true
+special11,,"no solution","no  solution",equivSymbolic,true
+special12,,"no  solution","no  solution",equivValue,true
+special13,,"not a   solution","no  solution",equivValue,false
+special14,,"none","none",equivValue,true
+special15,,"none ","none",equivValue,true
+special16,," none ","none",equivValue,true
+special17,," na ","none",equivValue,false
+special19,," n/a ","none",equivValue,false
+special20,," n /a ","none",equivValue,false
+special21,,"no solution","no  solution",equivSymbolic,true
+special22,,"no  solution","no  solution",equivLiteral,true
+special23,,"not a   solution","no  solution",equivLiteral,false
+special24,,"none","none",equivLiteral,true
+special25,,"none ","none",equivLiteral,true
+special26,," none ","none",equivLiteral,true
+special27,," na ","none",equivLiteral,false
+special29,," n/a ","none",equivLiteral,false
+special30,," n /a ","none",equivLiteral,false
