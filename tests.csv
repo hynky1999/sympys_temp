@@ -1132,3 +1132,150 @@ special26,," none ","none",equivLiteral,true
 special27,," na ","none",equivLiteral,false
 special29,," n/a ","none",equivLiteral,false
 special30,," n /a ","none",equivLiteral,false
+1a,equation with inequality,"[['line', [(4,0),(0,4)]]],['solid'],[(4,4)]","[['eqn','x+y \ge 4']]",evaluateGraphEquations,true
+#The student picked a different valid point
+1b,equation with inequality,"[['line', [(4,0),(0,4)]]],['solid'],[(5,0)]","[['eqn','x+y \ge 4']]",evaluateGraphEquations,true
+#The student entered a point that does not meet the required inequality
+1c,equation with inequality,"[['line', [(4,0),(0,4)]]],['solid'],[(-4,-4)]","[['eqn','x+y \ge 4']]",evaluateGraphEquations,false
+#The student picked a different valid line
+1d,equation with inequality,"[['line', [(2,2),(0,4)]]],['solid'],[(5,0)]","[['eqn','x+y \ge 4']]",evaluateGraphEquations,true
+#The student line is not valid
+1e,equation with inequality,"[['line', [(2,2),(1,1)]]],['solid'],[(5,0)]","[['eqn','x+y \ge 4']]",evaluateGraphEquations,false
+#The student shading is wrong
+1f,equation with inequality,"[['line', [(2,2),(0,4)]]],['dashed'],[(5,0)]","[['eqn','x+y \ge 4']]",evaluateGraphEquations,false
+1g,equation with inequality,"[['line', [(2,2),(0,4)]]],['dashed'],[(3,0)]","[['eqn','x+y \ge 4']]",evaluateGraphEquations,false
+1g,equation with equality,"[['line', [(2,2),(0,4)]]],['solid'],[(3,0)]","[['eqn','x+y = 4']]",evaluateGraphEquations,false
+1h,equation with equality,"[['line', [(2,2),(0,4)]]],['solid'],[(3,0)]","[['eqn','x+y - 4 = 0']]",evaluateGraphEquations,false
+1i,equation with equality,"[['line', [(2,2),(0,4)]]],['solid'],[(4,0)]","[['eqn','x+y = 4']]",evaluateGraphEquations,true
+1k,equation with equality,"[['line', [(2,2),(0,4)]]],['solid'],[(4.0,0.0)]","[['eqn','x+y = 4']]",evaluateGraphEquations,true
+# we should allow 3% tolerance on points and lines due to roundoff. Set as a parameter in the code in case we need to change it later
+#Not supported 1l,equation with equality, tolerance,"[['line', [(2,2),(0,4)]]],['solid'],[(4.01,0.01)]","[['eqn','x+y = 4']]",evaluateGraphEquations,true
+#Not supported 1m,equation with equality,"[['line', [(2,2),(0,4)]]],['solid'],[(4.1,0)]","[['eqn','x+y = 4']]",evaluateGraphEquations,false
+#Not supported 1n,equation with equality,"[['line', [(2,2),(0,4)]]],['solid'],[(3.8,0.1)]","[['eqn','x+y = 4']]",evaluateGraphEquations,false
+#Not supported 1o,equation with equality allow tolerance,"[['line', [(2.01,2.0),(0,4)]]],['solid'],[(3.99,0.01)]","[['eqn','x+y = 4']]",evaluateGraphEquations,true
+#Not supported 1p,equation with equality allow tolerance,"[['line', [(2.00,2.0),(0.01,4)]]],['solid'],[(3.99,0.01)]","[['eqn','x+y = 4']]",evaluateGraphEquations,true
+#Not supported 1d,equation with inequality allow tolerance,"[['line', [(2,2),(0,4)]]],['solid'],[(3.99,0)]","[['eqn','x+y \ge 4']]",evaluateGraphEquations,true
+
+
+
+
+2a,equation with inequality,"[['line', [(2,0),(0,4)]]],['solid'],[(5,2)]","[['eqn','2x+y \ge 4']]",evaluateGraphEquations,true
+2b,equation with inequality - wrong shading,"[['line', [(2,0),(0,4)]]],['solid'],[(0,0)]","[['eqn','2x+y \lt 4']]",evaluateGraphEquations,false
+2c,equation with inequality - point on the line is not valid,"[['line', [(2,0),(0,4)]]],['dashed'],[(2,0)]","[['eqn','2x+y \lt 4']]",evaluateGraphEquations,false
+2d,equation with inequality - point on the line is valid,"[['line', [(2,0),(0,4)]]],['dashed'],[(1.88,0)]","[['eqn','2x+y \lt 4']]",evaluateGraphEquations,true
+2e,equation with inequality - point on the line is valid,"[['line', [(2,0),(0,4)]]],['dashed'],[(1.88,0)]","[['eqn','2x+y-4 <0']]",evaluateGraphEquations,true
+2f,equation with inequality teacher uses form,"[['line', [(2,0),(0,4)]]],['solid'],[(0,0)]","[['line', [(2,0),(0,4)]]],['solid'],[(0,0)]",evaluateGraphEquations,true
+
+# Two Lines
+3a,equation with inequality,"[['line', [(4,0),(0,4)]], ['line', [(4,0),(0,-4)]]],['solid','solid'],[(5,0)]","[['eqn','x+y \ge 4']  , ['eqn','x-y \ge 4'] ]",evaluateGraphEquations,true
+3b,equation with inequality,"[['line', [(4,0),(0,4)]], ['line', [(4,0),(0,-4)]]],['solid','solid'],[(6,1)]","[['eqn','x+y \ge 4']  , ['eqn','x-y \ge 4'] ]",evaluateGraphEquations,true
+3c,equation with inequality,"[['line', [(4,0),(0,4)]], ['line', [(4,0),(0,-4)]]],['solid','solid'],[(0,0)]","[['eqn','x+y \ge 4']  , ['eqn','x-y \ge 4'] ]",evaluateGraphEquations,false
+3d,equation with inequality,"[['line', [(4,0),(0,4)]], ['line', [(4,0),(0,-4)]]],['solid','solid'],[(0,5)]","[['eqn','x+y \ge 4']  , ['eqn','x-y \ge 4'] ]",evaluateGraphEquations,false
+3e,"equation with inequality, reverse order","[['line', [(4,0),(0,-4)]], ['line', [(4,0),(0,4)]]],['solid','solid'],[(5,0)]","[['eqn','x+y \ge 4']  , ['eqn','x-y \ge 4'] ]",evaluateGraphEquations,true
+3f,"equation with inequality, reverse order","[['line', [(4,0),(0,-5)]], ['line', [(4,0),(0,4)]]],['solid','solid'],[(5,0)]","[['eqn','x+y \ge 4']  , ['eqn','x-y \ge 4'] ]",evaluateGraphEquations,false
+3g,equation with inequality two points,"[['line', [(4,0),(0,4)]], ['line', [(4,0),(0,-4)]]],['solid','solid'],[(5,0),(6,0)]","[['eqn','x+y \ge 4']  , ['eqn','x-y \ge 4'] ]",evaluateGraphEquations,true
+3h,equation with inequality two points-but one is wrong,"[['line', [(4,0),(0,4)]], ['line', [(4,0),(0,-4)]]],['solid','solid'],[(5,0),(3,0)]","[['eqn','x+y \ge 4']  , ['eqn','x-y \ge 4'] ]",evaluateGraphEquations,false
+3i,equation with inequality three points-but one is wrong,"[['line', [(4,0),(0,4)]], ['line', [(4,0),(0,-4)]]],['solid','solid'],[(6,0),(5,0),(3,0)]","[['eqn','x+y \ge 4']  , ['eqn','x-y \ge 4'] ]",evaluateGraphEquations,false
+
+
+
+
+# circle standard form has the center and one point
+4a,equation with inequality,"[['circle', [(0,0),(0,-2)]]],['solid'],[(3,0)]","[['eqn','x^2+y^2 \ge 4'] ]",evaluateGraphEquations,true
+4b,equation with inequality,"[['circle', [(0,0),(0,-2)]]],['solid'],[(2,0)]","[['circle',[(0,0),(0,2)]] ]",evaluateGraphEquations,true
+4c,equation with inequality,"[['circle', [(1,0),(1,-2)]]],['solid'],[(4,0)]","[['eqn','(x-1)^2+y^2 \ge 4'] ]",evaluateGraphEquations,true
+4f,equation with inequality,"[['circle', [(0,0),(0,-2)]]],['dashed'],[(1.9,0)]","[['eqn','x^2+y^2 < 4'] ]",evaluateGraphEquations,true
+4g,equation with inequality,"[['circle', [(0,1),(0,-2)]]],['dashed'],[(2,0)]","[['eqn','x^2+y^2 < 4'] ]",evaluateGraphEquations,false
+4h,equation with inequality,"[['circle', [(0,0),(0,-2.2)]]],['dashed'],[(2,0)]","[['eqn','x^2+y^2 < 4'] ]",evaluateGraphEquations,false
+4i,equation with inequality,"[['circle', [(0,0),(0,-2.0)]]],['dashed'],[(2.3,0)]","[['eqn','x^2+y^2 < 4'] ]",evaluateGraphEquations,false
+
+#ellipse has center and points on the curve along the horizontal and vertical axes.
+4j,ellipse,"[['ellipse',[(0,0),(1,0),(0,2)]]],['dashed'],[(0,0)]","[['eqn', 'x^2+(y/2)^2<1']]",evaluateGraphEquations,true
+4k,circle-but student used an ellipse,"[['ellipse',[(0,0),(1,0),(0,1)]]],['dashed'],[(0,0)]","[['eqn', 'x^2+y^2<1']]",evaluateGraphEquations,true
+4l,circle-but student used an ellipse,"[['ellipse',[(0,0.3),(1,0),(0,1)]]],['dashed'],[(0,0)]","[['eqn', 'x^2+y^2<1']]",evaluateGraphEquations,false
+
+
+#The form of parabola we are using is apex plus two points on either side.
+5a,parabola,"[['parabola', [(0,0), (1,1),(-1,1)]]],['solid'],[(1,1)]","[['eqn','y = x^2']]",evaluateGraphEquations,true
+5b,parabola,"[['parabola', [(0,0), (1,1),(1,-1)]]],['solid'],[(0,-1)]","[['eqn','y = x^2']]",evaluateGraphEquations,false
+5c,parabola,"[['parabola', [(0,1), (1,1),(1,-1)]]],['solid'],[(0,1)]","[['eqn','y = x^2']]",evaluateGraphEquations,false
+5d,parabola,"[['parabola', [(0,0), (1,1),(1,-1)]]],['solid'],[(0,1)]","[['eqn','y = x^2+1']]",evaluateGraphEquations,false
+5e,parabola,"[['parabola', [(0,0), (1,1),(1,-1)]]],['solid'],[(0,1)]","[['parabola',[(0,0), (1,1),(1,-1)]]],['solid'],[(0,1)]",evaluateGraphEquations,true
+
+
+# For Hyperbola use the two foci and one point
+6a,hyperbola,"[['hyperbola', [(-\sqrt{2},0),(\sqrt{2},0),(1,0)]]],['dashed'],[(2,0)]","[['eqn','x^2 - y^2 > 1']]",evaluateGraphEquations,true
+6b,hyperbola,"[['hyperbola', [(-\sqrt{2},0),(\sqrt{2},0),(1,0)]]],['solid'],[(2,0)]","[['hyperbola', [(-\sqrt{2},0),(\sqrt{2},0),(-1,0)]]],['solid'],[(2,0)]",evaluateGraphEquations,true
+
+
+6c,hyperbola,"[['hyperbola', [(-\sqrt{2},0.1),(\sqrt{2},0),(1,0)]]],['solid'],[(0.2,0)]","[['hyperbola', [(-\sqrt{2},0),(\sqrt{2},0),(-1,0)]]],['solid'],[(0.2,0)]",evaluateGraphEquations,false
+6d,hyperbola,"[['hyperbola', [(-\sqrt{2},0),(\sqrt{2},0),(1,0)]]],['solid'],[(2,0)]","[['hyperbola', [(-\sqrt{2},0),(\sqrt{2},0),(-1,0)]]],['solid'],[(0.2,0)]",evaluateGraphEquations,false
+6e,hyperbola,"[['hyperbola', [(-\sqrt{2},0),(\sqrt{2},0),(1,0)]]],['dashed'],[(2,0)(2.2,0)]","[['eqn','x^2 - y^2 > 1']]",evaluateGraphEquations,true
+6f,hyperbola,"[['hyperbola', [(-\sqrt{2},0),(\sqrt{2},0),(1,0)]]],['dashed'],[(2,0)(2.2,0),(3.0,0.5)]","[['eqn','x^2 - y^2 > 1']]",evaluateGraphEquations,true
+6g,hyperbola one bad point,"[['hyperbola', [(-\sqrt{2},0),(\sqrt{2},0),(-1,0)]]],['dashed'],[(2,0)(2.2,0),(0.0,0.0)]","[['eqn','x^2 - y^2 > 1']]",evaluateGraphEquations,false
+
+
+#Line and Circle
+7a,equation with inequality,"[['line', [(1,0),(0,1)]],['circle', [(0,0),(0,-2)]]],['solid','solid'],[(4,0)]","[['eqn','x+y \ge 1']  , ['eqn','x^2+y^2 \ge 4'] ]",evaluateGraphEquations,true
+7b,equation with inequality,"[['line', [(1,0),(0,1)]],['circle', [(0,0),(0,-2)]]],['solid','solid'],[(0,0)]","[['eqn','x+y \ge 1']  , ['eqn','x^2+y^2 \ge 4'] ]",evaluateGraphEquations,false
+7c,equation with inequality,"[['line', [(-1,0),(0,1)]],['circle', [(0,0),(0,-2)]]],['solid','solid'],[(0,0)]","[['eqn','x+y \ge 1']  , ['eqn','x^2+y^2 \ge 4'] ]",evaluateGraphEquations,false
+7d,equation with inequality two points,"[['line', [(1,0),(0,1)]],['circle', [(0,0),(0,-2)]]],['solid','solid'],[(2,0),(3,4)]","[['eqn','x+y \ge 1']  , ['eqn','x^2+y^2 \ge 4'] ]",evaluateGraphEquations,true
+7e,equation with inequality five points,"[['line', [(1,0),(0,1)]],['circle', [(0,0),(0,-2)]]],['solid','solid'],[(2,0),(3,4),(3,5),(3,6),(3,7)]","[['eqn','x+y \ge 1']  , ['eqn','x^2+y^2 \ge 4'] ]",evaluateGraphEquations,true
+7f,equation with inequality five points - one bad,"[['line', [(1,0),(0,1)]],['circle', [(0,0),(0,-2)]]],['solid','solid'],[(2,0)(3,4),(3,5),(3,6),(0,0)]","[['eqn','x+y \ge 1']  , ['eqn','x^2+y^2 \ge 4'] ]",evaluateGraphEquations,false
+
+#Two Lines and Circle
+7i,equation with inequality,"[['line', [(2,0),(0,2)]],['line', [(1,0),(0,1)]],['circle', [(0,0),(0,-2)]]],['solid','solid','solid'],[(3,0)]","[['eqn','x+y \ge 1'],['eqn','x+y>=2'],['eqn','x^2+y^2 \ge 4'] ]",evaluateGraphEquations,true
+7j,equation with inequality,"[['line', [(1,0),(0,1)]],['line', [(2,0),(0,2)]],['circle', [(0,0),(0,-2)]]],['solid','solid','solid'],[(3,0)]","[['eqn','x+y \ge 1'],['eqn','x+y>=2'],['eqn','x^2+y^2 \ge 4'] ]",evaluateGraphEquations,true
+7n,equation with inequality-wrong line style,"[['line', [(2,0),(0,2)]],['line', [(1,0),(0,1)]],['circle', [(0,0),(0,-2)]]],['dashed','dashed','solid'],[(3,0)]","[['eqn','x+y \ge 1'],['eqn','x+y>2'],['eqn','x^2+y^2 \ge 4'] ]",evaluateGraphEquations,false
+7o,circle and two lines - two regions,"[['line', [(0,-1),(1,0)]],['line', [(0,1),(1,2)]],['circle', [(0,0),(0,-2)]]],['dashed','dashed','solid'],[(0,1.5),(0,3.5))]","[['eqn','y>x+1'],['eqn','y<x-1'],['eqn','x^2+y^2 \le 4'] ]",evaluateGraphEquations,false
+7p,circle and two lines - two regions,"[['line', [(0,-1),(1,0)]],['line', [(0,1),(1,2)]],['circle', [(0,0),(0,-2)]]],['dashed','dashed','solid'],[(0,1.6),(0,1.5),(0,-1.5))]","[['eqn','y>x+1'],['eqn','y<x-1'],['eqn','x^2+y^2 \le 4'] ]",evaluateGraphEquations,false
+7q,circle and two lines - two regions but one bad point,"[['line', [(0,-1),(1,0)]],['line', [(0,1),(1,2)]],['circle', [(0,0),(0,-2)]]],['dashed','dashed','solid'],[(0,1.6),(0,1.5),(0,-2.5))]","[['eqn','y>x+1'],['eqn','y<x-1'],['eqn','x^2+y^2 \le 4'] ]",evaluateGraphEquations,false
+7r,circle and two lines - two regions but one bad point,"[['line', [(0,-1),(1,0)]],['line', [(0,1),(1,2)]],['circle', [(0,0),(0,-2)]]],['dashed','dashed','solid'],[(0,-2.5))]","[['eqn','y>x+1'],['eqn','y<x-1'],['eqn','x^2+y^2 \le 4'] ]",evaluateGraphEquations,false
+7s,circle and two lines - one region,"[['line', [(0,-1),(1,0)]],['line', [(0,1),(1,2)]],['circle', [(0,0),(0,-2)]]],['dashed','dashed','solid'],[(0,1.6),(0,-0.5))]","[['eqn','y>x+1'],['eqn','y>x-1'],['eqn','x^2+y^2 \le 4'] ]",evaluateGraphEquations,false
+
+8a,no solutions,"no solution","no solution",evaluateGraphEquations,true
+8b,no solutions,"no  solution","no solution",evaluateGraphEquations,true
+8c,no solutions," no solution","no solution",evaluateGraphEquations,true
+8d,no solutions," no  solution","no solution",evaluateGraphEquations,true
+8e,no solutions," no  solution ","no solution",evaluateGraphEquations,true
+8f,no solutions," no  idea ","no solution",evaluateGraphEquations,false
+8g,no solutions,"[['line', [(4,0),(0,4)]]],['solid'],[(4,4)]","no solution",evaluateGraphEquations,false
+
+# other shapes
+# two circles
+9a,candidate can enter an equation and solution is a single point,"[['circle', [(0,0),(0,-2)]],['eqn','(x-2)^2+y^2 \le 4']],['solid','solid'],[(2,0)]","[['eqn','x^2+y^2 \le 4'],['eqn','(x-2)^2+y^2 \le 4'] ]",evaluateGraphEquations,false
+9b,candidate can enter an equation and solution is a single point,"[['circle', [(0,0),(0,-2)]],['eqn','(x-2)^2+y^2 \le 4']],['solid','solid'],[(2.5,0)]","[['eqn','x^2+y^2 \le 4'],['eqn','(x-2)^2+y^2 \le 4'] ]",evaluateGraphEquations,false
+#9c,candidate can enter an equation and solution is a single point with tolerance,"[['circle', [(0,0),(0,-2)]],['eqn','(x-2)^2+y^2 \le 4']],['solid','solid'],[(2.02,0)]","[['eqn','x^2+y^2 \le 4'],['eqn','(x-2)^2+y^2 \le 4'] ]",evaluateGraphEquations,false
+9d,candidate can enter an equation,"[['circle', [(0,0),(0,-2)]],['eqn','(x-2)^2+y^2 \le 4']],['solid','solid'],[(1.5,0)]","[['eqn','x^2+y^2 \le 4'],['eqn','(x-2)^2+y^2 \le 4'] ]",evaluateGraphEquations,true
+
+#circle and hyperbola with one intersection region
+11a,hyperbola and circle has one region,"[['eqn','(x-1.5)^2+y^2 \le 4'],['hyperbola', [(-\sqrt{2},0),(\sqrt{2},0),(1,0)]]],['solid','solid'],[(2,0)]","[['eqn','(x-1.5)^2+y^2 \le 4'],['eqn','x^2 - y^2 >= 1']]",evaluateGraphEquations,true
+11b,hyperbola and circle has one region-two valid points,"[['eqn','(x-1.5)^2+y^2 \le 4'],['hyperbola', [(-\sqrt{2},0),(\sqrt{2},0),(1,0)]]],['solid','solid'],[(2,0),(3.0,0)]","[['eqn','(x-1.5)^2+y^2 \le 4'],['eqn','x^2 - y^2 >= 1']]",evaluateGraphEquations,true
+11c,hyperbola and circle has one region-one valid point one bad point,"[['eqn','(x-1.5)^2+y^2 \le 4'],['hyperbola', [(-\sqrt{2},0),(\sqrt(2),0),(1,0)]]],['solid','solid'],[(2,0),(4.5,0)]","[['eqn','(x-1.5)^2+y^2 \le 4'],['eqn','x^2 - y^2 >= 1']]",evaluateGraphEquations,false
+11d,hyperbola and circle has one region-three bad points,"[['eqn','(x-1.5)^2+y^2 \le 4'],['hyperbola', [(-\sqrt{2},0),(\sqrt{2},0),(1,0)]]],['solid','solid'],[(-6,0),(4.5,0)(5.5,0)]","[['eqn','(x-1.5)^2+y^2 \le 4'],['eqn','x^2 - y^2 >= 1']]",evaluateGraphEquations,false
+
+#circle and hyperbola with two intersection regions
+12a,hyperbola and circle has two regions,"[['eqn','x^2+y^2 \le 4'],['hyperbola', [(-\sqrt{2},0),(\sqrt{2},0),(1,0)]]],['solid','solid'],[(1.5,0)(-1.5,0)]","[['eqn','x^2+y^2 \le 4'],['eqn','x^2 - y^2 >= 1']]",evaluateGraphEquations,true
+12b,hyperbola and circle has two regions - one bad point,"[['eqn','x^2+y^2 \le 4'],['hyperbola', [(-\sqrt{2},0),(\sqrt{2},0),(1,0)]]],['solid','solid'],[(2.5,0)(-1.5,0)]","[['eqn','x^2+y^2 \le 4'],['eqn','x^2 - y^2 > 1']]",evaluateGraphEquations,false
+12c,hyperbola and circle has two regions - one point only,"[['eqn','x^2+y^2 \le 4'],['hyperbola', [(-\sqrt{2},0),(\sqrt{2},0),(1,0)]]],['solid','solid'],[(-1.5,0)]","[['eqn','x^2+y^2 \le 4'],['eqn','x^2 - y^2 > 1']]",evaluateGraphEquations,false
+12d,hyperbola and circle has two regions - two bad points,"[['eqn','x^2+y^2 \le 4'],['hyperbola', [(-\sqrt{2},0),(\sqrt{2},0),(1,0)]]],['solid','solid'],[(-3.5,0),(-5,0)]","[['eqn','x^2+y^2 \le 4'],['eqn','x^2 - y^2 > 1']]",evaluateGraphEquations,false
+
+
+# non-conics
+13a,non-conics,"[['eqn','x^3+y^2 \le 4']],['solid'],[(1,1)]","[['eqn','x^3+y^2 \le 4']]",evaluateGraphEquations,true
+13b,non-conics,"[['eqn','\exp^{x-1}+y^2 \le 4']],['solid'],[(1,1)]","[['eqn','\exp^{x-1}+y^2 \le 4']]",evaluateGraphEquations,true
+13c,non-conics,"[['eqn','\log(x-1)+y^2 \le 4']],['solid'],[(2,1)]","[['eqn','\log(x-1)+y^2 \le 4']]",evaluateGraphEquations,true
+13d,non-conics  bad point,"[['eqn','x^3+y^2 \le 4']],['solid'],[(2,1)]","[['eqn','x^3+y^2 \le 4']]",evaluateGraphEquations,false
+13e,non-conics bad eqn,"[['eqn','x^2+y^2 \le 4']],['solid'],[(1,1)]","[['eqn','x^3+y^2 \le 4']]",evaluateGraphEquations,false
+13f,non-conics bad style,"[['eqn','x^3+y^2 \le 4']],['dashed'],[(1,1)]","[['eqn','x^3+y^2 \le 4']]",evaluateGraphEquations,false
+13g,non-conics,"[['eqn','\sin(x)+y^2 \le 4']],['solid'],[(0,1)]","[['eqn','\sin(x)+y^2 \le 4']]",evaluateGraphEquations,true
+13h,non-conics,"[['eqn','\tan(x)+y^2 \le 4']],['solid'],[(0,1),(0,0)]","[['eqn','\sin(x)+y^2 \le 4']]",evaluateGraphEquations,false
+13i,non-conics,"[['eqn','\sin(x)+y^2 \le 4']],['solid'],[(0,1),(0,0)]","[['eqn','\sin(x)+y^2 \le 4']]",evaluateGraphEquations,true
+13j,non-conics,"[['eqn','\sin(x)+\cos(x)+y^2 \le 4']],['solid'],[(0,1),(0,0)]","[['eqn','\sin(x)+\cos(x)+y^2 \le 4']]",evaluateGraphEquations,true
+13k,non-conics one bad point,"[['eqn','\sin(x)+y^2 \le 4']],['solid'],[(0,3),(0,0)]","[['eqn','\sin(x)+y^2 \le 4']]",evaluateGraphEquations,false
+13l,non-conics,"[['eqn','x^3+y^2 \le 4'],['eqn','x^3+y^3 \le 4']],['solid','solid'],[(1,1),(0.9,0.0)]","[['eqn','x^3+y^2 \le 4'],['eqn','x^3+y^3 \le 4']]",evaluateGraphEquations,true
+13m,non-conics,"[['eqn','x^2+y^2 \le 4'],['eqn','x^3+y^3 \le 4'],['solid','solid'],[(1,1),(0.9,0.0)]","[['eqn','x^3+y^2 \le 4'],['eqn','x^3+y^3 \le 4']]",evaluateGraphEquations,false
+13n,non-conics,"[['eqn','x^2+y^2 \le 4'],['eqn','x^3+y^3 \le 4'],['solid','solid'],[(1,1),(2.9,0.0)]","[['eqn','x^3+y^2 \le 4'],['eqn','x^3+y^3 \le 4']]",evaluateGraphEquations,false
+
+
+

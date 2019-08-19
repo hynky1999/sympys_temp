@@ -11,16 +11,18 @@ decimal.getcontext().rounding = decimal.ROUND_HALF_UP
 
 from sympy import sympify
 from sympy import simplify 
-from sympy import expand, factor, logcombine, expand_log
-from sympy import srepr
+from sympy import expand, factor, logcombine, expand_log, expand_power_exp  
+from sympy import jscode
+from sympy import symbols,Matrix,linsolve,solveset
 from sympy.assumptions import register_handler, ask, Q
 from sympy import nsimplify,radsimp
-from sympy.core import Add, Basic, Mul
+from sympy.core.relational import Relational
+from sympy.core import Add, Basic, Mul, Lt, Le, Gt, Ge, Eq
 from sympy.core.basic import preorder_traversal
 from sympy.core.singleton import S
-from latex2sympy.process_latex import process_sympy
 from sympy.simplify.radsimp import fraction
 from sympy.assumptions.handlers import CommonHandler, test_closed_group
+from latex2sympy.process_latex import process_sympy
 # default values and dictionaries ---------------------------------------------
 UNIT_FOLDER = 'units'
 SI_CSV = 'si.csv'
@@ -110,10 +112,12 @@ separator_functions = {
 #Latex to math conversion of signs
 latex_separators = {
     r'\geq':'>=',
-	r'\ge':'>=',
-	r'\leq':'<=',
+    r'\ge':'>=',
+    r'\gt':'>',
+    r'\leq':'<=',
     r'\le':'<=',
-	r'\eq':'=',
+    r'\lt':'<',
+    r'\eq':'=',
     r'\neq':'≠'
 }
 # end of default values and dictionaries block --------------------------------
@@ -422,6 +426,442 @@ def convertEquation(eq_latex):
         separator_functions[eq_latex.group('sign')])
     eq = eq.format(eq_latex.group('l'),eq_latex.group('r'))
     return eq
+
+def transform_set(set_latex
+                ,par_open=['(','[','{']
+                ,par_close=[')',']','}']
+                ,options={}):
+    ''' Transform string set into list and return type of set
+        any == type does not matter - default
+        list == type matters and order matters
+        set == type matters and order does not matter
+    '''
+    #Parsing of list
+    #Try to match string using set regex and then perform balance check
+    type = 'any'
+    search_set = set_latex
+    for set_re in set_res:
+        search = set_re.match(set_latex)
+        if search and balance_check(search.group(2)):
+            if set_re == set_re_par:
+                type = 'list'
+            elif set_re == set_re_par2:
+                type = 'set'
+            search_set = search.group(2)
+            break
+    opening = []
+    set_symbolic = []
+    last_char = 0
+    quoted = False
+    closed = False
+    for i,char in enumerate(search_set):
+        if char in par_open and len(opening) == 0 and not quoted:
+            if closed:
+                raise ValueError
+
+            opening.append(char)
+            set_symbolic.append([char])
+            last_char = i+1
+            
+        elif char in par_close and len(opening) == 1 and not quoted:
+            element = str(convert(search_set[last_char:i],
+                             thousand_sep=getThousandsSeparator(options),
+                             decimal_sep=getDecimalSeparator(options),
+                             ignore_text=options.get('ignoreText', False),
+                             ignore_alpha=options.get('ignoreAlphabeticCharacters',False),
+                             euler_number=options.get('allowEulersNumber',False),
+                             evaluate=True))
+                             
+            if element == None:
+                raise ValueError
+                
+            set_symbolic[-1].append(str(element))
+            set_symbolic[-1].append(char)
+            char2 = opening.pop()
+            if char2 == '{' and char == '}':
+                set_symbolic[-1] = [[set_symbolic[-1][0]]
+                                  + sorted(set_symbolic[-1][1:-1])
+                                  + [set_symbolic[-1][-1]]]
+                                  
+            last_char = i+1
+            if closed:
+                raise ValueError
+                
+            closed = True
+        elif char == '"':
+            if quoted:
+                quoted = False
+                
+            else:
+                quoted = True
+                last_char = i+1 
+                
+        elif char == ',' and not quoted:
+            if opening:
+                element = str(convert(search_set[last_char:i],
+                                  thousand_sep=getThousandsSeparator(options),
+                                  decimal_sep=getDecimalSeparator(options),
+                                  ignore_text=options.get('ignoreText', False),
+                                  ignore_alpha=options.get('ignoreAlphabeticCharacters',False),
+                                  euler_number=options.get('allowEulersNumber',False),
+                                  evaluate=True))
+                if element is None:
+                    raise ValueError
+                set_symbolic[-1].append(str(element))
+                last_char = i+1
+            else:
+                if closed:
+                    last_char = i+1
+                    closed = False
+                    
+                else:
+                    element = str(convert(search_set[last_char:i],
+                                      thousand_sep=getThousandsSeparator(options),
+                                      decimal_sep=getDecimalSeparator(options),
+                                      ignore_text=options.get('ignoreText', False),
+                                      ignore_alpha=options.get('ignoreAlphabeticCharacters',False),
+                                      euler_number=options.get('allowEulersNumber',False),
+                                      evaluate=True))
+                    
+                    if element is None:
+                        raise ValueError
+                        
+                    set_symbolic.append([str(element)])
+                    last_char = i+1
+                    
+    if last_char != len(search_set) and not closed:
+        element = str(convert(search_set[last_char:],
+                          thousand_sep=getThousandsSeparator(options),
+                          decimal_sep=getDecimalSeparator(options),
+                          ignore_text=options.get('ignoreText', False),
+                          ignore_alpha=options.get('ignoreAlphabeticCharacters',False),
+                          euler_number=options.get('allowEulersNumber',False),
+                          evaluate=True))
+        if element is None:
+            raise ValueError
+            
+        set_symbolic.append([str(element)])
+    return set_symbolic,type
+
+def strToList(s):
+    s = s.strip()
+    level = 0
+    list_temp = []
+    esc1,esc2 = [False]*2
+    last_char = 0
+    flag = 0
+    for i,char in enumerate(s):
+
+        if not esc1 and not esc2:
+
+            if char in ('(','['):
+                level+= 1
+                flag = 1
+
+                if level == 1:
+                    last_char = i+1
+
+            elif char in (')',']'):
+                if level == 1:
+                    element = strToList(s[last_char:i])
+
+                    if element is not None:
+                        list_temp.append(element)
+
+                    last_char = i+1
+                level-= 1
+            elif char == ',' and level == 1:
+                    element = strToList(s[last_char:i])
+                    if element is not None:
+                        list_temp.append(element)
+
+                    last_char = i+1
+        if char == '"':
+            esc1 = not esc1
+
+        elif char == "'":
+            esc2 = not esc2
+
+    if not flag:
+        s = s.replace("'",'').replace('"','')
+        return s if s else None
+
+    else:
+        return list_temp
+        
+def formatEquation(equation,options={}):
+    equation = equation
+    equation = convert(equation, evaluate=False,
+                        thousand_sep=getThousandsSeparator(options),
+                        decimal_sep=getDecimalSeparator(options),
+                        euler_number=True)
+    return equation
+
+def formatLine(params):
+    point1,point2 = [list(map(convert,x)) for x in params]
+    a, b, x, y = symbols('a b x y')
+    if point1[0] == point2[0]:
+
+        if point1[1] == point2[1]:
+            raise ValueError('Point')
+
+        else:
+            return Eq(x,point1[0])
+
+    if point1[1] == point2[1]:
+        return Eq(y,point1[1])
+
+    A = Matrix([[point1[0],1],
+                [point2[0],1]])
+    B = Matrix([[point1[1]],
+                [point2[1]]])
+    a,b = linsolve((A,B),[a,b]).args[0]
+    return Eq(y,a*x+b)
+
+def formatCircle(params):
+    x, y = symbols('x y')
+    center,point1 = [list(map(convert,x)) for x in params]
+    if center == point1:
+        raise ValueError('Point')
+
+    e = (point1[0]-center[0])**2+(point1[1]-center[1])**2
+    return Eq((x-center[0])**2+(y-center[1])**2,e)
+
+def formatEllipse(params):
+    x, y = symbols('x y')
+    center,point1,point2 = [list(map(convert,x)) for x in params]
+    a_2 = (center[0]-point1[0])**2 
+    b_2 = (center[1]-point2[1])**2
+    if a_2 == 0 or b_2 == 0:
+        raise ValueError('Invalid Elipse')
+
+    return Eq(((x-center[0])**2)/a_2+((y-center[1])**2)/b_2,1)
+
+def formatParabola(params):
+    x, y = symbols('x y')
+    apex,point1,point2 = [list(map(convert,x)) for x in params]
+    if ((apex[1] < point1[1] and apex[1] < point2[1])#X-centric
+        or (apex[1] > point1[1] and apex[1] > point2[1])):
+        p1 = (point1[0]-apex[0])**2/(point1[1]-apex[1])
+        p2 = (point2[0]-apex[0])**2/(point2[1]-apex[1])
+        if point1[1] == apex[1] or point2[1] == apex[1]:
+            raise ValueError('Invalid Parabola')
+
+        if p1 == p2:
+            return Eq((x-apex[0])**2,p1*(y-apex[1]))
+
+        else:
+            raise ValueError('Invalid Parabola')
+
+    else:
+        if point1[0] == apex[0] or point2[0] == apex[0]:
+            raise ValueError('Invalid Parabola')
+
+        p1 = (point1[1]-apex[1])**2/(point1[0]-apex[0])
+        p2 = (point2[1]-apex[1])**2/(point2[0]-apex[0])
+        if p1 == p2:
+            return Eq((y-apex[1])**2,p1*(x-apex[0]))
+
+        else:
+            raise ValueError('Invalid Parabola')
+
+def formatHyperbola(params):
+    x, y, a_2, b_2 = symbols('x y a b')
+    foci1,foci2,point1 = [list(map(convert,x)) for x in params]
+    if foci1[1] == foci2[1]: 
+        e = (foci1[0]-foci2[0])/2
+        center = (foci2[0]+e,foci1[1])
+        a_2 = solveset(
+              Eq(((point1[0]-center[0])**2)/a_2\
+              -((point1[1]-center[1])**2)/(e**2-a_2),1),a_2).args[0]
+        b_2 = e**2 - a_2
+        if a_2 == 0 or b_2 ==0:
+            raise ValueError('Invalid Hyperbola')
+
+        else:
+            return Eq(((x-center[0])**2)/a_2-((y-center[1])**2)/b_2,1)
+
+    elif foci1[0] == foci2[0]:
+        e = (foci1[1]-foci2[1])/2
+        center = (foci1[0],foci2[1]+e)
+        b_2 = solveset(
+              Eq((((point1[1]-center[1])**2)/b_2-\
+                (point1[0]-center[0])**2)/(e**2-b_2),1),b_2).args[0]
+        a_2 = e**2 - b_2
+        if a_2 == 0 or b_2 ==0:
+            raise ValueError('Invalid Hyperbola')
+
+        else:
+            return Eq(((y-center[1])**2)/b_2-((x-center[0])**2)/a_2,1)
+
+    else:
+        raise ValueError('Invalid Hyperbola')
+
+def formatOp(eq,points,shapeStyle,strict=False):
+    equality,higher,lower = [False]*3
+    op_expected = type(eq)
+    if shapeStyle == 'solid':
+        if op_expected is Gt:
+            op_expected = Ge
+
+        elif op_expected is Lt:
+            op_expected = Le
+
+    elif shapeStyle == 'dashed':
+        if op_expected is Ge:
+            op_expected = Gt
+        
+        elif op_expected is Le:
+            op_expected = Lt
+        
+        elif op_expected is Eq and strict:
+            raise ValueError('Invalid object')
+
+    for p in points:
+        if subPoint(p,Eq(eq.lhs,eq.rhs)):
+            equality = True
+
+        elif subPoint(p,Lt(eq.lhs,eq.rhs)):
+            lower = True
+                
+        elif subPoint(p,Gt(eq.lhs,eq.rhs)):
+            higher = True
+
+    if higher and lower:
+        raise ValueError('Wrong Points')
+    
+    elif equality and shapeStyle == 'dashed':
+        raise ValueError('Wrong shapeStyle')
+
+    elif higher:
+        if shapeStyle == 'dashed':
+            op = Gt
+
+        else:
+            op = Ge
+
+    elif lower:
+        if shapeStyle == 'dashed':
+            op = Lt
+
+        else:
+            op = Le
+
+    elif equality:
+        op = Eq
+
+    else:
+        op = op_expected
+
+    if strict and op_expected is not op:
+        raise ValueError('Error op')
+
+    return op(eq.lhs,eq.rhs)
+
+def formatEquations(equations,points,shapeStyle):
+    eqs = []
+    for i,eq in enumerate(equations):
+        strict = False
+        object_type = eq[0]
+        if object_type == 'eqn':
+            formated_eqn = formatEquation(eq[1])
+
+            strict = True
+        elif object_type == 'line':
+            formated_eqn = formatLine(eq[1])
+
+        elif object_type == 'circle':
+            formated_eqn = formatCircle(eq[1])
+
+        elif object_type == 'ellipse':
+            formated_eqn = formatEllipse(eq[1])
+
+        elif object_type == 'parabola':
+            formated_eqn = formatParabola(eq[1])
+
+        elif object_type == 'hyperbola':
+            formated_eqn = formatHyperbola(eq[1])
+
+        else:
+            raise ValueError('Not Defined object')
+
+        formated_eqn = formatOp(formated_eqn,
+                                points,
+                                shapeStyle[i],
+                                strict=strict)
+        eqs.append(formated_eqn)
+    return eqs
+
+def formatGraphList(graph_list):
+    no_solution_re = re.compile(r'\s*no\s*solution\s*$')
+    graph_list = strToList('('+graph_list+')')
+    if len(graph_list) == 1:
+        shapeEqn = graph_list[0]
+
+        if (isinstance(shapeEqn,str)
+            and no_solution_re.match(shapeEqn)):
+            shapeEqn = []
+        shapeStyle = ['']*len(shapeEqn)
+        regionPoints = []
+
+    elif len(graph_list) == 2:
+        shapeEqn,shapeStyle = graph_list
+        regionPoints = []
+
+    elif len(graph_list) == 3:
+        shapeEqn,shapeStyle,regionPoints = graph_list
+
+    else:
+        raise ValueError('Could not format')
+
+    shapeStyle = formatShapeStyle(shapeStyle,len(shapeEqn))
+    return shapeEqn,shapeStyle,regionPoints
+    
+def formatShapeStyle(shapes,len_eqs):
+    if len(shapes) == 0:
+        shapes = [''] * len_eqs
+        
+    else:
+        shapes = [x for x in shapes]
+        
+    if len(shapes) != len_eqs:
+        raise ValueError('Error_graph')
+    
+    return shapes
+        
+    
+    return shapes
+def checkEquations(eq1,eq2):
+    if isinstance(eq1,Ge) or isinstance(eq1,Gt):
+        eq1 = eq1.reversed
+
+    if isinstance(eq2,Ge) or isinstance(eq2,Gt):
+        eq2 = eq2.reversed
+
+    if isinstance(eq1,Eq) and isinstance(eq2,Eq):
+        if (expand(simplify(eq1.lhs-eq1.rhs-(eq2.lhs-eq2.rhs))) == 0 or
+            expand(simplify(eq1.lhs-eq1.rhs+(eq2.lhs-eq2.rhs))) == 0):
+            return True
+
+    elif (isinstance(eq1,type(eq2)) and
+        expand(simplify(eq1.lhs-eq1.rhs-(eq2.lhs-eq2.rhs))) == 0):
+            return True
+
+    return False
+        
+def checkRegionPoints(points,equations):
+    for e in equations:
+        for p in points:
+            e = subPoint(p,e)
+            if e != True:
+                raise ValueError('Error_graph')
+
+    return True
+    
+def subPoint(point,eq):
+    x,y = symbols('x y')
+    a = eq.subs([[x,point[0]],[y,point[1]]])
+    return eq.subs([[x,point[0]],[y,point[1]]])
 
 
 def replace_separators(input_latex,
@@ -1429,6 +1869,53 @@ def equiv_value(input_latex, expected_latex, options):
         
     return result(xor(equiv, 'inverseResult' in options))
 
+def evaluate_graph_eq(input_latex,expected_latex,options={}):
+    '''
+    Function which compares input equations against expected equations
+    Equations can be either standar equations or JSXGraph objects
+    If we encounter object it is converted to equation with = sign.
+    All equations signs are then formated using points provided as
+    region points to include these points.
+    Then we compare these equations
+    '''
+    try:
+        expectedShapeEqn,expectedShapeStyle,expectedRegionPoints =\
+                                    formatGraphList(expected_latex)
+        expectedRegionPoints = [list(map(convert,x)) for
+                                    x in expectedRegionPoints]
+        eq_expected = formatEquations(expectedShapeEqn,
+                                      expectedRegionPoints,
+                                      expectedShapeStyle)
+
+    except ValueError as e:
+        return 'Error_Graph'
+
+    try:
+        answerShapeEqn,answerShapeStyle,answerRegionPoints =\
+                                 formatGraphList(input_latex)
+        answerRegionPoints = [list(map(convert,x)) for
+                                    x in answerRegionPoints]
+        eq_answer = formatEquations(answerShapeEqn,
+                                    answerRegionPoints,
+                                    answerShapeStyle)
+
+    except ValueError as e:
+        return result(False)
+
+    for a in eq_answer:
+        for eq in eq_expected:
+            if checkEquations(eq,a):
+                eq_expected.remove(eq)
+                break
+        else:
+            return result(False)
+
+    if len(eq_expected) == 0:
+        return result(True)
+
+    else:
+        return result(False)
+
 def string_match(input_latex, expected_latex, options):
     ''' check stringMatch
     '''
@@ -1555,122 +2042,16 @@ def is_rational(input_latex, expected_latex=None, options={}):
                 and equiv)
     return result(xor(rational, 'inverseResult' in options))
 
-
-def transform_set(set_latex
-                ,par_open=['(','[','{']
-                ,par_close=[')',']','}']
-                ,options={}):
-    ''' Transform string set into list and return type of set
-        any == type does not matter - default
-        list == type matters and order matters
-        set == type matters and order does not matter
-    '''
-    #Parsing of list
-    #Try to match string using set regex and then perform balance check
-    type = 'any'
-    search_set = set_latex
-    for set_re in set_res:
-        search = set_re.match(set_latex)
-        if search and balance_check(search.group(2)):
-            if set_re == set_re_par:
-                type = 'list'
-            elif set_re == set_re_par2:
-                type = 'set'
-            search_set = search.group(2)
-            break
-    opening = []
-    set_symbolic = []
-    last_char = 0
-    quoted = False
-    closed = False
-    for i,char in enumerate(search_set):
-        if char in par_open and len(opening) == 0 and not quoted:
-            if closed:
-                raise ValueError
-
-            opening.append(char)
-            set_symbolic.append([char])
-            last_char = i+1
-            
-        elif char in par_close and len(opening) == 1 and not quoted:
-            element = str(convert(search_set[last_char:i],
-                             thousand_sep=getThousandsSeparator(options),
-                             decimal_sep=getDecimalSeparator(options),
-                             ignore_text=options.get('ignoreText', False),
-                             ignore_alpha=options.get('ignoreAlphabeticCharacters',False),
-                             euler_number=options.get('allowEulersNumber',False),
-                             evaluate=True))
-                             
-            if element == None:
-                raise ValueError
-                
-            set_symbolic[-1].append(str(element))
-            set_symbolic[-1].append(char)
-            char2 = opening.pop()
-            if char2 == '{' and char == '}':
-                set_symbolic[-1] = [[set_symbolic[-1][0]]
-                                  + sorted(set_symbolic[-1][1:-1])
-                                  + [set_symbolic[-1][-1]]]
-                                  
-            last_char = i+1
-            if closed:
-                raise ValueError
-                
-            closed = True
-        elif char == '"':
-            if quoted:
-                quoted = False
-                
-            else:
-                quoted = True
-                last_char = i+1 
-                
-        elif char == ',' and not quoted:
-            if opening:
-                element = str(convert(search_set[last_char:i],
-                                  thousand_sep=getThousandsSeparator(options),
-                                  decimal_sep=getDecimalSeparator(options),
-                                  ignore_text=options.get('ignoreText', False),
-                                  ignore_alpha=options.get('ignoreAlphabeticCharacters',False),
-                                  euler_number=options.get('allowEulersNumber',False),
-                                  evaluate=True))
-                if element is None:
-                    raise ValueError
-                set_symbolic[-1].append(str(element))
-                last_char = i+1
-            else:
-                if closed:
-                    last_char = i+1
-                    closed = False
-                    
-                else:
-                    element = str(convert(search_set[last_char:i],
-                                      thousand_sep=getThousandsSeparator(options),
-                                      decimal_sep=getDecimalSeparator(options),
-                                      ignore_text=options.get('ignoreText', False),
-                                      ignore_alpha=options.get('ignoreAlphabeticCharacters',False),
-                                      euler_number=options.get('allowEulersNumber',False),
-                                      evaluate=True))
-                    
-                    if element is None:
-                        raise ValueError
-                        
-                    set_symbolic.append([str(element)])
-                    last_char = i+1
-                    
-    if last_char != len(search_set) and not closed:
-        element = str(convert(search_set[last_char:],
-                          thousand_sep=getThousandsSeparator(options),
-                          decimal_sep=getDecimalSeparator(options),
-                          ignore_text=options.get('ignoreText', False),
-                          ignore_alpha=options.get('ignoreAlphabeticCharacters',False),
-                          euler_number=options.get('allowEulersNumber',False),
-                          evaluate=True))
-        if element is None:
-            raise ValueError
-            
-        set_symbolic.append([str(element)])
-    return set_symbolic,type
+def convert_JS(input_latex, expected_latex=None, options={}):
+    eq = formatEquation(input_latex)
+    if isinstance(eq,Relational):
+        rel_op = '=' if eq.rel_op == '==' else rel_op
+        eq_l = jscode(simplify(eq.lhs - eq.rhs))
+    else:
+        eq_l = jscode(simplify(eq))
+        rel_op = '='
+    eq_str = '{} {} {}'.format(eq_l,rel_op,'0')
+    return eq_str
     
 def set_evaluation(input_latex, expected_latex=None, options={}):
     ''' check setEvaluation
@@ -1850,6 +2231,7 @@ def calculate(input_latex, expected_latex, options):
 
 # a dictionary mapping option names to functions performing the checks
 check_func = {
+    'evaluateGraphEquations': evaluate_graph_eq,
     'equivSymbolic': equiv_symbolic,
     'equivLiteral': equiv_literal,
     'equivValue': equiv_value,
@@ -1864,12 +2246,15 @@ check_func = {
     'equivSyntax': equiv_syntax,
     'setEvaluation': set_evaluation,
     'calculate': calculate,
+    'convertJS': convert_JS
 }
 
 # a dictionary of possible main options and their respective
 # sets of suboptions; will be used to check validity
 # of option combinations passed to the script
 allowed_options = {
+    'convertJS':{},
+    'evaluateGraphEquations':{},
     'equivSymbolic': {
         'allowEulersNumber',
         'setThousandsSeparator',
