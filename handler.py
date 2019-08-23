@@ -156,7 +156,7 @@ def convertLatex2Js(event, context):
 #  Outgoing:
 #      value: true/false, in this case true
 # 
-def evaluateGraphEquations(event, context):
+def graphEvaluate(event, context):
     print("Request Body: ")
     print(event["body"])
     try:
