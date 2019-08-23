@@ -334,7 +334,6 @@ def convert_func(func):
             arg = convert_func_arg(func.func_arg_noparens())
             
         name = func.func_normal().start.text[1:]
-
         # change arc<trig> -> a<trig>
         if name in ["arcsin", "arccos", "arctan", "arccsc", "arcsec",
         "arccot"]:
@@ -352,7 +351,8 @@ def convert_func(func):
             elif name == "ln":
                 base = sympy.E
             expr = sympy.log(arg, base, evaluate=False)
-
+        if (name=="exp"):
+            expr = getattr(sympy.functions, name)(arg, evaluate=False)
         func_pow = None
         should_pow = True
         if func.supexpr():

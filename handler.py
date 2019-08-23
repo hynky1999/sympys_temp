@@ -2,8 +2,18 @@ import csv
 import sys
 import json
 
-from checks import parse_checks, check_func, replace_variables, calculate_expression
+from checks import parse_checks, check_func, replace_variables, calculate_expression, convert_JS
 
+# Main handler:
+#  FrontEnd Endpoint /evaluate
+#    body: { "input":"x + 1", "expected":"x+1", "checks":"equivSymbolic" }
+#  Incoming:
+#     expected:  from teacher,  eg. x+1
+#     input:  from student, e.g. x + 1
+#     checks: type of check e.g. equivSymbolic
+#  Outgoing:
+#      value: true/false, in this case true
+# 
 def handle(event, context):
     print("Request Body: ")
     print(event["body"])
@@ -66,6 +76,156 @@ def handle(event, context):
             })
         }
         return response
+
+# latex conversion :
+#  FrontEnd Endpoint /convertLatex2Js
+#    body: { "latex":"y-\\sin{x}=0"}
+#  Incoming:
+#         latex that needs to be converted into something that can be plotted, .eg. "y-\sin{x}=0"
+#  Outgoing:
+#      value: the converted input, in this case it will be "y-sin(x)=0"
+# 
+def convertLatex2Js(event, context):
+    print("Request Body: ")
+    print(event["body"])
+    try:
+        body = json.loads(event["body"])
+    except Exception as e:
+        response = {
+            "statusCode": 500,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": json.dumps({
+                "error": "Error occured",
+                "message": str(e)
+            })
+        }
+        return response
+
+    if body["latex"] is None:
+        return {
+            "statusCode": 400,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": {
+                "message": "Bad Request"
+            }
+        }
+    try:
+        latex = body["latex"]
+        result = convertLatex2Js(latex)
+
+        response = {
+            "statusCode": 200,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": json.dumps({
+                "result": result
+            })
+        }
+
+        return response
+    except Exception as e:
+        response = {
+            "statusCode": 500,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": json.dumps({
+                "error": "Internal Server Error",
+                "message": str(e)
+            })
+        }
+        return response
+
+# Graph handler:
+#  FrontEnd Endpoint /graphEvaluate
+#    body: { "input":"[['line', [(2.0,2.0),(0.0,4.0)]]],['solid'],[(4.0,0.0)]", "expected":"[['eqn','x+y \gt 4']],[(5,0)]", "checks":"equivSymbolic" }
+#  Incoming:
+#     expected:  from teacher, Two fields separated by a comma, first the equations, and then the points for shading/selecting the regions
+#          eg. [['eqn','x+y \gt 4']],[(5,0)], here it is a line and a point to identify the region
+#          Note that the teacher can also enter a JSXGraph object
+#
+#     input:  from student, Three fields separated by a comma, first the shapes, then the shape line pattern, then the points for shading
+#      a shading type for the line, dashed or solid where dashed is for < or > cases. Lastline
+#        e.g. [['line', [(2.0,2.0),(0.0,4.0)]]],['solid'],[(4.0,0.0)], here it is a JSXGraph line object, 
+#     checks: type of check e.g. equivSymbolic
+#  Outgoing:
+#      value: true/false, in this case true
+# 
+def evaluateGraphEquations(event, context):
+    print("Request Body: ")
+    print(event["body"])
+    try:
+        body = json.loads(event["body"])
+    except Exception as e:
+        response = {
+            "statusCode": 500,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": json.dumps({
+                "error": "Error occured",
+                "message": str(e)
+            })
+        }
+        return response
+
+    if body["input"] is None or\
+       body["expected"] is None or\
+       body["checks"] is None:
+        return {
+            "statusCode": 400,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": {
+                "message": "Bad Request"
+            }
+        }
+    try:
+        checks = parse_checks(body["checks"])
+        result = "true"
+        for check in checks:
+            value = check_func[check](body["input"], body["expected"], checks[check])
+            if value != "true":
+                result = value
+                break
+
+        response = {
+            "statusCode": 200,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": json.dumps({
+                "result": result
+            })
+        }
+
+        return response
+    except Exception as e:
+        response = {
+            "statusCode": 500,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": json.dumps({
+                "error": "Internal Server Error",
+                "message": str(e)
+            })
+        }
+        return response
+
+# Endpoint /calculate
+#  Incoming:
+# [{"id":"1a","latexes":[{"id":"z","formula":"x+y"},{"id":"z2","formula":"x+y^2"}],"variables":[{"id":"x","value":1},{"id":"y","value":2}]}]
+#  Outgoing:
+#   computes z and z2  based on the variables 
+# "[{"id":"1a","values": {"z":"3","z2":"5"}}]"
+
 
 def calculate(event, context):
     try:
@@ -142,6 +302,14 @@ def calculate(event, context):
         }
         return response
 
+#  backend tester
+#  takes test cases from a file in the format of:
+#   
+#    testId,description,input,expected,check,result
+#    
+#    where "input" is from the student, and "result" is the expected result (true/false) for the given check, input and expected.
+#    This returns pass/fail and counts of fails for each test
+#
 def test(event, context):
     test_file_name = 'tests.csv'
 

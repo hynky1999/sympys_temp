@@ -12,7 +12,9 @@ decimal.getcontext().rounding = decimal.ROUND_HALF_UP
 from sympy import sympify
 from sympy import simplify 
 from sympy import expand, factor, logcombine, expand_log, expand_power_exp  
-from sympy import jscode
+from sympy.printing.jscode import JavascriptCodePrinter
+from sympy.printing.codeprinter import CodePrinter
+from sympy.printing.precedence import precedence, PRECEDENCE
 from sympy import symbols,Matrix,linsolve,solveset
 from sympy.assumptions import register_handler, ask, Q
 from sympy import nsimplify,radsimp
@@ -119,6 +121,30 @@ latex_separators = {
     r'\lt':'<',
     r'\eq':'=',
     r'\neq':'≠'
+}
+
+known_functions = {
+    'Abs': 'abs',
+    'acos': 'acos',
+    'acosh': 'acosh',
+    'asin': 'asin',
+    'asinh': 'asinh',
+    'atan': 'atan',
+    'atan2': 'atan2',
+    'atanh': 'atanh',
+    'ceiling': 'ceil',
+    'cos': 'cos',
+    'cosh': 'cosh',
+    'exp': 'exp',
+    'floor': 'floor',
+    'log': 'log',
+    'Max': 'max',
+    'Min': 'min',
+    'sign': 'sign',
+    'sin': 'sin',
+    'sinh': 'sinh',
+    'tan': 'tan',
+    'tanh': 'tanh',
 }
 # end of default values and dictionaries block --------------------------------
 
@@ -590,11 +616,12 @@ def strToList(s):
         return list_temp
         
 def formatEquation(equation,options={}):
-    equation = equation
     equation = convert(equation, evaluate=False,
                         thousand_sep=getThousandsSeparator(options),
                         decimal_sep=getDecimalSeparator(options),
                         euler_number=True)
+    if equation is None:
+        raise ValueError('Error')
     return equation
 
 def formatLine(params):
@@ -699,24 +726,11 @@ def formatHyperbola(params):
 
 def formatOp(eq,points,shapeStyle,strict=False):
     equality,higher,lower = [False]*3
-    op_expected = type(eq)
-    if shapeStyle == 'solid':
-        if op_expected is Gt:
-            op_expected = Ge
-
-        elif op_expected is Lt:
-            op_expected = Le
-
-    elif shapeStyle == 'dashed':
-        if op_expected is Ge:
-            op_expected = Gt
+    if shapeStyle == '' and strict:
+        if isinstance(eq,(Lt,Gt)):
+            shapeStyle = 'dashed'
+    #print(points,eq)
         
-        elif op_expected is Le:
-            op_expected = Lt
-        
-        elif op_expected is Eq and strict:
-            raise ValueError('Invalid object')
-
     for p in points:
         if subPoint(p,Eq(eq.lhs,eq.rhs)):
             equality = True
@@ -743,7 +757,7 @@ def formatOp(eq,points,shapeStyle,strict=False):
     elif lower:
         if shapeStyle == 'dashed':
             op = Lt
-
+        
         else:
             op = Le
 
@@ -751,11 +765,7 @@ def formatOp(eq,points,shapeStyle,strict=False):
         op = Eq
 
     else:
-        op = op_expected
-
-    if strict and op_expected is not op:
-        raise ValueError('Error op')
-
+        raise ValueError()
     return op(eq.lhs,eq.rhs)
 
 def formatEquations(equations,points,shapeStyle):
@@ -805,8 +815,8 @@ def formatGraphList(graph_list):
         regionPoints = []
 
     elif len(graph_list) == 2:
-        shapeEqn,shapeStyle = graph_list
-        regionPoints = []
+        shapeEqn,regionPoints = graph_list
+        shapeStyle = ['']*len(shapeEqn)
 
     elif len(graph_list) == 3:
         shapeEqn,shapeStyle,regionPoints = graph_list
@@ -838,15 +848,11 @@ def checkEquations(eq1,eq2):
     if isinstance(eq2,Ge) or isinstance(eq2,Gt):
         eq2 = eq2.reversed
 
-    if isinstance(eq1,Eq) and isinstance(eq2,Eq):
-        if (expand(simplify(eq1.lhs-eq1.rhs-(eq2.lhs-eq2.rhs))) == 0 or
-            expand(simplify(eq1.lhs-eq1.rhs+(eq2.lhs-eq2.rhs))) == 0):
+    if isinstance(eq1,type(eq2)):
+        division = simplify(expand((eq1.lhs-eq1.rhs)/(eq2.lhs-eq2.rhs)))
+        if (division.is_number and
+            (division.is_positive or isinstance(eq1,Eq))):
             return True
-
-    elif (isinstance(eq1,type(eq2)) and
-        expand(simplify(eq1.lhs-eq1.rhs-(eq2.lhs-eq2.rhs))) == 0):
-            return True
-
     return False
         
 def checkRegionPoints(points,equations):
@@ -1026,9 +1032,11 @@ def preprocess_latex(input_latex,
                         lambda x: latex_separators[x.group(0)],input_latex)
     # \textit to \text
     input_latex = input_latex.replace(r'\textit',r'\text')
+
     # Euler Number handling
     if euler_number:
-        input_latex = re.sub(r'(\\exp|e)','E',input_latex)
+        input_latex = re.sub(r'([^\\a-zA-Z]+|[xy]|^)e',r'\1E',input_latex)
+        input_latex = re.sub(r'\\exp\^',r'E^',input_latex)
         
     else:
         input_latex = scientific_re.sub(r'*10^{\1}',input_latex)
@@ -1226,6 +1234,40 @@ def getDecimalSeparator(options):
         decimal_sep = ',' if thousand_sep == '.' else '.'
         
     return decimal_sep
+
+class JavascriptCodePrinterMod(JavascriptCodePrinter):
+    """"A Printer to convert python expressions to strings of javascript code
+    """
+
+    def __init__(self, settings={}):
+        CodePrinter.__init__(self, settings)
+        self.known_functions = dict(known_functions)
+        userfuncs = settings.get('user_functions', {})
+        self.known_functions.update(userfuncs)
+
+    def _print_Pow(self, expr):
+        PREC = precedence(expr)
+        if expr.exp == -1:
+            return '1/%s' % (self.parenthesize(expr.base, PREC))
+        elif expr.exp == 0.5:
+            return 'sqrt(%s)' % self._print(expr.base)
+        elif expr.exp == S(1)/3:
+            return 'cbrt(%s)' % self._print(expr.base)
+        else:
+            return 'pow(%s, %s)' % (self._print(expr.base),
+                                 self._print(expr.exp))
+
+    def _print_Exp1(self, expr):
+        return "exp(1)"
+
+    def _print_Pi(self, expr):
+        return 'PI'
+
+    def _print_Infinity(self, expr):
+        return 'POSITIVE_INFINITY'
+
+    def _print_NegativeInfinity(self, expr):
+        return 'NEGATIVE_INFINITY'
     
 class AskRationalHandler2(CommonHandler):
     """
@@ -1883,6 +1925,7 @@ def evaluate_graph_eq(input_latex,expected_latex,options={}):
                                     formatGraphList(expected_latex)
         expectedRegionPoints = [list(map(convert,x)) for
                                     x in expectedRegionPoints]
+
         eq_expected = formatEquations(expectedShapeEqn,
                                       expectedRegionPoints,
                                       expectedShapeStyle)
@@ -1895,13 +1938,18 @@ def evaluate_graph_eq(input_latex,expected_latex,options={}):
                                  formatGraphList(input_latex)
         answerRegionPoints = [list(map(convert,x)) for
                                     x in answerRegionPoints]
+        #print(answerRegionPoints)
         eq_answer = formatEquations(answerShapeEqn,
                                     answerRegionPoints,
                                     answerShapeStyle)
-
     except ValueError as e:
         return result(False)
 
+    if (len(expectedRegionPoints) < 1
+        or len(expectedRegionPoints) != len(answerRegionPoints)):
+        return 'Error_Point'
+
+    #print(eq_expected,eq_answer)
     for a in eq_answer:
         for eq in eq_expected:
             if checkEquations(eq,a):
@@ -2043,14 +2091,25 @@ def is_rational(input_latex, expected_latex=None, options={}):
     return result(xor(rational, 'inverseResult' in options))
 
 def convert_JS(input_latex, expected_latex=None, options={}):
-    eq = formatEquation(input_latex)
-    if isinstance(eq,Relational):
-        rel_op = '=' if eq.rel_op == '==' else rel_op
-        eq_l = jscode(simplify(eq.lhs - eq.rhs))
-    else:
-        eq_l = jscode(simplify(eq))
-        rel_op = '='
-    eq_str = '{} {} {}'.format(eq_l,rel_op,'0')
+    x,y = symbols('x y')
+    try:
+        eq = formatEquation(input_latex)
+        if not isinstance(eq,Relational):
+            eq = Eq(y,eq)
+        if not eq.free_symbols.issubset([x,y]):
+            raise ValueError('Free Symbols')
+
+        eq_l = JavascriptCodePrinterMod(
+                {'user_functions':known_functions}).doprint(
+                    expand(simplify(eq.lhs-eq.rhs)),None)
+        if re.search('Not supported in Javascript',eq_l):
+            raise ValueError('Function not supported')
+
+        rel_op = '=' if eq.rel_op == '==' else eq.rel_op
+        eq_str = '{} {} {}'.format(eq_l,rel_op,'0')
+    except:
+        return r'Conversion_Error'
+
     return eq_str
     
 def set_evaluation(input_latex, expected_latex=None, options={}):
@@ -2068,10 +2127,12 @@ def set_evaluation(input_latex, expected_latex=None, options={}):
         input_symbolic,type1 = transform_set(input_latex)
     except ValueError:
         return 'false'
+
     try:
         expected_symbolic,type2 = transform_set(expected_latex)  
     except ValueError:
         return 'Unreadable_List_Error'
+
     if 'interpretAsList' in options or 'interpretAsSet' in options:
         type1 = 'any'
         
@@ -2246,14 +2307,14 @@ check_func = {
     'equivSyntax': equiv_syntax,
     'setEvaluation': set_evaluation,
     'calculate': calculate,
-    'convertJS': convert_JS
+    'convertLatex2Js': convert_JS
 }
 
 # a dictionary of possible main options and their respective
 # sets of suboptions; will be used to check validity
 # of option combinations passed to the script
 allowed_options = {
-    'convertJS':{},
+    'convertLatex2Js':{},
     'evaluateGraphEquations':{},
     'equivSymbolic': {
         'allowEulersNumber',
