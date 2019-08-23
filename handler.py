@@ -115,7 +115,7 @@ def convertLatex2Js(event, context):
         }
     try:
         latex = body["latex"]
-        result = convertLatex2Js(latex)
+        result = convert_JS(latex)
 
         response = {
             "statusCode": 200,
