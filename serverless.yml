@@ -61,6 +61,25 @@ functions:
           path: /test
           method: GET
           cors: true
+  graphEvaluate:
+      handler: handler.graphEvaluate
+      name: graphEvaluate-${self:provider.stage}
+      description: which calls a function evaluateGraphEquations
+      events:
+        - http:
+            path: /graphEvaluate
+            method: POST
+            cors: true
+  convertLatex2Js:
+      handler: handler.convertLatex2Js
+      name: convertLatex2Js-${self:provider.stage}
+      description: which calls a function with the same name convertLatex2Js
+      events:
+        - http:
+            path: /convertLatex2Js
+            method: POST
+            cors: true
+            
 plugins:
 resources:
   Resources:
