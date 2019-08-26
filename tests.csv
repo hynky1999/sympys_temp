@@ -1226,3 +1226,82 @@ H1f,hyperbola,"[['hyperbola', [(-\sqrt{2},0),(\sqrt{2},0),(1,0)]]],['dashed'],[(
 # graphs:
 g1,equation with inequality,"[['line', [(4,0),(0,4)]]],['solid'],[(-1,0)]","[['eqn','x+y \ge 4']],[(-5,0)]",evaluateGraphEquations,true
 g2,equation with inequality,"[['line', [(4,0),(0,4)]]],['solid'],[(-1,0)]","[['eqn','x+y \ge 4']],[(5,0)]",evaluateGraphEquations,false
+1aa,equation with inequality,"[['line', [(4,0),(0,-4)]]],['solid'],[(8.5,4)]","[['eqn','x-y \ge 4']],[(5,0)]",evaluateGraphEquations,true
+1ab,equation with inequality,"[['line', [(5,1),(-1,-5)]]],['solid'],[(8.5,4)]","[['eqn','x-y \ge 4']],[(5,0)]",evaluateGraphEquations,true
+1ac,equation with inequality,"[['line', [(6,1),(-1,-5)]]],['solid'],[(8.5,4)]","[['eqn','x-y \ge 4']],[(5,0)]",evaluateGraphEquations,false
+1ad,equation with inequality,"[['line', [(40,1),(0.5,-40)]]],['solid'],[(44.5,4)]","[['eqn','x-y \ge 40']],[(41,0)]",evaluateGraphEquations,false
+1ae,equation with inequality,"[['line', [(2,2),(0,0)]]],['solid'],[(4,0)]","[['eqn','x-y \ge 0']],[(2,0)]",evaluateGraphEquations,true
+1af,equation with inequality,"[['line', [(1.5,3),(0,1.5)]]],['solid'],[(0,0.5)]","[['eqn','x-y \ge -1.5']],[(-1,0)]",evaluateGraphEquations,true
+1ag,equation with inequality,"[['line', [(0.5,0),(0,-1)]]],['solid'],[(1,0)]","[['eqn','2x-y \ge 1']],[(2,0)]",evaluateGraphEquations,true
+1ah,equation with inequality,"[['line', [(1,0),(0,-0.5)]]],['solid'],[(5,0)]","[['eqn','x-2y \ge 1']],[(4,1)]",evaluateGraphEquations,true
+1ai,equation with inequality,"[['line', [(1,0),(0,-1)]]],['solid'],[(5,0)]","[['eqn','2x-2y \ge 2']],[(4,1)]",evaluateGraphEquations,true
+1aj,equation with inequality,"[['line', [(1,0),(0,-1)]]],['solid'],[(5,0)]","[['eqn','x-y \ge 1']],[(4,1)]",evaluateGraphEquations,true
+1ak,equation with inequality,"[['line', [(-1.5,0),(0,0.75)]]],['solid'],[(0,0.5)]","[['eqn','x-2y \ge -1.5']],[(-1,0)]",evaluateGraphEquations,true
+1al,equation with inequality,"[['line', [(1,0),(0,-0.5)]]],['solid'],[(0.5,-0.5)]","[['eqn','x-2y \ge 1']],[(4,1)]",evaluateGraphEquations,true
+1am,equation with inequality,"[['line', [(2.5,2.5),(0.5,0.5)]]],['solid'],[(4.5,0)]","[['eqn','x-y \ge 0']],[(3,1)]",evaluateGraphEquations,true
+1an,equation with inequality,"[['line', [(42.5,2.5),(0.5,-39.5)]]],['solid'],[(44.5,4)]","[['eqn','x-y \ge 40']],[(41,0)] ",evaluateGraphEquations,true
+1ao,equation with inequality,"[['line', [(42.5,2.5),(0.5,-39.5)]]],['solid'],[(44.5,4)]","[['line', [(42.5,2.5),(0.5,-39.5)]]],['solid'],[(41,0)]",evaluateGraphEquations,true
+
+#Multiple Lines
+1aaa,one lines,"[['line', [(1,0),(0,-1)]]],['solid'],[(2,0)]","[['eqn','x-y \ge 1']],[(2,0)]",evaluateGraphEquations,true
+1abb,one lines,"[['line', [(1,0),(0,1)]]],['solid'],[(2,0)]","[['eqn','x+y \ge 1']],[(2,0)]",evaluateGraphEquations,true
+1aac,two lines,"[['line', [(1,0),(0,-1)]],['line',[(1,0),(0,1)]]],['solid','solid'],[(2,0)]","[['eqn','x-y \ge 1'],['eqn','x+y \ge 1']],[(2,0)]",evaluateGraphEquations,true
+1aad,two lines,"[['line', [(4,0),(0,-4)]],['line',[(4,0),(0,4)]]],['solid','solid'],[(6,0)]","[['eqn','x-y \ge 4'],['eqn','x+y \ge 4']],[(6,0)]",evaluateGraphEquations,true
+1aae1,three lines,"[['line', [(4,0),(0,-4)]],['line', [(5,0),(0,-5)]['line', [(4,0),(0,4)]]],['solid','solid','solid'],[(6,0)]","[['eqn','x-y \ge 5'],['eqn','x-y \ge 4'],['eqn','x+y \ge 4']],[(6,0)]",evaluateGraphEquations,true
+1aae2,three lines,"[['line', [(4,0),(0,4)]],['line', [(5,0),(0,-5)]['line', [(4,0),(0,-4)]]],['solid','solid','solid'],[(6,0)]","[['eqn','x-y \ge 5'],['eqn','x-y \ge 4'],['eqn','x+y \ge 4']],[(6,0)]",evaluateGraphEquations,true
+1aae3,three lines-same order,"[['line', [(5,0),(0,5)]],['line', [(4,0),(0,4)]['line', [(4,0),(0,-4)]]],['solid','solid','solid'],[(6,0)]","[['eqn','x-y \ge 5'],['eqn','x-y \ge 4'],['eqn','x+y \ge 4']],[(6,0)]",evaluateGraphEquations,true
+1aaf,three lines,"[['line', [(4,0),(0,-4)]],['line', [(5,0),(0,-5)]['line', [(4,0),(0,4)]]],['solid','solid','solid'],[(8.5,5)]","[['eqn','x-y \ge 5'],['eqn','x-y \ge 4'],['eqn','x+y \ge 4']],[(8.5,4)]",evaluateGraphEquations,false
+
+1aac,two lines,"[['line', [(1,0),(0,-1)]],['line',[(1,0),(0,1)]]],['solid','solid'],[(2,0)]","[['eqn','x+y \le 0'],['eqn','x+y \ge 1']],[(2,0)]",evaluateGraphEquations,true
+# Circles
+4ca,equation with inequality,"[['circle', [(1,0),(1,-2)]]],['solid'],[(4,0)]","[['eqn','(x-1)^2+y^2 \ge 4'] ],[(4,0)]",evaluateGraphEquations,true
+4cb,"circle centered at (1,0), radius 2","[['circle', [(1,0),(1,-2)]]],['solid'],[(4,0)]","[['eqn','((x-1)/2)^2+(y/2)^2 \ge 1'] ],[(4,0)]",evaluateGraphEquations,true
+4cc,"circle centered at (1,0), radius 2","[['circle', [(1,0),(3,0)]]],['solid'],[(4,0)]","[['eqn','((x-1)/2)^2+(y/2)^2 \ge 1'] ],[(4,0)]",evaluateGraphEquations,true
+4cd,"circle centered at (1,0), radius 2","[['circle', [(1,0),(1,2)]]],['solid'],[(4,0)]","[['eqn','((x-1)/2)^2+(y/2)^2 \ge 1'] ],[(4,0)]",evaluateGraphEquations,true
+4ce,equation with inequality,"[['circle', [(1,0),(1,-4)]]],['solid'],[(5.5,0)]","[['eqn','(x-1)^2+y^2 \ge 16'] ],[(5.5,0)]",evaluateGraphEquations,true
+4cf,equation with inequality,"[['circle', [(1,0),(1,-4)]]],['solid'],[(5.5,0)]","[['circle', [(1,0),(1,-4)]]],['solid'],[(5.5,0)]",evaluateGraphEquations,true
+#two circles
+4cg,two circles,"[['circle', [(0,0),(0,2)]],['circle', [(0,0),(0,3)]]],['solid','solid'],[(4,0)]","[['eqn','x^2+y^2 \ge 4'],['eqn','x^2+y^2 \ge 9'] ],[(4,0)]",evaluateGraphEquations,true
+4ch,two circles,"[['circle', [(0,0),(0,4)]],['circle', [(0,0),(0,3)]]],['solid','solid'],[(4,0)]","[['eqn','x^2+y^2 \ge 4'],['eqn','x^2+y^2 \ge 9'] ],[(4,0)]",evaluateGraphEquations,false
+4ci,three circles,"[['circle', [(0,0),(0,4)]],['circle', [(0,0),(0,3)]],['circle', [(0,0),(0,4)]],['solid','solid','solid'],[(5,0)]","[['eqn','x^2+y^2 \ge 4'],['eqn','x^2+y^2 \ge 9'],['eqn','x^2+y^2 \ge 16'] ],[(5,0)]",evaluateGraphEquations,false
+4cf,three circles,"[['circle', [(0,0),(0,4)]],['circle', [(0,0),(0,3)]],['circle', [(0,0),(0,4)]],['solid','solid','solid'],[(5,0)]","[['eqn','x^2+y^2 \ge 4'],['eqn','x^2+y^2 \ge 9'],['eqn','x^2+y^2 \ge 16'] ],[(5,0)]",evaluateGraphEquations,false
+
+4cg,two circles,"[['circle', [(0,0),(0,2)]],['circle', [(0,1),(0,3)]]],['solid','solid'],[(0,0)]","[['eqn','x^2+y^2 \le 4'],['eqn','x^2+(y-1)^2 \le 4'] ],[(0,0)]",evaluateGraphEquations,true
+4ch,two circles,"[['circle', [(0,0),(0,2)]],['circle', [(0,1),(0,3)]]],['solid','solid'],[(0,-1.5)]","[['eqn','x^2+y^2 \le 4'],['eqn','x^2+(y-1)^2 \le 4'] ],[(0,0)]",evaluateGraphEquations,false
+4ci,three circles,"[['circle', [(0,0),(0,2)]],['circle', [(0,1),(0,3)]],['circle', [(0,0),(0,4)]]],['solid','solid','solid'],[(0,0)]","[['eqn','x^2+y^2 \le 4'],['eqn','x^2+(y-1)^2 \le 4'],['eqn','x^2+y^2 \le 16'] ],[(0,0)]",evaluateGraphEquations,true
+4cj,three circles,"[['circle', [(0,0),(0,2)]],['circle', [(0,1),(0,3)]],['circle', [(0,0),(0,4)]]],['solid','solid','solid'],[(0,-1.5)]","[['eqn','x^2+y^2 \le 4'],['eqn','x^2+(y-1)^2 \le 4'],['eqn','x^2+y^2 \le 16'] ],[(0,0)]",evaluateGraphEquations,false
+
+#Ellipse
+4ja,ellipse,"[['ellipse',[(0,0),(1,0),(0,2)]]],['dashed'],[(0,0)]","[['eqn', 'x^2+(y/2)^2<1']],[(0,0)]",evaluateGraphEquations,true
+4jb,ellipse,"[['ellipse',[(0,0),(1,0),(0,2)]]],['dashed'],[(0,0)]","[['eqn', 'x^2+(y/2)^2 \lt 1']],[(0,0)]",evaluateGraphEquations,true
+4jc,ellipse,"[['ellipse',[(0,0),(1,0),(0,2)]]],['dashed'],[(0,0)]","[['eqn', '(2x)^2+(y)^2 \lt 4']],[(0,0)]",evaluateGraphEquations,true
+4jd,ellipse,"[['ellipse',[(0,1),(1,1),(0,3)]]],['dashed'],[(0,0)]","[['eqn', '(2x)^2+(y-1)^2 \lt 4']],[(0,0)]",evaluateGraphEquations,true
+4je,ellipse,"[['ellipse',[(0,1),(1,1),(0,3)]]],['dashed'],[(0,0)]","[['ellipse',[(0,1),(1,1),(0,3)]]],['dashed'],[(0,0)]",evaluateGraphEquations,true
+4je,ellipse,"[['ellipse',[(0,1),(1,1),(0,3)]]],['dashed'],[(0,0)]","[['ellipse',[(0,1),(1,1),(0,3)]]],['dashed'],[(10,0)]",evaluateGraphEquations,false
+
+#Parabola
+#Vertex and two points
+5aa,parabola,"[['parabola', [(0,1), (1,2),(-1,2)]]],['solid'],[(1,2)]","[['eqn','y = x^2 + 1']],[(1,2)]",evaluateGraphEquations,true
+5ab,parabola,"[['parabola', [(0,1), (2,5),(-2,5)]]],['solid'],[(1,2)]","[['eqn','y = x^2 + 1']],[(1,2)]",evaluateGraphEquations,true
+5ac,parabola,"[['parabola', [(0,1), (1,2),(-1,2)]]],['solid'],[(1,1)]","[['eqn','y < x^2 + 1']],[(1,1)]",evaluateGraphEquations,true
+5ad,parabola,"[['parabola', [(0,1), (1,2),(-1,2)]]],['solid'],[(1,-1)]","[['eqn','y < x^2 + 1']],[(1,-1)]",evaluateGraphEquations,true
+5ae,parabola,"[['parabola', [(-0.5,-0.25), (0.5,0.75),(-1.5,0.75)]]],['solid'],[(1,2)]","[['eqn','y = x^2 + x']],[(1,2)]",evaluateGraphEquations,true
+5af,parabola,"[['parabola', [(0,0), (2,-4),(-2,-4)]]],['solid'],[(0,0)]","[['eqn','y = -x^2']],[(0,0)]",evaluateGraphEquations,true
+5ag,parabola,"[['parabola', [(0,0), (2,-4),(-2,-4)]]],['solid'],[(0,-1)]","[['eqn','y \le -x^2']],[(0,-1)]",evaluateGraphEquations,true
+5ah,parabola,"[['parabola', [(0,0), (2,-4),(-2,-4)]]],['solid'],[(0,1)]","[['eqn','y \le -x^2']],[(0,1)]",evaluateGraphEquations,false
+5ai,parabola,"[['parabola', [(0,0), (4,2),(4,-2)]]],['solid'],[(-4,0)]","[['eqn','x > -y^2']],[(-4,0)]",evaluateGraphEquations,true
+5aj,parabola,"[['parabola', [(0,0), (4,2),(4,-2)]]],['solid'],[(4,0)]","[['eqn','x > y^2']],[(4,0)]",evaluateGraphEquations,true
+5ak,parabola,"[['eqn','y = x^2 + 1']],[(1,2)]","[['eqn','y = x^2 + 1']],[(1,2)]",evaluateGraphEquations,true
+5al,parabola,"[['eqn','y > x^2 + 1']],[(1,3)]","[['eqn','y > x^2 + 1']],[(1,3)]",evaluateGraphEquations,true
+5am,parabola,"[['eqn','y < x^2 + 1']],[(1,3)]","[['eqn','y > x^2 + 1']],[(1,3)]",evaluateGraphEquations,false
+5an,parabola-inverse,"[['eqn','y > x^2 + 1']],[(1,0)]","[['eqn','y > x^2 + 1']],[(1,0)]",evaluateGraphEquations,true
+5ap,parabola-inverse,"[['eqn','y > x^2 + 1']],[(1,3)]","[['eqn','y > x^2 + 1']],[(1,0)]",evaluateGraphEquations,false
+
+# Parabola and line
+5aaa,parabola,"[['line',[(0,0),(1,1)]],['parabola', [(0,1), (1,2),(-1,2)]]],['solid','solid'],[(0,3)]","[['eqn','y > x^2 + 1'],['eqn','y>x']],[(0,2)]",evaluateGraphEquations,true
+5aab,parabola but wrong line,"[['line',[(0,0),(1,2)]],['parabola', [(0,1), (1,2),(-1,2)]]],['solid','solid'],[(0,3)]","[['eqn','y > x^2 + 1'],['eqn','y>x']],[(0,2)]",evaluateGraphEquations,true
+5aac,line but wrong parabola,"[['line',[(0,0),(1,1)]],['parabola', [(0,-1), (1,2),(-1,2)]]],['solid','solid'],[(0,3)]","[['eqn','y > x^2 + 1'],['eqn','y>x']],[(0,2)]",evaluateGraphEquations,false
+5aad,parabola,"[['line',[(0,0),(1,1)]],['parabola', [(0,1), (1,2),(-1,2)]]],['solid','solid'],[(0,0)]","[['eqn','y > x^2 + 1'],['eqn','y>x']],[(0,2)]",evaluateGraphEquations,false
+# Parabola and two lines
+5aae,parabola,"[['line',[(0,0),(1,1)]],['line',[(0,-1),(1,0)]],['parabola', [(0,1), (1,2),(-1,2)]]],['solid','solid','solid'],[(0,3)]","[['eqn','y > x^2 + 1'],['eqn','y>x-1'],['eqn','y>x']],[(0,2)]",evaluateGraphEquations,true
+5aaf,parabola- one line is bad,"[['line',[(0,0),(1,2)]],['line',[(0,-1),(1,0)]],['parabola', [(0,1), (1,2),(-1,2)]]],['solid','solid','solid'],[(0,3)]","[['eqn','y > x^2 + 1'],['eqn','y>x-1'],['eqn','y>x']],[(0,2)]",evaluateGraphEquations,false
