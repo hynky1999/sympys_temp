@@ -17,7 +17,20 @@ $ export SLS_DEBUG=*
 $ sls offline --printOutput
 6) Hit the http://localhost:3000/test in the browser, details logs will be displayed in the terminal.
 
+ENDPOINTS:
 
+serverless invoke local --function evaluate --path event.json
+{"method": "POST", "path": "/", "body": "{\"input\":\"3\",\"expected\":\"3\",\"checks\":\"equivSymbolic\"}" }
+
+serverless invoke local --function convertLatex2Js --path event.json
+event.json: { "method": "POST", "path": "/", "body": "{\"latex\":\"y=x\"}" }
+
+serverless invoke local --function calculate --path event.json
+event.json: {
+  "method": "POST",
+  "path": "/",
+  "body": "{\"id\":\"1\",\"latexes\":[{\"id\":\"w\",\"formula\":\"x+y+z\"}],\"variables\": [{\"id\":\"x\", \"value\": 3 }]}"
+}
 
 FILES:
 tests.csv ==> official test file
