@@ -2,12 +2,7 @@ import csv
 import sys
 import json
 
-#from checks import parse_checks, check_func, replace_variables, calculate_expression, convert_JS
-from checks import check_func
-from checks_lib.parse_checks import parse_checks
-from checks_lib.testing_func.calculate import replace_variables
-from checks_lib.testing_func.calculate import calculate_expression
-from checks_lib.js_conversion.convert_JS import convert_JS
+from checks import parse_checks, check_func, replace_variables, calculate_expression, convert_JS
 
 # Main handler:
 #  FrontEnd Endpoint /evaluate

@@ -2,7 +2,8 @@
 
 import csv
 import sys
-from checks import parse_checks, check_func
+
+from checks import parse_checks, check_func, is_simplified
 
 def test_case(input_latex, expected_latex, options):
     checks = parse_checks(options)
