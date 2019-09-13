@@ -227,7 +227,6 @@ def preprocess_latex(input_latex,
                                          decimal=decimal_sep)
         if SEP_ERROR_PLACEHOLDER in input_latex:
             return None
-            
     if not balance_check(input_latex) and not interval_form_re.search(input_latex):
         raise ValueError('Parenthesis_Error')
         
