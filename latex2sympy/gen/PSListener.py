@@ -17,12 +17,84 @@ class PSListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by PSParser#left_p.
+    def enterLeft_p(self, ctx:PSParser.Left_pContext):
+        pass
+
+    # Exit a parse tree produced by PSParser#left_p.
+    def exitLeft_p(self, ctx:PSParser.Left_pContext):
+        pass
+
+
+    # Enter a parse tree produced by PSParser#right_p.
+    def enterRight_p(self, ctx:PSParser.Right_pContext):
+        pass
+
+    # Exit a parse tree produced by PSParser#right_p.
+    def exitRight_p(self, ctx:PSParser.Right_pContext):
+        pass
+
+
     # Enter a parse tree produced by PSParser#relation.
     def enterRelation(self, ctx:PSParser.RelationContext):
         pass
 
     # Exit a parse tree produced by PSParser#relation.
     def exitRelation(self, ctx:PSParser.RelationContext):
+        pass
+
+
+    # Enter a parse tree produced by PSParser#struct_form.
+    def enterStruct_form(self, ctx:PSParser.Struct_formContext):
+        pass
+
+    # Exit a parse tree produced by PSParser#struct_form.
+    def exitStruct_form(self, ctx:PSParser.Struct_formContext):
+        pass
+
+
+    # Enter a parse tree produced by PSParser#list_form.
+    def enterList_form(self, ctx:PSParser.List_formContext):
+        pass
+
+    # Exit a parse tree produced by PSParser#list_form.
+    def exitList_form(self, ctx:PSParser.List_formContext):
+        pass
+
+
+    # Enter a parse tree produced by PSParser#set_form_2.
+    def enterSet_form_2(self, ctx:PSParser.Set_form_2Context):
+        pass
+
+    # Exit a parse tree produced by PSParser#set_form_2.
+    def exitSet_form_2(self, ctx:PSParser.Set_form_2Context):
+        pass
+
+
+    # Enter a parse tree produced by PSParser#set_form.
+    def enterSet_form(self, ctx:PSParser.Set_formContext):
+        pass
+
+    # Exit a parse tree produced by PSParser#set_form.
+    def exitSet_form(self, ctx:PSParser.Set_formContext):
+        pass
+
+
+    # Enter a parse tree produced by PSParser#mixed_form.
+    def enterMixed_form(self, ctx:PSParser.Mixed_formContext):
+        pass
+
+    # Exit a parse tree produced by PSParser#mixed_form.
+    def exitMixed_form(self, ctx:PSParser.Mixed_formContext):
+        pass
+
+
+    # Enter a parse tree produced by PSParser#value.
+    def enterValue(self, ctx:PSParser.ValueContext):
+        pass
+
+    # Exit a parse tree produced by PSParser#value.
+    def exitValue(self, ctx:PSParser.ValueContext):
         pass
 
 

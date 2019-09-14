@@ -33,6 +33,7 @@ if __name__ == '__main__':
             except IndexError:
                 pass
             testno, desc, input_latex, expected_latex, options, expected_result = row
+            print(testno)
             test_result = test_case(input_latex, expected_latex, options)
             if test_result != expected_result:
                 fails.append(row + [test_result])

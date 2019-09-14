@@ -35,6 +35,19 @@ def process_sympy(sympy):
 
     return expr
 
+def process_set(sympy):
+
+    stream = antlr4.InputStream(sympy)
+    lex    = PSLexer(stream)
+
+    tokens = antlr4.CommonTokenStream(lex)
+    parser = PSParser(tokens)
+
+    struct_f = parser.struct_form()
+    expr = convert_struct_form(struct_f)
+
+    return expr
+
 class MathErrorListener(ErrorListener):
     def __init__(self, src):
         super(ErrorListener, self).__init__()
@@ -60,6 +73,51 @@ class MathErrorListener(ErrorListener):
         else:
             err = fmt % ("I don't understand this", self.src, marker)
         raise Exception(err)
+
+def convert_struct_form(form):
+    print(form.value())
+    if len(form.value()) == 1:
+        return convert_value(form.value()[0])
+    l = []
+    for x in form.value():
+        l.append(convert_value(x))
+    l = ['any'] + l + ['any']
+    return l
+
+def convert_value(value):
+    if value.list_form():
+        return convert_list_form(value.list_form())
+    elif value.set_form_2():
+        return convert_set_form(value.set_form_2())
+    elif value.set_form():
+        return convert_set_form(value.set_form())
+    elif value.mixed_form():
+        return convert_mixed_form(value.mixed_form())
+    elif value.relation():
+        return convert_relation(value.relation())
+
+def convert_list_form(form):
+    l = []
+    for x in form.value():
+        l.append(convert_value(x))
+    l = ['list'] + l + ['list']
+    return l
+
+def convert_set_form(form):
+    l = []
+    for x in form.value():
+        l.append(convert_value(x))
+    l = ['set'] + sorted(l,key=lambda x: str(x)) + ['set']
+    return l
+
+def convert_mixed_form(form):
+    l = []
+    for x in form.value():
+        l.append(convert_value(x))
+    l_p = form.left_p().getText()
+    r_p = form.right_p().getText()
+    l = [l_p] + sorted(l) + [r_p]
+    return l
 
 def convert_relation(rel):
     if rel.expr():
