@@ -51,7 +51,8 @@ FUNC_TANH: '\\tanh';
 FUNC_ARSINH: '\\arsinh';
 FUNC_ARCOSH: '\\arcosh';
 FUNC_ARTANH: '\\artanh';
-
+FUNC_MATRIX_START: '\\begin{bmatrix}';
+FUNC_MATRIX_END: '\\end{bmatrix}';
 FUNC_SQRT: '\\sqrt';
 FUNC_EXP: '\\exp';
 
@@ -83,7 +84,7 @@ GTE: '>=';
 
 BANG: '!';
 
-SYMBOL: '\\' [a-zA-Z]+;
+SYMBOL: '\\' ([a-zA-Z]+ | '%');
 
 math: relation;
 
@@ -126,7 +127,7 @@ value:
 equality:
     expr EQUAL expr;
 
-expr: additive;
+expr: additive | set_notation_sub;
 
 additive:
     additive (ADD | SUB) additive
@@ -235,7 +236,11 @@ func:
     | (FUNC_SUM | FUNC_PROD)
     (subeq supexpr | supexpr subeq)
     mp
-    | FUNC_LIM limit_sub mp;
+    | FUNC_LIM limit_sub mp
+    
+    | FUNC_MATRIX_START matrix FUNC_MATRIX_END;
+
+    
 
 args: (expr ',' args) | expr;
 
@@ -245,6 +250,18 @@ limit_sub:
     LIM_APPROACH_SYM
     expr (CARET L_BRACE (ADD | SUB) R_BRACE)?
     R_BRACE;
+
+set_notation_sub:
+    L_BRACE
+    (LETTER | SYMBOL)
+    BAR
+    relation
+    R_BRACE;
+
+matrix_row:
+    expr ('&' expr)*;
+matrix:
+    matrix_row ('\\\\' matrix_row)*;
 
 func_arg: expr | (expr ',' func_arg);
 func_arg_noparens: mp_nofunc;

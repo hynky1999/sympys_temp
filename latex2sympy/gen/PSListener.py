@@ -341,6 +341,33 @@ class PSListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by PSParser#set_notation_sub.
+    def enterSet_notation_sub(self, ctx:PSParser.Set_notation_subContext):
+        pass
+
+    # Exit a parse tree produced by PSParser#set_notation_sub.
+    def exitSet_notation_sub(self, ctx:PSParser.Set_notation_subContext):
+        pass
+
+
+    # Enter a parse tree produced by PSParser#matrix_row.
+    def enterMatrix_row(self, ctx:PSParser.Matrix_rowContext):
+        pass
+
+    # Exit a parse tree produced by PSParser#matrix_row.
+    def exitMatrix_row(self, ctx:PSParser.Matrix_rowContext):
+        pass
+
+
+    # Enter a parse tree produced by PSParser#matrix.
+    def enterMatrix(self, ctx:PSParser.MatrixContext):
+        pass
+
+    # Exit a parse tree produced by PSParser#matrix.
+    def exitMatrix(self, ctx:PSParser.MatrixContext):
+        pass
+
+
     # Enter a parse tree produced by PSParser#func_arg.
     def enterFunc_arg(self, ctx:PSParser.Func_argContext):
         pass

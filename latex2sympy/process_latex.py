@@ -1,4 +1,5 @@
 import sympy
+from sympy.logic.boolalg import BooleanAtom
 import antlr4
 import re
 from antlr4.error.ErrorListener import ErrorListener
@@ -75,7 +76,6 @@ class MathErrorListener(ErrorListener):
         raise Exception(err)
 
 def convert_struct_form(form):
-    print(form.value())
     if len(form.value()) == 1:
         return convert_value(form.value()[0])
     l = []
@@ -126,18 +126,21 @@ def convert_relation(rel):
     lh = convert_relation(rel.relation(0))
     rh = convert_relation(rel.relation(1))
     if rel.LT():
-        return sympy.StrictLessThan(lh, rh)
+        return sympy.StrictLessThan(lh, rh,evaluate=False)
     elif rel.LTE():
-        return sympy.LessThan(lh, rh)
+        return sympy.LessThan(lh, rh,evaluate=False)
     elif rel.GT():
-        return sympy.StrictGreaterThan(lh, rh) 
+        return sympy.StrictGreaterThan(lh, rh,evaluate=False) 
     elif rel.GTE():
-        return sympy.GreaterThan(lh, rh)
+        return sympy.GreaterThan(lh, rh,evaluate=False)
     elif rel.EQUAL():
-        return sympy.Eq(lh, rh)
+        return sympy.Eq(lh, rh,evaluate=False)
 
 def convert_expr(expr):
-    return convert_add(expr.additive())
+    if expr.additive():
+        return convert_add(expr.additive())
+    elif expr.set_notation_sub():
+        return handle_set_notation(expr)
 
 def convert_add(add):
     if add.ADD():
@@ -197,7 +200,7 @@ def convert_postfix_list(arr, i=0):
         raise Exception("Index out of bounds")
 
     res = convert_postfix(arr[i])
-    if isinstance(res, sympy.Expr):
+    if isinstance(res, sympy.Expr) or isinstance(res, sympy.Matrix):
         if i == len(arr) - 1:
             return res # nothing to multiply by
         else:
@@ -240,7 +243,6 @@ def convert_postfix(postfix):
         exp_nested = postfix.exp()
     else:
         exp_nested = postfix.exp_nofunc()
-
     exp = convert_exp(exp_nested)
     for op in postfix.postfix_op():
         if op.BANG():
@@ -261,7 +263,6 @@ def convert_postfix(postfix):
                 exp = at_b
             elif at_a != None:
                 exp = at_a
-            
     return exp
 
 def convert_exp(exp):
@@ -313,6 +314,8 @@ def convert_atom(atom):
         s = atom.SYMBOL().getText()[1:]
         if s == "infty":
             return sympy.oo
+        elif s == r"%":
+            return sympy.Rational(1,100)
         else:
             if atom.subexpr():
                 subscript = None
@@ -466,6 +469,8 @@ def convert_func(func):
         return handle_sum_or_prod(func, "product")
     elif func.FUNC_LIM():
         return handle_limit(func)
+    elif func.FUNC_MATRIX_START():
+        return handle_matrix(func)
 
 def convert_func_arg(arg):
     if hasattr(arg, 'expr'):
@@ -473,6 +478,41 @@ def convert_func_arg(arg):
     else:
         return convert_mp(arg.mp_nofunc())
 
+def handle_matrix(matrix):
+    matrix = matrix.matrix()
+    m_list = []
+    for row in matrix.matrix_row():
+        m_list.append(convert_matrix_row(row))
+    return sympy.Matrix(m_list)
+
+def convert_matrix_row(row):
+    row_list = []
+    for expr in row.expr():
+        row_list.append(convert_expr(expr))
+    return row_list
+
+def handle_set_notation(func):
+    sub = func.set_notation_sub()
+    if sub.LETTER():
+        var = sympy.Symbol(sub.LETTER().getText())
+    elif sub.SYMBOL():
+        var = sympy.Symbol(sub.SYMBOL().getText()[1:])
+    else:
+        var = sympy.Symbol('x')
+    rel = convert_relation(sub.relation())
+    sol = sympy.S.Reals
+    while isinstance(rel,sympy.relational.Relational):
+        future_rel = rel.lhs
+        if isinstance(rel.lhs,sympy.relational.Relational):
+            future_rel = rel.lhs
+            rel = type(rel)(rel.lhs.rhs,rel.rhs)
+
+        if not isinstance(rel,BooleanAtom):
+            sol_tmp = sympy.solveset(rel,var,sympy.S.Reals)
+            sol = sympy.Intersection(sol,sol_tmp)
+        rel = future_rel
+    return sol
+    
 def handle_integral(func):
     if func.additive():
         integrand = convert_add(func.additive())

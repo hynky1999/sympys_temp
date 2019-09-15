@@ -77,6 +77,7 @@ allowed_options = {
     'equivSymbolic': {
         'allowEulersNumber',
         'setThousandsSeparator',
+        'tolerance',
         'setDecimalSeparator',
         'inverseResult',
         'ignoreText',

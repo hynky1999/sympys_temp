@@ -182,6 +182,7 @@ def sympify_latex(input_latex, evaluate=None):
                             lambda x: globals()[x.group('func')](
                             sympify(str(process_sympy(x.group(2)))))
                             ,input_latex)
+            print(input_latex)
             input_symbolic = sympify(input_latex,evaluate=evaluate)
         else:
             input_symbolic = process_sympy(input_latex)
@@ -250,7 +251,9 @@ def preprocess_latex(input_latex,
     # Imaginary number
     input_latex = re.sub(r'(?<![a-zA-Z])(i)(?![a-zA-Z])','I',input_latex)
     # Percent sign (\%)
+    '''
     input_latex = percent_re.sub(convert_percent, input_latex)
+    '''
 	# Degree fix
     input_latex = re.sub('°',r'*2*\\pi',input_latex)
     # \log_a -> \log_{a}
@@ -301,15 +304,16 @@ def preprocess_latex(input_latex,
         input_latex = neg_fraction_re.sub(convert_frac, input_latex)
         
     #Matrices preparation
+    '''
     if matrix_form_re.search(input_latex):
         input_latex = re.sub(r'\\end\{bmatrix\}*\\begin\{bmatrix\}'
                             ,r'\\end{bmatrix}*\\begin{bmatrix}'
                             ,input_latex)
         input_latex = matrix_form_re.sub(convertMatrix,input_latex)
-        
     #Form perparation
     if set_form_re.search(input_latex):
-        input_latex = set_form_re.sub(convertSet,input_latex)   
+        input_latex = set_form_re.sub(convertSet,input_latex)
+    '''
     return input_latex
 
 def convert(input_latex, evaluate=None,

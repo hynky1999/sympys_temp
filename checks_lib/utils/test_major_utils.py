@@ -1,5 +1,6 @@
 from sympy import (expand,simplify,logcombine,expand_log)
 from sympy.sets.sets import Interval
+from sympy.core.relational import Lt,Gt,Ge,Le
 from checks_lib.regexes import (set_res,set_re_error,separator_pairs,
      separator_re)
 from checks_lib.testing_func.equiv_set import equiv_set
@@ -57,43 +58,22 @@ def identify_expected(input_latex,expected_latex,options):
     else:
         return None
 
-def equation_parts(input_latex,expected_latex,options):
+def equation_parts(eq1,eq2,options):
     ''' Function splits input and expected into 2 parts
         by sign
     '''
-    try:
-        a_sep = separator_re.search(input_latex).group(0)
-        s_sep = separator_re.search(expected_latex).group(0)
-    except IndexError:
-        raise ValueError('Signs_Error')
-    flipped = False
-    if a_sep != s_sep:
-        if separator_pairs[a_sep] == s_sep:
-            flipped = True
-            
-        else:
-            raise ValueError('false')
+    if isinstance(eq1,Ge) or isinstance(eq1,Gt):
+        eq1 = eq1.reversed
+
+    if isinstance(eq2,Ge) or isinstance(eq2,Gt):
+        eq2 = eq2.reversed
     
-    expected_latex, expected_result_latex = expected_latex.split(
-                                                s_sep, maxsplit=1)
-    expected_symbolic = sympify_latex(expected_latex)
-    expected_result_symbolic = sympify_latex(expected_result_latex)
-        
-    input_latex, input_result_latex = input_latex.split(
-                                                a_sep, maxsplit=1)
-    input_symbolic = sympify_latex(input_latex)
-    input_result_symbolic = sympify_latex(input_result_latex)
-        
-    if flipped:
-        input_symbolic,input_result_symbolic = (input_result_symbolic
-                                                ,input_symbolic)
-                                                
-    equiv = (checkOptions(input_latex,options)
-        or checkOptions(input_result_latex,options))
-        
-    return (input_symbolic,input_result_symbolic,
-                expected_symbolic,expected_result_symbolic,
-                equiv,a_sep)
+    if eq1.rel_op != eq2.rel_op:
+        raise ValueError('Error_Sign')
+
+    #Must add equivCheck
+    return (eq1.lhs,eq1.rhs,
+                eq2.lhs,eq2.rhs,True,eq1.rel_op)
 
 
 def format_sym_expression(exp,options):
@@ -106,12 +86,12 @@ def format_sym_expression(exp,options):
         exp = expand(simplify(exp))
     except AttributeError:
         exp = simplify(exp)
-    decimal_places = options.get('significantDecimalPlaces')
-    if decimal_places:
-        try:
-            exp = round(decimal.Decimal(str(float(exp))),decimal_places)
-        except:
-            pass
+    decimal_places = options.get('significantDecimalPlaces',15)
+    try:
+        print(exp)
+        exp = exp.round(decimal_places)
+    except:
+        pass
     return exp
                 
 def parse_tolerance(tolerance,expected_result_numeric):
