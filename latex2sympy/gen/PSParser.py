@@ -19,8 +19,8 @@ def serializedATN():
         buf.write("\13\7\3\7\3\7\3\b\3\b\3\b\3\b\7\b\u0089\n\b\f\b\16\b\u008c")
         buf.write("\13\b\3\b\3\b\3\t\3\t\3\t\3\t\7\t\u0094\n\t\f\t\16\t\u0097")
         buf.write("\13\t\3\t\3\t\3\n\3\n\3\n\3\n\7\n\u009f\n\n\f\n\16\n\u00a2")
-        buf.write("\13\n\3\n\3\n\3\13\3\13\3\13\3\13\3\13\3\13\3\f\3\f\3")
-        buf.write("\f\3\f\3\f\5\f\u00b1\n\f\3\r\3\r\3\r\3\r\3\16\3\16\3\16")
+        buf.write("\13\n\3\n\3\n\3\13\3\13\3\13\3\13\3\13\5\13\u00ab\n\13")
+        buf.write("\3\f\3\f\3\f\3\f\3\f\3\f\3\r\3\r\3\r\3\r\3\16\3\16\3\16")
         buf.write("\5\16\u00ba\n\16\3\17\3\17\3\17\3\17\3\17\3\17\7\17\u00c2")
         buf.write("\n\17\f\17\16\17\u00c5\13\17\3\20\3\20\3\20\3\20\3\20")
         buf.write("\3\20\7\20\u00cd\n\20\f\20\16\20\u00d0\13\20\3\21\3\21")
@@ -61,7 +61,7 @@ def serializedATN():
         buf.write("\17\23\23\3\2\n\13\5\2\f\r\62\6499\4\2;;CC\4\2\32-\61")
         buf.write("\61\3\2\30\31\u0239\2`\3\2\2\2\4b\3\2\2\2\6d\3\2\2\2\b")
         buf.write("f\3\2\2\2\nq\3\2\2\2\fy\3\2\2\2\16\u0084\3\2\2\2\20\u008f")
-        buf.write("\3\2\2\2\22\u009a\3\2\2\2\24\u00a5\3\2\2\2\26\u00b0\3")
+        buf.write("\3\2\2\2\22\u009a\3\2\2\2\24\u00aa\3\2\2\2\26\u00ac\3")
         buf.write("\2\2\2\30\u00b2\3\2\2\2\32\u00b9\3\2\2\2\34\u00bb\3\2")
         buf.write("\2\2\36\u00c6\3\2\2\2 \u00d1\3\2\2\2\"\u00e3\3\2\2\2$")
         buf.write("\u00ee\3\2\2\2&\u00f0\3\2\2\2(\u00f7\3\2\2\2*\u0100\3")
@@ -75,58 +75,58 @@ def serializedATN():
         buf.write("\3\2\2\2^\u0219\3\2\2\2`a\5\b\5\2a\3\3\2\2\2bc\t\2\2\2")
         buf.write("c\5\3\2\2\2de\t\3\2\2e\7\3\2\2\2fg\b\5\1\2gh\5\32\16\2")
         buf.write("hn\3\2\2\2ij\f\4\2\2jk\t\4\2\2km\5\b\5\5li\3\2\2\2mp\3")
-        buf.write("\2\2\2nl\3\2\2\2no\3\2\2\2o\t\3\2\2\2pn\3\2\2\2qv\5\26")
-        buf.write("\f\2rs\7\3\2\2su\5\26\f\2tr\3\2\2\2ux\3\2\2\2vt\3\2\2")
-        buf.write("\2vw\3\2\2\2w\13\3\2\2\2xv\3\2\2\2yz\7\16\2\2z\177\5\26")
-        buf.write("\f\2{|\7\3\2\2|~\5\26\f\2}{\3\2\2\2~\u0081\3\2\2\2\177")
-        buf.write("}\3\2\2\2\177\u0080\3\2\2\2\u0080\u0082\3\2\2\2\u0081")
-        buf.write("\177\3\2\2\2\u0082\u0083\7\17\2\2\u0083\r\3\2\2\2\u0084")
-        buf.write("\u0085\7\22\2\2\u0085\u008a\5\26\f\2\u0086\u0087\7\3\2")
-        buf.write("\2\u0087\u0089\5\26\f\2\u0088\u0086\3\2\2\2\u0089\u008c")
-        buf.write("\3\2\2\2\u008a\u0088\3\2\2\2\u008a\u008b\3\2\2\2\u008b")
-        buf.write("\u008d\3\2\2\2\u008c\u008a\3\2\2\2\u008d\u008e\7\23\2")
-        buf.write("\2\u008e\17\3\2\2\2\u008f\u0090\7\20\2\2\u0090\u0095\5")
-        buf.write("\26\f\2\u0091\u0092\7\3\2\2\u0092\u0094\5\26\f\2\u0093")
+        buf.write("\2\2\2nl\3\2\2\2no\3\2\2\2o\t\3\2\2\2pn\3\2\2\2qv\5\24")
+        buf.write("\13\2rs\7\3\2\2su\5\24\13\2tr\3\2\2\2ux\3\2\2\2vt\3\2")
+        buf.write("\2\2vw\3\2\2\2w\13\3\2\2\2xv\3\2\2\2yz\7\16\2\2z\177\5")
+        buf.write("\24\13\2{|\7\3\2\2|~\5\24\13\2}{\3\2\2\2~\u0081\3\2\2")
+        buf.write("\2\177}\3\2\2\2\177\u0080\3\2\2\2\u0080\u0082\3\2\2\2")
+        buf.write("\u0081\177\3\2\2\2\u0082\u0083\7\17\2\2\u0083\r\3\2\2")
+        buf.write("\2\u0084\u0085\7\22\2\2\u0085\u008a\5\24\13\2\u0086\u0087")
+        buf.write("\7\3\2\2\u0087\u0089\5\24\13\2\u0088\u0086\3\2\2\2\u0089")
+        buf.write("\u008c\3\2\2\2\u008a\u0088\3\2\2\2\u008a\u008b\3\2\2\2")
+        buf.write("\u008b\u008d\3\2\2\2\u008c\u008a\3\2\2\2\u008d\u008e\7")
+        buf.write("\23\2\2\u008e\17\3\2\2\2\u008f\u0090\7\20\2\2\u0090\u0095")
+        buf.write("\5\24\13\2\u0091\u0092\7\3\2\2\u0092\u0094\5\24\13\2\u0093")
         buf.write("\u0091\3\2\2\2\u0094\u0097\3\2\2\2\u0095\u0093\3\2\2\2")
         buf.write("\u0095\u0096\3\2\2\2\u0096\u0098\3\2\2\2\u0097\u0095\3")
         buf.write("\2\2\2\u0098\u0099\7\21\2\2\u0099\21\3\2\2\2\u009a\u009b")
-        buf.write("\5\4\3\2\u009b\u00a0\5\26\f\2\u009c\u009d\7\3\2\2\u009d")
-        buf.write("\u009f\5\26\f\2\u009e\u009c\3\2\2\2\u009f\u00a2\3\2\2")
+        buf.write("\5\4\3\2\u009b\u00a0\5\24\13\2\u009c\u009d\7\3\2\2\u009d")
+        buf.write("\u009f\5\24\13\2\u009e\u009c\3\2\2\2\u009f\u00a2\3\2\2")
         buf.write("\2\u00a0\u009e\3\2\2\2\u00a0\u00a1\3\2\2\2\u00a1\u00a3")
         buf.write("\3\2\2\2\u00a2\u00a0\3\2\2\2\u00a3\u00a4\5\6\4\2\u00a4")
-        buf.write("\23\3\2\2\2\u00a5\u00a6\t\5\2\2\u00a6\u00a7\5\32\16\2")
-        buf.write("\u00a7\u00a8\7\4\2\2\u00a8\u00a9\5\32\16\2\u00a9\u00aa")
-        buf.write("\t\6\2\2\u00aa\25\3\2\2\2\u00ab\u00b1\5\f\7\2\u00ac\u00b1")
-        buf.write("\5\20\t\2\u00ad\u00b1\5\16\b\2\u00ae\u00b1\5\22\n\2\u00af")
-        buf.write("\u00b1\5\b\5\2\u00b0\u00ab\3\2\2\2\u00b0\u00ac\3\2\2\2")
-        buf.write("\u00b0\u00ad\3\2\2\2\u00b0\u00ae\3\2\2\2\u00b0\u00af\3")
-        buf.write("\2\2\2\u00b1\27\3\2\2\2\u00b2\u00b3\5\32\16\2\u00b3\u00b4")
-        buf.write("\7=\2\2\u00b4\u00b5\5\32\16\2\u00b5\31\3\2\2\2\u00b6\u00ba")
-        buf.write("\5N(\2\u00b7\u00ba\5\24\13\2\u00b8\u00ba\5\34\17\2\u00b9")
-        buf.write("\u00b6\3\2\2\2\u00b9\u00b7\3\2\2\2\u00b9\u00b8\3\2\2\2")
-        buf.write("\u00ba\33\3\2\2\2\u00bb\u00bc\b\17\1\2\u00bc\u00bd\5\36")
-        buf.write("\20\2\u00bd\u00c3\3\2\2\2\u00be\u00bf\f\4\2\2\u00bf\u00c0")
-        buf.write("\t\7\2\2\u00c0\u00c2\5\34\17\5\u00c1\u00be\3\2\2\2\u00c2")
-        buf.write("\u00c5\3\2\2\2\u00c3\u00c1\3\2\2\2\u00c3\u00c4\3\2\2\2")
-        buf.write("\u00c4\35\3\2\2\2\u00c5\u00c3\3\2\2\2\u00c6\u00c7\b\20")
-        buf.write("\1\2\u00c7\u00c8\5\"\22\2\u00c8\u00ce\3\2\2\2\u00c9\u00ca")
-        buf.write("\f\4\2\2\u00ca\u00cb\t\b\2\2\u00cb\u00cd\5\36\20\5\u00cc")
-        buf.write("\u00c9\3\2\2\2\u00cd\u00d0\3\2\2\2\u00ce\u00cc\3\2\2\2")
-        buf.write("\u00ce\u00cf\3\2\2\2\u00cf\37\3\2\2\2\u00d0\u00ce\3\2")
-        buf.write("\2\2\u00d1\u00d2\b\21\1\2\u00d2\u00d3\5$\23\2\u00d3\u00d9")
-        buf.write("\3\2\2\2\u00d4\u00d5\f\4\2\2\u00d5\u00d6\t\b\2\2\u00d6")
-        buf.write("\u00d8\5 \21\5\u00d7\u00d4\3\2\2\2\u00d8\u00db\3\2\2\2")
-        buf.write("\u00d9\u00d7\3\2\2\2\u00d9\u00da\3\2\2\2\u00da!\3\2\2")
-        buf.write("\2\u00db\u00d9\3\2\2\2\u00dc\u00dd\t\7\2\2\u00dd\u00e4")
-        buf.write("\5\"\22\2\u00de\u00e0\5&\24\2\u00df\u00de\3\2\2\2\u00e0")
-        buf.write("\u00e1\3\2\2\2\u00e1\u00df\3\2\2\2\u00e1\u00e2\3\2\2\2")
-        buf.write("\u00e2\u00e4\3\2\2\2\u00e3\u00dc\3\2\2\2\u00e3\u00df\3")
-        buf.write("\2\2\2\u00e4#\3\2\2\2\u00e5\u00e6\t\7\2\2\u00e6\u00ef")
-        buf.write("\5$\23\2\u00e7\u00eb\5&\24\2\u00e8\u00ea\5(\25\2\u00e9")
-        buf.write("\u00e8\3\2\2\2\u00ea\u00ed\3\2\2\2\u00eb\u00e9\3\2\2\2")
-        buf.write("\u00eb\u00ec\3\2\2\2\u00ec\u00ef\3\2\2\2\u00ed\u00eb\3")
-        buf.write("\2\2\2\u00ee\u00e5\3\2\2\2\u00ee\u00e7\3\2\2\2\u00ef%")
-        buf.write("\3\2\2\2\u00f0\u00f4\5\62\32\2\u00f1\u00f3\5*\26\2\u00f2")
+        buf.write("\23\3\2\2\2\u00a5\u00ab\5\f\7\2\u00a6\u00ab\5\20\t\2\u00a7")
+        buf.write("\u00ab\5\16\b\2\u00a8\u00ab\5\22\n\2\u00a9\u00ab\5\b\5")
+        buf.write("\2\u00aa\u00a5\3\2\2\2\u00aa\u00a6\3\2\2\2\u00aa\u00a7")
+        buf.write("\3\2\2\2\u00aa\u00a8\3\2\2\2\u00aa\u00a9\3\2\2\2\u00ab")
+        buf.write("\25\3\2\2\2\u00ac\u00ad\t\5\2\2\u00ad\u00ae\5\32\16\2")
+        buf.write("\u00ae\u00af\7\3\2\2\u00af\u00b0\5\32\16\2\u00b0\u00b1")
+        buf.write("\t\6\2\2\u00b1\27\3\2\2\2\u00b2\u00b3\5\32\16\2\u00b3")
+        buf.write("\u00b4\7=\2\2\u00b4\u00b5\5\32\16\2\u00b5\31\3\2\2\2\u00b6")
+        buf.write("\u00ba\5N(\2\u00b7\u00ba\5\26\f\2\u00b8\u00ba\5\34\17")
+        buf.write("\2\u00b9\u00b6\3\2\2\2\u00b9\u00b7\3\2\2\2\u00b9\u00b8")
+        buf.write("\3\2\2\2\u00ba\33\3\2\2\2\u00bb\u00bc\b\17\1\2\u00bc\u00bd")
+        buf.write("\5\36\20\2\u00bd\u00c3\3\2\2\2\u00be\u00bf\f\4\2\2\u00bf")
+        buf.write("\u00c0\t\7\2\2\u00c0\u00c2\5\34\17\5\u00c1\u00be\3\2\2")
+        buf.write("\2\u00c2\u00c5\3\2\2\2\u00c3\u00c1\3\2\2\2\u00c3\u00c4")
+        buf.write("\3\2\2\2\u00c4\35\3\2\2\2\u00c5\u00c3\3\2\2\2\u00c6\u00c7")
+        buf.write("\b\20\1\2\u00c7\u00c8\5\"\22\2\u00c8\u00ce\3\2\2\2\u00c9")
+        buf.write("\u00ca\f\4\2\2\u00ca\u00cb\t\b\2\2\u00cb\u00cd\5\36\20")
+        buf.write("\5\u00cc\u00c9\3\2\2\2\u00cd\u00d0\3\2\2\2\u00ce\u00cc")
+        buf.write("\3\2\2\2\u00ce\u00cf\3\2\2\2\u00cf\37\3\2\2\2\u00d0\u00ce")
+        buf.write("\3\2\2\2\u00d1\u00d2\b\21\1\2\u00d2\u00d3\5$\23\2\u00d3")
+        buf.write("\u00d9\3\2\2\2\u00d4\u00d5\f\4\2\2\u00d5\u00d6\t\b\2\2")
+        buf.write("\u00d6\u00d8\5 \21\5\u00d7\u00d4\3\2\2\2\u00d8\u00db\3")
+        buf.write("\2\2\2\u00d9\u00d7\3\2\2\2\u00d9\u00da\3\2\2\2\u00da!")
+        buf.write("\3\2\2\2\u00db\u00d9\3\2\2\2\u00dc\u00dd\t\7\2\2\u00dd")
+        buf.write("\u00e4\5\"\22\2\u00de\u00e0\5&\24\2\u00df\u00de\3\2\2")
+        buf.write("\2\u00e0\u00e1\3\2\2\2\u00e1\u00df\3\2\2\2\u00e1\u00e2")
+        buf.write("\3\2\2\2\u00e2\u00e4\3\2\2\2\u00e3\u00dc\3\2\2\2\u00e3")
+        buf.write("\u00df\3\2\2\2\u00e4#\3\2\2\2\u00e5\u00e6\t\7\2\2\u00e6")
+        buf.write("\u00ef\5$\23\2\u00e7\u00eb\5&\24\2\u00e8\u00ea\5(\25\2")
+        buf.write("\u00e9\u00e8\3\2\2\2\u00ea\u00ed\3\2\2\2\u00eb\u00e9\3")
+        buf.write("\2\2\2\u00eb\u00ec\3\2\2\2\u00ec\u00ef\3\2\2\2\u00ed\u00eb")
+        buf.write("\3\2\2\2\u00ee\u00e5\3\2\2\2\u00ee\u00e7\3\2\2\2\u00ef")
+        buf.write("%\3\2\2\2\u00f0\u00f4\5\62\32\2\u00f1\u00f3\5*\26\2\u00f2")
         buf.write("\u00f1\3\2\2\2\u00f3\u00f6\3\2\2\2\u00f4\u00f2\3\2\2\2")
         buf.write("\u00f4\u00f5\3\2\2\2\u00f5\'\3\2\2\2\u00f6\u00f4\3\2\2")
         buf.write("\2\u00f7\u00fb\5\64\33\2\u00f8\u00fa\5*\26\2\u00f9\u00f8")
@@ -255,7 +255,7 @@ def serializedATN():
         buf.write("\r\2\u0217\u0218\7\21\2\2\u0218]\3\2\2\2\u0219\u021a\7")
         buf.write("\67\2\2\u021a\u021b\7\20\2\2\u021b\u021c\5\30\r\2\u021c")
         buf.write("\u021d\7\21\2\2\u021d_\3\2\2\28nv\177\u008a\u0095\u00a0")
-        buf.write("\u00b0\u00b9\u00c3\u00ce\u00d9\u00e1\u00e3\u00eb\u00ee")
+        buf.write("\u00aa\u00b9\u00c3\u00ce\u00d9\u00e1\u00e3\u00eb\u00ee")
         buf.write("\u00f4\u00fb\u0100\u0108\u010e\u0116\u0124\u0127\u012b")
         buf.write("\u0138\u013b\u013f\u0147\u014d\u015b\u0163\u0168\u0172")
         buf.write("\u0181\u0184\u0187\u018a\u018c\u0193\u0197\u01a4\u01a7")
@@ -312,8 +312,8 @@ class PSParser ( Parser ):
     RULE_set_form_2 = 6
     RULE_set_form = 7
     RULE_mixed_form = 8
-    RULE_interval = 9
-    RULE_value = 10
+    RULE_value = 9
+    RULE_interval = 10
     RULE_equality = 11
     RULE_expr = 12
     RULE_additive = 13
@@ -353,7 +353,7 @@ class PSParser ( Parser ):
 
     ruleNames =  [ "math", "left_p", "right_p", "relation", "struct_form", 
                    "list_form", "set_form_2", "set_form", "mixed_form", 
-                   "interval", "value", "equality", "expr", "additive", 
+                   "value", "interval", "equality", "expr", "additive", 
                    "mp", "mp_nofunc", "unary", "unary_nofunc", "postfix", 
                    "postfix_nofunc", "postfix_op", "eval_at", "eval_at_sub", 
                    "eval_at_sup", "exp", "exp_nofunc", "comp", "comp_nofunc", 
@@ -991,78 +991,6 @@ class PSParser ( Parser ):
             self.exitRule()
         return localctx
 
-    class IntervalContext(ParserRuleContext):
-
-        def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
-            super().__init__(parent, invokingState)
-            self.parser = parser
-
-        def expr(self, i:int=None):
-            if i is None:
-                return self.getTypedRuleContexts(PSParser.ExprContext)
-            else:
-                return self.getTypedRuleContext(PSParser.ExprContext,i)
-
-
-        def L_PAREN(self):
-            return self.getToken(PSParser.L_PAREN, 0)
-
-        def L_BRACKET(self):
-            return self.getToken(PSParser.L_BRACKET, 0)
-
-        def R_PAREN(self):
-            return self.getToken(PSParser.R_PAREN, 0)
-
-        def R_BRACKET(self):
-            return self.getToken(PSParser.R_BRACKET, 0)
-
-        def getRuleIndex(self):
-            return PSParser.RULE_interval
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterInterval" ):
-                listener.enterInterval(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitInterval" ):
-                listener.exitInterval(self)
-
-
-
-
-    def interval(self):
-
-        localctx = PSParser.IntervalContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 18, self.RULE_interval)
-        self._la = 0 # Token type
-        try:
-            self.enterOuterAlt(localctx, 1)
-            self.state = 163
-            _la = self._input.LA(1)
-            if not(_la==PSParser.L_PAREN or _la==PSParser.L_BRACKET):
-                self._errHandler.recoverInline(self)
-            else:
-                self.consume()
-            self.state = 164
-            self.expr()
-            self.state = 165
-            self.match(PSParser.T__1)
-            self.state = 166
-            self.expr()
-            self.state = 167
-            _la = self._input.LA(1)
-            if not(_la==PSParser.R_PAREN or _la==PSParser.R_BRACKET):
-                self._errHandler.recoverInline(self)
-            else:
-                self.consume()
-        except RecognitionException as re:
-            localctx.exception = re
-            self._errHandler.reportError(self, re)
-            self._errHandler.recover(self, re)
-        finally:
-            self.exitRule()
-        return localctx
-
     class ValueContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -1106,42 +1034,114 @@ class PSParser ( Parser ):
     def value(self):
 
         localctx = PSParser.ValueContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 20, self.RULE_value)
+        self.enterRule(localctx, 18, self.RULE_value)
         try:
-            self.state = 174
+            self.state = 168
             self._errHandler.sync(self);
             la_ = self._interp.adaptivePredict(self._input,6,self._ctx)
             if la_ == 1:
                 self.enterOuterAlt(localctx, 1)
-                self.state = 169
+                self.state = 163
                 self.list_form()
                 pass
 
             elif la_ == 2:
                 self.enterOuterAlt(localctx, 2)
-                self.state = 170
+                self.state = 164
                 self.set_form()
                 pass
 
             elif la_ == 3:
                 self.enterOuterAlt(localctx, 3)
-                self.state = 171
+                self.state = 165
                 self.set_form_2()
                 pass
 
             elif la_ == 4:
                 self.enterOuterAlt(localctx, 4)
-                self.state = 172
+                self.state = 166
                 self.mixed_form()
                 pass
 
             elif la_ == 5:
                 self.enterOuterAlt(localctx, 5)
-                self.state = 173
+                self.state = 167
                 self.relation(0)
                 pass
 
 
+        except RecognitionException as re:
+            localctx.exception = re
+            self._errHandler.reportError(self, re)
+            self._errHandler.recover(self, re)
+        finally:
+            self.exitRule()
+        return localctx
+
+    class IntervalContext(ParserRuleContext):
+
+        def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
+            super().__init__(parent, invokingState)
+            self.parser = parser
+
+        def expr(self, i:int=None):
+            if i is None:
+                return self.getTypedRuleContexts(PSParser.ExprContext)
+            else:
+                return self.getTypedRuleContext(PSParser.ExprContext,i)
+
+
+        def L_PAREN(self):
+            return self.getToken(PSParser.L_PAREN, 0)
+
+        def L_BRACKET(self):
+            return self.getToken(PSParser.L_BRACKET, 0)
+
+        def R_PAREN(self):
+            return self.getToken(PSParser.R_PAREN, 0)
+
+        def R_BRACKET(self):
+            return self.getToken(PSParser.R_BRACKET, 0)
+
+        def getRuleIndex(self):
+            return PSParser.RULE_interval
+
+        def enterRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "enterInterval" ):
+                listener.enterInterval(self)
+
+        def exitRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "exitInterval" ):
+                listener.exitInterval(self)
+
+
+
+
+    def interval(self):
+
+        localctx = PSParser.IntervalContext(self, self._ctx, self.state)
+        self.enterRule(localctx, 20, self.RULE_interval)
+        self._la = 0 # Token type
+        try:
+            self.enterOuterAlt(localctx, 1)
+            self.state = 170
+            _la = self._input.LA(1)
+            if not(_la==PSParser.L_PAREN or _la==PSParser.L_BRACKET):
+                self._errHandler.recoverInline(self)
+            else:
+                self.consume()
+            self.state = 171
+            self.expr()
+            self.state = 172
+            self.match(PSParser.T__0)
+            self.state = 173
+            self.expr()
+            self.state = 174
+            _la = self._input.LA(1)
+            if not(_la==PSParser.R_PAREN or _la==PSParser.R_BRACKET):
+                self._errHandler.recoverInline(self)
+            else:
+                self.consume()
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)

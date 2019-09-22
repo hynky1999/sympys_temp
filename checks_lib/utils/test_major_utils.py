@@ -50,12 +50,8 @@ def identify_expected(input_latex,expected_latex,options):
             
         elif search.group(1) == '{' and search.group(3) == '}':
             return equiv_set(input_latex,expected_latex,options)
-            
-    if (set_re_error.search(input_latex)
-        and getThousandsSeparator(options)) == ',':
-        return 'Undefined_Expected_Error'
-    else:
-        return None
+        
+        input_latex = input_latex.replace(',','~')
 
 def equation_parts(eq1,eq2,options):
     ''' Function splits input and expected into 2 parts

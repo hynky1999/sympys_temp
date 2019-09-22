@@ -142,7 +142,7 @@ def convert_expr(expr):
     elif expr.set_notation_sub():
         return handle_set_notation(expr)
     elif expr.interval():
-        return handle_interval(expr)
+        return handle_interval(expr.interval())
 
 def convert_add(add):
     if add.ADD():

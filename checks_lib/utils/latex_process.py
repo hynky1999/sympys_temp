@@ -7,14 +7,13 @@ from checks_lib.regexes import *
 from checks_lib.utils.test_utils import (balance_check,
      replaceNonEffective)
 
-def convertInterval(interval_latex):
-    opening = interval_opening[interval_latex.group(1)]
-    closing = interval_closing[interval_latex.group(4)]
-    interval_str = (r'NotLatex:Interval(Format({1})'
-        + r'Format,Format({2})Format,{0},{3})')
-    
-    return interval_str.format(
-        opening,*interval_latex.groups()[1:3],closing)
+def convert_frac(matchobj):
+    if matchobj.group(1) == '1':
+        return ''.join((r'\frac{\one}{',
+                        matchobj.group(2), r'}*(-1)'))
+    else:
+        return ''.join((r'\frac{', matchobj.group(1),
+                        r'}{', matchobj.group(2), r'}*(-1)'))
 
 def replace_separators(input_latex,
                        thousand=None,
@@ -178,7 +177,9 @@ def preprocess_latex(input_latex,
     if ignore_trailing_zeros:
         input_latex = trailing_zeros_re.sub(
             lambda x: '' if (x.group(1) == '.') else x.group(1), input_latex)
-
+    
+    if interval_form_re.search(input_latex):
+        input_latex = input_latex.replace(',','~')
         
     #fix fractions so that -\frac{1}{2} is not converted into -1/2    
     if keep_neg_fraction_form:

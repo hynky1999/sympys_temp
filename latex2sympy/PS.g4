@@ -87,7 +87,6 @@ BANG: '!';
 SYMBOL: '\\' ([a-zA-Z]+ | '%');
 
 math: relation;
-
 left_p : (L_PAREN | L_BRACE | L_BRACKET);
 right_p : (R_PAREN | R_BRACE | R_BRACKET);
 relation:
@@ -117,17 +116,17 @@ mixed_form:
     value ('~' value)*
     right_p;
 
-interval:
-    (L_PAREN | L_BRACKET)
-    expr ',' expr
-    (R_PAREN | R_BRACKET);
-
 value:
     list_form
     | set_form
     | set_form_2
     | mixed_form
     | relation;
+
+interval:
+    (L_PAREN | L_BRACKET)
+    expr '~' expr
+    (R_PAREN | R_BRACKET);
 
 equality:
     expr EQUAL expr;
