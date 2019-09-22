@@ -4,7 +4,7 @@ from checks_lib.utils.test_utils import (result,xor,
 from checks_lib.utils.test_major_utils import (identify_expected,
      format_sym_expression,parse_tolerance,equation_parts)
 from checks_lib.utils.latex_process import (preprocess_latex,
-     sympify_latex,derivateExpected)
+     sympify_latex)
 from checks_lib.testing_func.test_minor import checkOptions
 from checks_lib.utils.unit_conversion import swap_units
 from sympy.core.relational import Relational
@@ -31,6 +31,7 @@ def equiv_symbolic(input_latex, expected_latex, options):
     identified = identify_expected(input_latex,expected_latex,options)
     if identified is not None:
         return identified
+    
     #Swap of integral for derivation
     if integral_der_re.search(input_latex):
         options['integral'] = True

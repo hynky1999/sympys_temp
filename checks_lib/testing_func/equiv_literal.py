@@ -4,8 +4,7 @@ from checks_lib.utils.test_major_utils import identify_expected
 from checks_lib.testing_func.test_minor import checkOptions
 from checks_lib.regexes import (leading_zero_re,constituent_parts_re,
      coefficient_of_one_re,integral_der_re)
-from checks_lib.utils.latex_process import (convert,preprocess_latex,
-     derivateExpected)
+from checks_lib.utils.latex_process import (convert,preprocess_latex)
 
 def equiv_literal(input_latex, expected_latex, options):
     ''' check equivLiteral

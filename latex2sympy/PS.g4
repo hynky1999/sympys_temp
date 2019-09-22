@@ -117,6 +117,11 @@ mixed_form:
     value ('~' value)*
     right_p;
 
+interval:
+    (L_PAREN | L_BRACKET)
+    expr ',' expr
+    (R_PAREN | R_BRACKET);
+
 value:
     list_form
     | set_form
@@ -127,7 +132,7 @@ value:
 equality:
     expr EQUAL expr;
 
-expr: additive | set_notation_sub;
+expr: set_notation_sub | interval | additive;
 
 additive:
     additive (ADD | SUB) additive

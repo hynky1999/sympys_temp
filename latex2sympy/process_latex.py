@@ -141,6 +141,8 @@ def convert_expr(expr):
         return convert_add(expr.additive())
     elif expr.set_notation_sub():
         return handle_set_notation(expr)
+    elif expr.interval():
+        return handle_interval(expr)
 
 def convert_add(add):
     if add.ADD():
@@ -514,6 +516,17 @@ def handle_set_notation(func):
             sol = sympy.Intersection(sol,sol_tmp)
         rel = future_rel
     return sol
+
+def handle_interval(interval):
+    left_bool = False
+    right_bool = False
+    if interval.L_PAREN():
+        left_bool = True
+    if interval.R_PAREN():
+        right_bool = True
+    left_expr = convert_expr(interval.expr(0))
+    right_expr = convert_expr(interval.expr(1))
+    return sympy.Interval(left_expr,right_expr,left_bool,right_bool)
     
 def handle_integral(func):
     if func.additive():
