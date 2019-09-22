@@ -1,5 +1,5 @@
 import re
-from sympy import simplify
+from sympy.simplify.simplify import simplify
 from checks_lib.utils.latex_process import (preprocess_latex,
      sympify_latex)
 from checks_lib.testing_func.equiv_symbolic import equiv_symbolic

@@ -9,7 +9,6 @@ from checks_lib.testing_func.test_minor import checkOptions
 from checks_lib.utils.unit_conversion import swap_units
 from sympy.core.relational import Relational
 from sympy.logic.boolalg import BooleanAtom
-from sympy import simplify
 
 def equiv_symbolic(input_latex, expected_latex, options):
     ''' check equivSymbolic
@@ -55,8 +54,6 @@ def equiv_symbolic(input_latex, expected_latex, options):
             euler_number=options.get('allowEulersNumber',False))
     except ValueError:
         return result(False)
-    
-    #Swap of units to numbers
 
     if input_latex is None:
         return 'Parsing_Error'
@@ -188,16 +185,17 @@ def equiv_symbolic(input_latex, expected_latex, options):
     print(input_symbolic,expected_symbolic)
     try:
         if options.get('integral'):
-            if simplify(input_symbolic-expected_symbolic).free_symbols:
-                equiv = True
-        if tolerance == 0.0:
+            print(1)
+            if not format_sym_expression(input_symbolic-expected_symbolic,options).free_symbols:
+                tolerance_check = True
+        elif tolerance == 0.0:
             tolerance_check = input_symbolic == expected_symbolic
         else:
             tolerance_check = abs(input_symbolic - expected_symbolic)\
                                         <= float(tolerance)
         equiv = bool(tolerance_check) and equiv
 
-    except TypeError:
+    except:
         return 'Compare_Error'
    
     return result(xor(equiv, 'inverseResult' in options))

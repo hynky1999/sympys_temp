@@ -1,5 +1,11 @@
 from sympy.core.relational import Lt,Gt,Ge,Le,Eq
-from sympy import (symbols,simplify,Matrix,linsolve,solveset,expand)
+from sympy.simplify.hyperexpand import expand
+from sympy.simplify.simplify import simplify
+from sympy.solvers.solveset import solveset
+from sympy.solvers.solveset import linsolve
+from sympy.core.symbol import symbols
+from sympy.matrices import Matrix
+
 from checks_lib.utils.latex_process import convert
 from checks_lib.utils.test_utils import (getThousandsSeparator,getDecimalSeparator)
 

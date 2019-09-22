@@ -1,4 +1,5 @@
-from sympy import (expand,simplify,logcombine,expand_log)
+from sympy.simplify.hyperexpand import expand
+from sympy.simplify.simplify import simplify,logcombine,expand_log
 from sympy.sets.sets import Interval
 from sympy.core.relational import Lt,Gt,Ge,Le
 from checks_lib.regexes import (set_res,set_re_error,separator_pairs,
@@ -8,7 +9,6 @@ from checks_lib.utils.test_utils import (replaceNonEffective,
      balance_check)
 from checks_lib.testing_func.test_minor import checkOptions
 from checks_lib.utils.latex_process import convert,sympify_latex
-from sympy import Poly
 
 def identify_expected(input_latex,expected_latex,options):
     '''
@@ -57,6 +57,7 @@ def equation_parts(eq1,eq2,options):
     ''' Function splits input and expected into 2 parts
         by sign
     '''
+    print(eq1,eq2,1111)
     if isinstance(eq1,Ge) or isinstance(eq1,Gt):
         eq1 = eq1.reversed
 
@@ -65,7 +66,6 @@ def equation_parts(eq1,eq2,options):
     
     if eq1.rel_op != eq2.rel_op:
         raise ValueError('Error_Sign')
-
     #Must add equivCheck
     return (eq1.lhs,eq1.rhs,
                 eq2.lhs,eq2.rhs,True,eq1.rel_op)

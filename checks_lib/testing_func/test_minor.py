@@ -1,5 +1,6 @@
 import re
-from sympy import (expand,simplify,factor,nsimplify)
+from sympy.simplify.simplify import simplify,factor,nsimplify
+from sympy.simplify.hyperexpand import expand
 from sympy.simplify.radsimp import fraction
 from sympy.assumptions import register_handler, ask, Q
 from checks_lib.regexes import (factorised_re,parentheses_minus_re,

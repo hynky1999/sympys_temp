@@ -1,6 +1,6 @@
 from latex2sympy.process_latex import process_sympy
 from sympy.core.singleton import S
-from sympy import sympify
+from sympy.core.sympify import sympify
 
 from checks_lib.default_values import *
 from checks_lib.regexes import *
@@ -55,12 +55,10 @@ def replace_separators(input_latex,
 def replaceNonEffective(input_latex):
     input_latex = escaped_par_re.sub(r'\1',input_latex)
     # \left,\right
-    input_latex = left_par_re.sub(r'\1',input_latex)
-    input_latex = right_par_re.sub(r'\1',input_latex)
+    #input_latex = left_par_re.sub(r'\1',input_latex)
+    #input_latex = right_par_re.sub(r'\1',input_latex)
     # times for *
     input_latex = times_re.sub(r'*',input_latex)
-    # \cfrac to frac
-    input_latex = input_latex.replace(r'\cfrac', r'\frac')
     
     return input_latex
 
@@ -134,8 +132,8 @@ def preprocess_latex(input_latex,
     # $ to \dol
     input_latex = input_latex.replace(r'\$', r'\dol')
     # latex signs to normal
-    input_latex = latex_sign_re.sub(
-                        lambda x: latex_separators[x.group(0)],input_latex)
+    #input_latex = latex_sign_re.sub(
+    #                    lambda x: latex_separators[x.group(0)],input_latex)
     # \textit to \text
     input_latex = input_latex.replace(r'\textit',r'\text')
 
