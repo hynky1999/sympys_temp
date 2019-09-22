@@ -59,7 +59,7 @@ FUNC_EXP: '\\exp';
 CMD_TIMES: '\\times';
 CMD_CDOT:  '\\cdot';
 CMD_DIV:   '\\div';
-CMD_FRAC:  '\\frac';
+CMD_FRAC:  '\\' 'c'? 'frac';
 
 CMD_MATHIT: '\\mathit';
 
@@ -248,7 +248,7 @@ limit_sub:
     UNDERSCORE L_BRACE
     (LETTER | SYMBOL)
     LIM_APPROACH_SYM
-    expr (CARET L_BRACE (ADD | SUB) R_BRACE)?
+    expr (CARET (L_BRACE (ADD | SUB) R_BRACE | (ADD | SUB)))?
     R_BRACE;
 
 set_notation_sub:

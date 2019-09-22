@@ -9,6 +9,7 @@ from checks_lib.testing_func.test_minor import checkOptions
 from checks_lib.utils.unit_conversion import swap_units
 from sympy.core.relational import Relational
 from sympy.logic.boolalg import BooleanAtom
+from sympy import simplify
 
 def equiv_symbolic(input_latex, expected_latex, options):
     ''' check equivSymbolic
@@ -32,9 +33,7 @@ def equiv_symbolic(input_latex, expected_latex, options):
         return identified
     #Swap of integral for derivation
     if integral_der_re.search(input_latex):
-        input_latex,expected_latex = derivateExpected(
-                                        input_latex
-                                        ,expected_latex)
+        options['integral'] = True
     
     #Preprocessing of Latex
     try:
@@ -129,7 +128,6 @@ def equiv_symbolic(input_latex, expected_latex, options):
             La = format_sym_expression(input_symbolic,options)
             Ra = format_sym_expression(input_result_symbolic
                                                     ,options)
-            print(La,Ra)
             Ls = format_sym_expression(expected_symbolic,options)
             Rs = format_sym_expression(expected_result_symbolic
                                                     ,options)
@@ -153,7 +151,6 @@ def equiv_symbolic(input_latex, expected_latex, options):
                 input_one_side_1 = format_sym_expression(input_symbolic-input_result_symbolic,options)
                 input_one_side_2 = format_sym_expression(input_result_symbolic-input_symbolic,options)
                 expected_one_side = format_sym_expression(expected_symbolic-expected_result_symbolic,options)
-                print(input_one_side_1,input_one_side_2,expected_one_side)
         
             except TypeError:
                 input_one_side_1 = (str(input_symbolic)
@@ -187,8 +184,11 @@ def equiv_symbolic(input_latex, expected_latex, options):
 
     tolerance = parse_tolerance(str(options.get('tolerance', 0.0))
                                 ,expected_symbolic)
+    print(input_symbolic,expected_symbolic)
     try:
-        print(tolerance,input_symbolic,expected_symbolic)
+        if options.get('integral'):
+            if simplify(input_symbolic-expected_symbolic).free_symbols:
+                equiv = True
         if tolerance == 0.0:
             tolerance_check = input_symbolic == expected_symbolic
         else:
@@ -196,7 +196,7 @@ def equiv_symbolic(input_latex, expected_latex, options):
                                         <= float(tolerance)
         equiv = bool(tolerance_check) and equiv
 
-    except:
+    except TypeError:
         return 'Compare_Error'
    
     return result(xor(equiv, 'inverseResult' in options))

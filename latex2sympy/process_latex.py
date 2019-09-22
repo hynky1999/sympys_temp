@@ -222,7 +222,7 @@ def convert_postfix_list(arr, i=0):
             raise Exception("Expected expression for derivative")
         else:
             expr = convert_postfix_list(arr, i + 1)
-            return sympy.Derivative(expr, wrt)
+            return sympy.Derivative(expr, wrt).doit()
 
 def do_subs(expr, at):
     if at.expr():
@@ -316,6 +316,8 @@ def convert_atom(atom):
             return sympy.oo
         elif s == r"%":
             return sympy.Rational(1,100)
+        elif s == 'pi':
+            return sympy.pi
         else:
             if atom.subexpr():
                 subscript = None
@@ -381,7 +383,7 @@ def convert_frac(frac):
         elif partial_op and frac.upper.start.text == '\\partial':
             expr_top = process_sympy(upper_text[len('\\partial'):])
         if expr_top:
-            return sympy.Derivative(expr_top, wrt)
+            return sympy.Derivative(expr_top, wrt).doit()
 
     expr_top = convert_expr(frac.upper)
     expr_bot = convert_expr(frac.lower)
@@ -548,9 +550,9 @@ def handle_integral(func):
             upper = convert_atom(func.supexpr().atom())
         else:
             upper = convert_expr(func.supexpr().expr())
-        return sympy.Integral(integrand, (int_var, lower, upper))
+        return sympy.Integral(integrand, (int_var, lower, upper)).doit()
     else:
-        return sympy.Integral(integrand, int_var)
+        return sympy.Integral(integrand, int_var).doit()
 
 def handle_sum_or_prod(func, name):
     val      = convert_mp(func.mp())
@@ -563,9 +565,9 @@ def handle_sum_or_prod(func, name):
         
 
     if name == "summation":
-        return sympy.Sum(val, (iter_var, start, end))
+        return sympy.Sum(val, (iter_var, start, end)).doit()
     elif name == "product":
-        return sympy.Product(val, (iter_var, start, end))
+        return sympy.Product(val, (iter_var, start, end)).doit()
 
 def handle_limit(func):
     sub = func.limit_sub()
@@ -582,7 +584,7 @@ def handle_limit(func):
     approaching = convert_expr(sub.expr())
     content     = convert_mp(func.mp())
     
-    return sympy.Limit(content, var, approaching, direction)
+    return sympy.Limit(content, var, approaching, direction).doit()
 
 def get_differential_var(d):
     text = get_differential_var_str(d.getText())

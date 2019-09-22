@@ -8,8 +8,7 @@ from checks_lib.utils.test_utils import (replaceNonEffective,
      balance_check)
 from checks_lib.testing_func.test_minor import checkOptions
 from checks_lib.utils.latex_process import convert,sympify_latex
-import decimal
-decimal.getcontext().rounding = decimal.ROUND_HALF_UP
+from sympy import Poly
 
 def identify_expected(input_latex,expected_latex,options):
     '''
@@ -88,7 +87,6 @@ def format_sym_expression(exp,options):
         exp = simplify(exp)
     decimal_places = options.get('significantDecimalPlaces',15)
     try:
-        print(exp)
         exp = exp.round(decimal_places)
     except:
         pass
